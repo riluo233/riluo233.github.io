@@ -156,6 +156,8 @@ function loadPyodideAndRun(code, btn, wrapper) {
     var output = '';
     btn.textContent = '⚡';
     try {
+            code = code.replace(/plt\.show\(\)/g, 'import io,base64\nbuf=io.BytesIO()\nplt.savefig(buf,format="png",dpi=100,bbox_inches="tight")\nbuf.seek(0)\n_ds_img=base64.b64encode(buf.read()).decode()');
+
       pyodide.runPython('import sys\nfrom io import StringIO\n_ds_stdout = StringIO()\nsys.stdout = _ds_stdout\nsys.stderr = _ds_stdout');
       var pkgs = [];
       var re = /(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;
