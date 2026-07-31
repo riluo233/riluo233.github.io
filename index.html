@@ -316,7 +316,8 @@ function loadPyodideAndRun(code, btn, wrapper) {
       pyodide.runPythonAsync(code).then(function() {
         // check for matplotlib figures
         var hasFig = false;
-        // 获取 Python 层面的输出
+          try { output = pyodide.runPython('_ds_stdout.getvalue()'); } catch(e) {}
+
         try { hasFig = pyodide.globals.get('__has_figs__'); } catch(e) {}
         try {
           var figTest = pyodide.runPython("import matplotlib.pyplot as plt; len(plt.get_fignums()) if 'matplotlib.pyplot' in dir() else 0");
