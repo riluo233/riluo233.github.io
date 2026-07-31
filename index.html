@@ -104,24 +104,45 @@ function render(){
 }
 function updateLast(msg){var bubbles=chatEl.querySelectorAll('.msg.a .bub');var last=bubbles[bubbles.length-1];if(last)last.innerHTML=md2html(msg.content);scrollBottom();}
 window.copyCode=function(btn){var code=btn.closest('.cw').querySelector('code').innerText;navigator.clipboard.writeText(code).then(function(){btn.textContent='✅';setTimeout(function(){btn.textContent='📋';},1800);});};
-window.runCode=function(btn){var wrapper=btn.closest('.cw');var code=wrapper.querySelector('code').innerText;var old=wrapper.querySelector('.er');if(old)old.remove();if(pyLoading){toast('Python 加载中，请稍候');return;}btn.disabled=true;btn.textContent='⏳';loadPyodideAndRun(code,btn,wrapper);};
+window.runCode=function(btn){
+  var wrapper=btn.closest('.cw');
+  var code=wrapper.querySelector('code').innerText;
+  var old=wrapper.querySelector('.er');if(old)old.remove();
+  if(pyLoading){toast('Python 加载中，请稍候');return;}
+  btn.disabled=true;btn.textContent='⏳';
+  loadPyodideAndRun(code,btn,wrapper);
+};
 function loadPyodideAndRun(code,btn,wrapper){
   function run(){
     var output='';btn.textContent='⚡';
     try{
-      pyodide.runPython('import sys\nfrom io import StringIO\n_ds_stdout=StringIO()\nsys.stdout=_ds_stdout\nsys.stderr=_ds_stdout');
-      pyodide.runPython('import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as _plt\n_orig_show=_plt.show\ndef _ps(*a,**k):\n import io,base64\n b=io.BytesIO()\n _plt.savefig(b,format="png",dpi=100,bbox_inches="tight")\n b.seek(0)\n global _ds_img\n _ds_img=base64.b64encode(b.read()).decode()\n_plt.show=_ps');
-      var pkgs=[];var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;
+      pyodide.runPython('import sys');
+      pyodide.runPython('from io import StringIO');
+      pyodide.runPython('_so=StringIO()');
+      pyodide.runPython('sys.stdout=_so');
+      pyodide.runPython('sys.stderr=_so');
+      var isChart=code.includes('matplotlib')||code.includes('plt.');
+      if(isChart){
+        pyodide.runPython('import matplotlib');
+        pyodide.runPython('matplotlib.use("Agg")');
+      }
+      var pkgs=[];
+      var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;
       var map={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
       while((m=re.exec(code))!==null){var p=map[m[1]||m[2]];if(p&&pkgs.indexOf(p)===-1)pkgs.push(p);}
       pyodide.runPythonAsync(code).then(function(){
-        try{output=pyodide.runPython('_ds_stdout.getvalue()');}catch(e){}
+        try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
         var imgData=null;
-        try{
-          pyodide.runPython('import matplotlib.pyplot as _plt');
-          var figCount=pyodide.runPython('len(_plt.get_fignums())');
-          if(figCount>0){var raw=pyodide.runPython('import io,base64\nb=io.BytesIO()\n_plt.savefig(b,format="png",dpi=100,bbox_inches="tight")\nb.seek(0)\nbase64.b64encode(b.read()).decode()');if(raw&&raw.length>100)imgData=raw;}
-        }catch(e){}
+        if(isChart){
+          try{
+            pyodide.runPython('import matplotlib.pyplot as _plt');
+            var fc=pyodide.runPython('len(_plt.get_fignums())');
+            if(fc>0){
+              var raw=pyodide.runPython('import io,base64\nb=io.BytesIO()\n_plt.savefig(b,format="png",dpi=100,bbox_inches="tight")\nb.seek(0)\nbase64.b64encode(b.read()).decode()');
+              if(raw&&raw.length>100)imgData=raw;
+            }
+          }catch(e){}
+        }
         if(imgData){showExecResult(wrapper,output.trim()||'(图表已生成)',false,imgData);}
         else{showExecResult(wrapper,output.trim()||'(执行成功)',false);}
         btn.disabled=false;btn.textContent='▶ 运行';
