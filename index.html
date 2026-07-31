@@ -282,7 +282,7 @@ window.copyCode = function(btn) {
 
 window.runCode = function(btn) {
   var wrapper = btn.closest('.cw');
-  var code = wrapper.querySelector('code').textContent;
+  var code = wrapper.querySelector('code').innerText;
 
   // remove old result
   var old = wrapper.querySelector('.er');
