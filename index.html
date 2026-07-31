@@ -283,6 +283,8 @@ window.copyCode = function(btn) {
 window.runCode = function(btn) {
   var wrapper = btn.closest('.cw');
   var code = wrapper.querySelector('code').innerText;
+    code = code.replace(/plt\.show\(\)/g, '# plt.show() removed');
+
 
   // remove old result
   var old = wrapper.querySelector('.er');
