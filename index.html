@@ -283,9 +283,9 @@ window.copyCode = function(btn) {
 window.runCode = function(btn) {
   var wrapper = btn.closest('.cw');
   var code = wrapper.querySelector('code').innerText;
-    if (code.includes('matplotlib') || code.includes('plt.')) {
-    code += '\nimport io, base64\nimport matplotlib.pyplot as plt\nbuf = io.BytesIO()\nplt.savefig(buf, format="png", dpi=100, bbox_inches="tight")\nbuf.seek(0)\n_ds_img = base64.b64encode(buf.read()).decode("utf-8")\nprint("_DS_IMG_" + _ds_img)';
-  }
+    // 替换 plt.show()
+  code = code.replace(/plt\.show\(\)/g, 'import io, base64\nbuf = io.BytesIO()\nplt.savefig(buf, format="png", dpi=100, bbox_inches="tight")\nbuf.seek(0)\n_ds_img = base64.b64encode(buf.read()).decode("utf-8")\nprint("IMG:" + _ds_img)');
+
 
 
 
