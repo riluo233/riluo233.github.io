@@ -9,15 +9,25 @@
 <title>DeepSeek+</title>
 <script>
 const manifest = {
-  name: "DeepSeek+", short_name: "DS+", start_url: "/", display: "standalone",名称: "DeepSeek+", 短名称: "DS+", 起始网址: "/", 显示模式: "独立应用",
+  name: "DeepSeek+", short_name: "DS+", start_url: "/", display: "standalone",名称: "DeepSeek+", 短名称: "DS+", 起始网址: "/", 显示模式: "独立应用",名称: "DeepSeek+", 短名称: "DS+", 起始网址: "/", 显示模式: "独立应用",名称: "DeepSeek+", 短名称: "DS+", 起始网址: "/", 显示模式: "独立应用",
   background_color背景颜色: "#0f0f0f", theme_color主题颜色: "#0f0f0f",背景颜色: "#0f0f0f", 主题颜色: "#0f0f0f",
-  icons: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80">🧠</text></svg>'), sizes: "192x192", type: "image/svg+xml" }]图标: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80"></text></svg>'), sizes: "192x192", type: "image/svg+xml" }]
+  icons: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80">🧠</text></svg>'), sizes: "192x192", type: "image/svg+xml" }]图标: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80"></text></svg>'), sizes: "192x192", type: "image/svg+xml" }]图标: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80"></text></svg>'), sizes: "192x192", type: "image/svg+xml" }]图标: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80"></text></svg>'), sizes: "192x192", type: "image/svg+xml" }]
 };
 const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
 const link = document.createElement('link'); link.rel = 'manifest';
-link.href = URL.createObjectURL(blob); document.head.appendChild(link);链接.href = URL.createObjectURL(blob二进制大对象); document文档文档.head头部头部.appendChild(链接);
+link.href = URL.createObjectURL(blob); document.head.appendChild(link);链接.href = URL.createObjectURL(blob二进制大对象); document文档文档.head头部头部.appendChild(链接);链接.href = URL.createObjectURL(blob); document.head.appendChild(链接);链接.href = URL.createObjectURL(blob二进制大对象); document文档文档.head头部头部.appendChild(链接);
 </script>
-<script脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本 src="https://cdn.bootcdn.net/ajax/libs/marked/9.1.6/marked.min.js"></script脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本>
+<script>
+window.marked = window.marked || { parse: function(t) {
+  return t.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>')
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/\n/g, '<br>')
+          .replace(/^/, '<p>').replace(/$/, '</p>');
+}};
+</script>
+
 <style>
 :root {:根 {
   --bg: #0f0f0f; --surface—表面: #1a1a1a; --surface2—表面2: #242424;  --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;
