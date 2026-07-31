@@ -142,9 +142,8 @@ window.copyCode = function(btn) {
 window.runCode = function(btn) {
   var wrapper = btn.closest('.cw');
   var code = wrapper.querySelector('code').innerText;
-    var chartSnippet = 'import io,base64\nbuf=io.BytesIO()\nplt.savefig(buf,format="png",dpi=100,bbox_inches="tight")\nbuf.seek(0)\n_ds_img=base64.b64encode(buf.read()).decode()';
+  var chartSnippet = 'import io,base64\nbuf=io.BytesIO()\nplt.savefig(buf,format="png",dpi=100,bbox_inches="tight")\nbuf.seek(0)\n_ds_img=base64.b64encode(buf.read()).decode()';
   code = code.replace(/plt\.show\(\)/g, chartSnippet);
-
   var old = wrapper.querySelector('.er');
   if (old) old.remove();
   if (pyLoading) { toast('Python 加载中，请稍候'); return; }
@@ -156,8 +155,7 @@ function loadPyodideAndRun(code, btn, wrapper) {
     var output = '';
     btn.textContent = '⚡';
     try {
-            code = code.replace(/plt\.show\(\)/g, 'import io,base64\nbuf=io.BytesIO()\nplt.savefig(buf,format="png",dpi=100,bbox_inches="tight")\nbuf.seek(0)\n_ds_img=base64.b64encode(buf.read()).decode()');
-
+      code = code.replace(/plt\.show\(\)/g, 'import io,base64\nbuf=io.BytesIO()\nplt.savefig(buf,format="png",dpi=100,bbox_inches="tight")\nbuf.seek(0)\n_ds_img=base64.b64encode(buf.read()).decode()');
       pyodide.runPython('import sys\nfrom io import StringIO\n_ds_stdout = StringIO()\nsys.stdout = _ds_stdout\nsys.stderr = _ds_stdout');
       var pkgs = [];
       var re = /(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;
@@ -167,7 +165,8 @@ function loadPyodideAndRun(code, btn, wrapper) {
         var p = map[m[1] || m[2]];
         if (p && pkgs.indexOf(p)===-1) pkgs.push(p);
       }
-      pyodide.runPythonAsync(code).then(function() {
+      var aggCode = 'import matplotlib\nmatplotlib.use("Agg")\n' + code;
+      pyodide.runPythonAsync(aggCode).then(function() {
         try { output = pyodide.runPython('_ds_stdout.getvalue()'); } catch(e) {}
         var imgData = null;
         try {
