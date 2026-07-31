@@ -116,17 +116,8 @@ function loadPyodideAndRun(code,btn,wrapper){
   function run(){
     var output='';btn.textContent='⚡';
     try{
-      pyodide.runPython('import sys');
-      pyodide.runPython('from io import StringIO');
-      pyodide.runPython('_so=StringIO()');
-      pyodide.runPython('sys.stdout=_so');
-      pyodide.runPython('sys.stderr=_so');
-      var hasPltShow=code.includes('plt.show()');
-      if(hasPltShow){
-        if(!code.includes('import io')) code='import io\n'+code;
-        if(!code.includes('import base64')) code='import base64\n'+code;
-        code=code.split('plt.show()').join('_buf=io.BytesIO()\nplt.savefig(_buf,format="png",dpi=100,bbox_inches="tight")\n_buf.seek(0)\nprint("___IMG___"+base64.b64encode(_buf.read()).decode())\n');
-      }
+      pyodide.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
+      pyodide.runPython('import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as _plt\nimport io,base64\ndef _show(*a,**k):\n b=io.BytesIO()\n _plt.savefig(b,format="png",dpi=100,bbox_inches="tight")\n b.seek(0)\n print("___IMG___"+base64.b64encode(b.read()).decode())\n_plt.show=_show');
       var pkgs=[];
       var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;
       var map={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
@@ -134,9 +125,7 @@ function loadPyodideAndRun(code,btn,wrapper){
       pyodide.runPythonAsync(code).then(function(){
         try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
         var imgData=null;
-        var re1=/___IMG___\s*:?\s*([A-Za-z0-9+/=]{100,})/;
-        var re2=/___PYODIDE_IMG_\d+___\s*:?\s*([A-Za-z0-9+/=]{100,})/;
-        var mm=output.match(re1)||output.match(re2);
+        var mm=output.match(/___IMG___([A-Za-z0-9+/=]{100,})/);
         if(mm){imgData=mm[1];output=output.replace(mm[0],'');}
         output=output.trim();
         if(imgData){showExecResult(wrapper,output||'(图表已生成)',false,imgData);}
