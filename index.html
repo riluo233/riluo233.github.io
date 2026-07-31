@@ -142,8 +142,6 @@ window.copyCode = function(btn) {
 window.runCode = function(btn) {
   var wrapper = btn.closest('.cw');
   var code = wrapper.querySelector('code').innerText;
-  var chartSnippet = 'import io,base64\nbuf=io.BytesIO()\nplt.savefig(buf,format="png",dpi=100,bbox_inches="tight")\nbuf.seek(0)\n_ds_img=base64.b64encode(buf.read()).decode()';
-  code = code.replace(/plt\.show\(\)/g, chartSnippet);
   var old = wrapper.querySelector('.er');
   if (old) old.remove();
   if (pyLoading) { toast('Python 加载中，请稍候'); return; }
@@ -155,8 +153,8 @@ function loadPyodideAndRun(code, btn, wrapper) {
     var output = '';
     btn.textContent = '⚡';
     try {
-      code = code.replace(/plt\.show\(\)/g, 'import io,base64\nbuf=io.BytesIO()\nplt.savefig(buf,format="png",dpi=100,bbox_inches="tight")\nbuf.seek(0)\n_ds_img=base64.b64encode(buf.read()).decode()');
       pyodide.runPython('import sys\nfrom io import StringIO\n_ds_stdout = StringIO()\nsys.stdout = _ds_stdout\nsys.stderr = _ds_stdout');
+      pyodide.runPython('import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as _plt\n_orig_show=_plt.show\ndef _ps(*a,**k):\n import io,base64\n b=io.BytesIO()\n _plt.savefig(b,format="png",dpi=100,bbox_inches="tight")\n b.seek(0)\n global _ds_img\n _ds_img=base64.b64encode(b.read()).decode()\n_plt.show=_ps');
       var pkgs = [];
       var re = /(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;
       var m;
@@ -165,8 +163,7 @@ function loadPyodideAndRun(code, btn, wrapper) {
         var p = map[m[1] || m[2]];
         if (p && pkgs.indexOf(p)===-1) pkgs.push(p);
       }
-      var aggCode = 'import matplotlib\nmatplotlib.use("Agg")\n' + code;
-      pyodide.runPythonAsync(aggCode).then(function() {
+      pyodide.runPythonAsync(code).then(function() {
         try { output = pyodide.runPython('_ds_stdout.getvalue()'); } catch(e) {}
         var imgData = null;
         try {
