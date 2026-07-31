@@ -283,7 +283,10 @@ window.copyCode = function(btn) {
 window.runCode = function(btn) {
   var wrapper = btn.closest('.cw');
   var code = wrapper.querySelector('code').innerText;
-    code = code.replace(/plt\.show\(\)/g, '# plt.show() removed');
+    if (code.includes('matplotlib') || code.includes('plt.')) {
+    code += '\nimport io, base64\nimport matplotlib.pyplot as plt\nbuf = io.BytesIO()\nplt.savefig(buf, format="png", dpi=100, bbox_inches="tight")\nbuf.seek(0)\n_ds_img = base64.b64encode(buf.read()).decode("utf-8")\nprint("_DS_IMG_" + _ds_img)';
+  }
+
 
 
   // remove old result
@@ -316,28 +319,17 @@ function loadPyodideAndRun(code, btn, wrapper) {
       }
 
       pyodide.runPythonAsync(code).then(function() {
-        // check for matplotlib figures
-        var hasFig = false;
-          try { output = pyodide.runPython('_ds_stdout.getvalue()'); } catch(e) {}
+   var imgData = null;
+   try {
+     var raw = pyodide.runPython('_ds_img if "_ds_img" in dir() else ""');
+     if (raw && raw.length > 100) imgData = raw;
+   } catch(e) {}
+   if (imgData) {
+     showExecResult(wrapper, output.trim() || '(图表已生成)', false, imgData);
+   } else {
+     showExecResult(wrapper, output.trim() || '(执行成功)', false);
+   }
 
-        try { hasFig = pyodide.globals.get('__has_figs__'); } catch(e) {}
-        try {
-          var figTest = pyodide.runPython("import matplotlib.pyplot as plt; len(plt.get_fignums()) if 'matplotlib.pyplot' in dir() else 0");
-          hasFig = figTest > 0;
-        } catch(e) {}
-
-        if (hasFig) {
-          try {
-            var imgData = pyodide.runPython(
-              "import matplotlib.pyplot as plt, io, base64\n" +
-              "buf = io.BytesIO()\nplt.savefig(buf, format='png', dpi=90, bbox_inches='tight')\n" +
-              "buf.seek(0)\nbase64.b64encode(buf.read()).decode('utf-8')"
-            );
-            showExecResult(wrapper, output.trim() || '(执行成功)', false, imgData);
-          } catch(e) {
-            showExecResult(wrapper, output.trim() || '(执行成功)', false);
-          }
-        } else {
           showExecResult(wrapper, output.trim() || '(执行成功，无输出)', false);
         }
         btn.disabled = false;
