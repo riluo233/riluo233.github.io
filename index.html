@@ -121,13 +121,11 @@ function loadPyodideAndRun(code,btn,wrapper){
       pyodide.runPython('_so=StringIO()');
       pyodide.runPython('sys.stdout=_so');
       pyodide.runPython('sys.stderr=_so');
-      var isChart=code.includes('matplotlib')||code.includes('plt.');
-      if(isChart){
-        pyodide.runPython('import matplotlib');
-        pyodide.runPython('import matplotlib.pyplot as _plt');
-        pyodide.runPython('_real_show=_plt.show');
-        pyodide.runPython('def _fake_show(*a,**k):\n import io,base64\n b=io.BytesIO()\n _plt.gcf().savefig(b,format="png",dpi=100,bbox_inches="tight")\n b.seek(0)\n global _ds_img\n _ds_img=base64.b64encode(b.read()).decode()');
-        pyodide.runPython('_plt.show=_fake_show');
+      var hasPltShow=code.includes('plt.show()');
+      if(hasPltShow){
+        if(!code.includes('import io')) code='import io\n'+code;
+        if(!code.includes('import base64')) code='import base64\n'+code;
+        code=code.split('plt.show()').join('_buf=io.BytesIO()\nplt.savefig(_buf,format="png",dpi=100,bbox_inches="tight")\n_buf.seek(0)\nprint("___IMG___"+base64.b64encode(_buf.read()).decode())\n');
       }
       var pkgs=[];
       var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;
@@ -136,14 +134,16 @@ function loadPyodideAndRun(code,btn,wrapper){
       pyodide.runPythonAsync(code).then(function(){
         try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
         var imgData=null;
-        if(isChart){
-          try{
-            var raw=pyodide.runPython('_ds_img if "_ds_img" in dir() else ""');
-            if(raw&&raw.length>100)imgData=raw;
-          }catch(e){}
+        var marker='___IMG___';
+        var idx=output.indexOf(marker);
+        if(idx>=0){
+          imgData=output.substring(idx+marker.length).split('\n')[0].trim();
+          output=output.substring(0,idx)+output.substring(idx+marker.length+imgData.length);
+          if(imgData.length<100)imgData=null;
         }
-        if(imgData){showExecResult(wrapper,output.trim()||'(图表已生成)',false,imgData);}
-        else{showExecResult(wrapper,output.trim()||'(执行成功)',false);}
+        output=output.trim();
+        if(imgData){showExecResult(wrapper,output||'(图表已生成)',false,imgData);}
+        else{showExecResult(wrapper,output||'(执行成功)',false);}
         btn.disabled=false;btn.textContent='▶ 运行';
       }).catch(function(err){showExecResult(wrapper,output.trim()+'\n\n❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
     }catch(err){showExecResult(wrapper,'❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
