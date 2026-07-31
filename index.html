@@ -117,7 +117,10 @@ function loadPyodideAndRun(code,btn,wrapper){
     var output='';btn.textContent='⚡';
     try{
       pyodide.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
-      pyodide.runPython('import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as _plt\nimport io,base64\ndef _show(*a,**k):\n b=io.BytesIO()\n _plt.savefig(b,format="png",dpi=100,bbox_inches="tight")\n b.seek(0)\n print("___IMG___"+base64.b64encode(b.read()).decode())\n_plt.show=_show');
+      var isChart=code.includes('plt.')||code.includes('matplotlib');
+      if(isChart){
+        code+='\n# --- auto save figures ---\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  print("___IMG___"+base64.b64encode(__b.read()).decode())\nexcept: pass\n';
+      }
       var pkgs=[];
       var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;
       var map={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
@@ -127,7 +130,7 @@ function loadPyodideAndRun(code,btn,wrapper){
         var imgData=null;
         var mm=output.match(/___IMG___([A-Za-z0-9+/=]{100,})/);
         if(mm){imgData=mm[1];output=output.replace(mm[0],'');}
-        output=output.trim();
+        output=output.replace(/# --- auto save figures ---[\s\S]*$/,'').trim();
         if(imgData){showExecResult(wrapper,output||'(图表已生成)',false,imgData);}
         else{showExecResult(wrapper,output||'(执行成功)',false);}
         btn.disabled=false;btn.textContent='▶ 运行';
