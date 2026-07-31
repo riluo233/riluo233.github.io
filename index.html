@@ -60,17 +60,16 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 .wc h2{color:#eee;margin-bottom:4px}
 .wc p{font-size:.82rem;line-height:1.5}
 .tt{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:8px 18px;border-radius:20px;font-size:.78rem;font-weight:600;z-index:200}
-.thinking{color:#8b5cf6;font-style:italic;font-size:.8rem;padding:4px 0}
 </style>
 </head>
 <body>
 <div id="app">
-<div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="auto-btn" title="自动搜索模式">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro + 搜索</h2><p>点 🔍 开启自动搜索<br>说「推演 曼联 vs 切尔西」即可</p></div></div>
+<div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="auto-btn" title="自动搜索">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
+<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>点 🔍 开启自动搜索<br>说「推演 曼联 vs 切尔西」即可</p></div></div>
 <div id="ps" class="h"><div class="ld"><span></span><span></span><span></span></div><span id="pst">加载 Python...</span></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
 </div>
-<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek API Key（推演用）</label><input type="password" id="sk_ds" placeholder="sk-xxxx..."><label>DeepSeek Base URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>ChatboxAI License Key（搜索用）</label><input type="password" id="sk_cb" placeholder="1c0964a1-..."><label>ChatboxAI Base URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
+<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek API Key</label><input type="password" id="sk_ds" placeholder="sk-xxxx..."><label>DeepSeek Base URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>ChatboxAI License Key</label><input type="password" id="sk_cb" placeholder="1c0964a1-..."><label>ChatboxAI Base URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
 <script>
 var apiDS=localStorage.getItem('dsk')||'';
 var urlDS=localStorage.getItem('dsu')||'https://api.deepseek.com';
@@ -100,7 +99,7 @@ function md2html(t){
   return ps.map(function(p){if(p.indexOf('<div class="cw">')===0)return p;return '<p style="margin-bottom:5px">'+p.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 function render(){
-  if(messages.length===0){chatEl.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro + 搜索</h2><p>点 🔍 开启自动搜索<br>说「推演 曼联 vs 切尔西」即可</p></div>';return;}
+  if(messages.length===0){chatEl.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>点 🔍 开启自动搜索<br>说「推演 曼联 vs 切尔西」即可</p></div>';return;}
   chatEl.innerHTML='';
   messages.forEach(function(m){if(m.role==='system')return;var row=document.createElement('div');row.className='msg '+(m.role==='user'?'u':'a');row.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md2html(m.content)+'</div>';chatEl.appendChild(row);});
   scrollBottom();
@@ -135,7 +134,7 @@ function loadPyodideAndRun(code,btn,wrapper){
 
   if(pyReady){run();return;}
   if(pyLoading)return;
-  pyLoading=true;psEl.classList.remove('h');pstEl.textContent='加载 Python 环境...';
+  pyLoading=true;psEl.classList.remove('h');pstEl.textContent='加载 Python 环境... (首次约20秒)';
   var script=document.createElement('script');
   script.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
   script.onload=function(){
@@ -144,12 +143,11 @@ function loadPyodideAndRun(code,btn,wrapper){
       pyodide=py;pyReady=true;pyLoading=false;psEl.classList.add('h');
       pyodide.loadPackage(['numpy','matplotlib']).catch(function(){});
       run();
-    }).catch(function(err){pyLoading=false;psEl.classList.add('h');showExecResult(wrapper,'❌ 加载失败',true);btn.disabled=false;btn.textContent='▶ 运行';});
+    }).catch(function(err){pyLoading=false;psEl.classList.add('h');showExecResult(wrapper,'❌ 加载失败: '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
   };
   script.onerror=function(){pyLoading=false;psEl.classList.add('h');showExecResult(wrapper,'❌ 网络错误',true);btn.disabled=false;btn.textContent='▶ 运行';};
   document.head.appendChild(script);
 }
-
 function showExecResult(wrapper,text,isError,imgs){
   var div=document.createElement('div');div.className='er'+(isError?' e':'');
   div.innerHTML='<div style="font-size:.7rem;color:'+(isError?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(isError?'❌ 出错':'✅ 成功')+'</div>';
@@ -158,23 +156,24 @@ function showExecResult(wrapper,text,isError,imgs){
   wrapper.appendChild(div);scrollBottom();
 }
 
-var SYS_PROMPT='你是DeepSeek V4-Pro，配有自动搜索能力。需要实时数据时输出 [SEARCH:关键词]，系统会自动执行搜索并返回结果。收到搜索结果后继续回答。';
-
+// ========== API调用（含CORS代理）==========
 function callAPI(api,url,model,msgs,stream,cb){
-  fetch(url.replace(/\/$/,'')+'/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+api},
+  var targetUrl=url.replace(/\/$/,'')+'/chat/completions';
+  if(url.indexOf('chatboxai')>-1){
+    targetUrl='https://corsproxy.io/?'+encodeURIComponent(targetUrl);
+  }
+  fetch(targetUrl,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+api},
     body:JSON.stringify({model:model,messages:msgs,stream:stream,temperature:0.7})
   }).then(function(res){
-    if(!res.ok)return res.text().then(function(t){cb('❌ API '+res.status+': '+t,null);});
-    if(!stream){return res.json().then(function(j){cb(null,j.choices[0].message.content);});}
-    var reader=res.body.getReader();var decoder=new TextDecoder();var buf='',full='';
-    function pump(){reader.read().then(function(r){if(r.done){cb(null,full);return;}buf+=decoder.decode(r.value,{stream:true});var lines=buf.split('\n');buf=lines.pop()||'';lines.forEach(function(line){if(!line.startsWith('data: '))return;var d=line.slice(6).trim();if(d==='[DONE]')return;try{var j=JSON.parse(d);var delta=(j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content)||'';if(delta)full+=delta;}catch(e){}});if(stopFlag){cb(null,full);return;}pump();}).catch(function(){cb(null,full);});}pump();
-  }).catch(function(err){cb('❌ 网络错误: '+err.message,null);});
-}
+    if(!res.ok)return res.text().then(function(t){cb('❌ '+res.status+': '+t.substring(0,100),null);});
+    if
+var SYS_PROMPT='你是DeepSeek V4-Pro，配有自动搜索能力。需要实时数据时输出 [SEARCH:关键词]，系统会自动执行搜索并返回实时结果。收到结果后继续回答。';
 
 function doSearch(query,callback){
   if(!apiCB){callback(null,'搜索未配置');return;}
-  callAPI(apiCB,urlCB,'gemini-3-pro',[{role:'user',content:'请搜索：'+query}],false,function(err,result){callback(err,result||'(无结果)');});
+  callAPI(apiCB,urlCB,'gemini-3-pro',[{role:'user',content:'请搜索以下信息并返回详细结果：'+query}],false,function(err,result){callback(err,result||'(无结果)');});
 }
 
 function finishSend(){busy=false;sendBtn.style.display='flex';stopBtn.style.display='none';}
@@ -187,10 +186,10 @@ function sendWithSearch(userText){
     var sm=reply.match(/\[SEARCH:\s*([^\]]+)\]/);
     if(sm){
       var sq=sm[1].trim();
-      messages[aiIdx].content='🔍 搜索中：'+sq+'...';render();
+      messages[aiIdx].content='🔍 搜索：'+sq+'...';render();
       doSearch(sq,function(serr,sresult){
         if(serr){messages[aiIdx].content=serr;render();save();finishSend();return;}
-        var finalMsgs=[{role:'system',content:SYS_PROMPT},{role:'user',content:userText},{role:'user',content:'搜索结果：\n'+sresult+'\n\n请根据以上数据回答。'}];
+        var finalMsgs=[{role:'system',content:SYS_PROMPT},{role:'user',content:userText},{role:'user',content:'实时搜索结果：\n'+sresult+'\n\n请根据以上数据回答。'}];
         messages[aiIdx].content='';render();
         callAPI(apiDS,urlDS,'deepseek-v4-pro',finalMsgs,true,function(ferr,full){
           if(ferr){messages[aiIdx].content=ferr;}else{messages[aiIdx].content=full||'(无响应)';}
@@ -205,7 +204,7 @@ function sendWithSearch(userText){
 
 function send(){
   var text=inpEl.value.trim();if(!text||busy)return;
-  if(!apiDS){toast('请先设置 DeepSeek API Key ⚙️');openModal();return;}
+  if(!apiDS){toast('请先设置 API Key ⚙️');openModal();return;}
   if(messages.length===0)chatEl.innerHTML='';
   messages.push({role:'user',content:text});save();render();
   inpEl.value='';inpEl.style.height='auto';
