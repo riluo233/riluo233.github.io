@@ -31,7 +31,7 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 .cw pre code{font-family:monospace;font-size:.75rem;color:#c9d1d9;white-space:pre-wrap}
 .er{margin-top:-1px;padding:8px 12px;background:#0d1117;border-top:1px solid #333;font-size:.75rem;max-height:300px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;color:#c9d1d9}
 .er.e{color:#ef4444;border-top-color:#ef4444}
-.er img{max-width:100%;border-radius:6px;margin-top:6px}
+.er img,.rimg{max-width:100%;border-radius:6px;margin-top:6px;display:block}
 .ld{display:inline-flex;gap:4px}
 .ld span{width:5px;height:5px;border-radius:50%;background:#999;animation:d 1.4s infinite}
 .ld span:nth-child(2){animation-delay:.2s}
@@ -127,16 +127,15 @@ function loadPyodideAndRun(code,btn,wrapper){
       while((m=re.exec(code))!==null){var p=map[m[1]||m[2]];if(p&&pkgs.indexOf(p)===-1)pkgs.push(p);}
       pyodide.runPythonAsync(code).then(function(){
         try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
-        var imgTags='';
-        output=output.replace(/_{2,3}IMG_{2,3}\s*([A-Za-z0-9+/=\s]+)/g,function(match,b64){
+        var imgs=[];
+        output=output.replace(/_{2,3}IMG_{2,3}([A-Za-z0-9+/=\s]+?)(?=\n_{2,3}IMG|$)/g,function(match,b64){
           var clean=b64.replace(/\s/g,'');
-          if(clean.length>20){imgTags+='<img src="data:image/png;base64,'+clean+'" style="max-width:100%;border-radius:6px;margin-top:6px">';return'';}
+          if(clean.length>20){imgs.push(clean);return'';}
           return match;
         });
         output=output.replace(/# --- auto save figures ---[\s\S]*$/,'').trim();
-        if(imgTags){output=(output||'')+'\n'+imgTags;}
-        if(output.trim()){showExecResult(wrapper,output,false);}
-        else{showExecResult(wrapper,'(执行成功)',false);}
+        showExecResult(wrapper,output||'(执行成功)',false);
+        imgs.forEach(function(b64){addImg(wrapper,b64);});
         btn.disabled=false;btn.textContent='▶ 运行';
       }).catch(function(err){showExecResult(wrapper,output.trim()+'\n\n❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
     }catch(err){showExecResult(wrapper,'❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
@@ -159,18 +158,25 @@ function loadPyodideAndRun(code,btn,wrapper){
   document.head.appendChild(script);
 }
 
-function showExecResult(wrapper,text,isError,imgBase64){
-  var div=document.createElement('div');div.className='er'+(isError?' e':'');
+function showExecResult(wrapper,text,isError){
+  var div=document.createElement('div');
+  div.className='er'+(isError?' e':'');
   div.innerHTML='<div style="font-size:.7rem;color:'+(isError?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(isError?'❌ 出错':'✅ 成功')+'</div>';
   if(text){
     var pre=document.createElement('pre');
-    pre.innerHTML=text;
+    pre.textContent=text;
     pre.style.cssText='margin:0;white-space:pre-wrap;font:inherit;';
     div.appendChild(pre);
   }
-  if(imgBase64){var img=document.createElement('img');img.src='data:image/png;base64,'+imgBase64;div.appendChild(img);}
-  wrapper.appendChild(div);scrollBottom();
+  wrapper.appendChild(div);
 }
+function addImg(wrapper,b64){
+  var img=document.createElement('img');
+  img.className='rimg';
+  img.src='data:image/png;base64,'+b64;
+  wrapper.appendChild(img);
+}
+function scrollNow(){scrollBottom();}
 
 function send(){
   var text=inpEl.value.trim();if(!text||busy)return;
