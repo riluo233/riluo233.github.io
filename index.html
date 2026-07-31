@@ -9,35 +9,35 @@
 <title>DeepSeek+</title>
 <script>
 const manifest = {
-  name: "DeepSeek+", short_name: "DS+", start_url: "/", display: "standalone",
-  background_color: "#0f0f0f", theme_color: "#0f0f0f",
-  icons: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80">🧠</text></svg>'), sizes: "192x192", type: "image/svg+xml" }]
+  name: "DeepSeek+", short_name: "DS+", start_url: "/", display: "standalone",名称: "DeepSeek+", 短名称: "DS+", 起始网址: "/", 显示模式: "独立应用",
+  background_color背景颜色: "#0f0f0f", theme_color主题颜色: "#0f0f0f",背景颜色: "#0f0f0f", 主题颜色: "#0f0f0f",
+  icons: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80">🧠</text></svg>'), sizes: "192x192", type: "image/svg+xml" }]图标: [{ src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="192" height="192" rx="32" fill="#0f0f0f"/><text x="96" y="120" text-anchor="middle" font-size="96" fill="#4ade80"></text></svg>'), sizes: "192x192", type: "image/svg+xml" }]
 };
 const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
 const link = document.createElement('link'); link.rel = 'manifest';
-link.href = URL.createObjectURL(blob); document.head.appendChild(link);
+link.href = URL.createObjectURL(blob); document.head.appendChild(link);链接.href = URL.createObjectURL(blob二进制大对象); document文档文档.head头部头部.appendChild(链接);
 </script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本 src="https://cdn.bootcdn.net/ajax/libs/marked/9.1.6/marked.min.js"></script脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本脚本>
 <style>
-:root {
-  --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
-  --text: #e5e5e5; --text2: #a3a3a3; --accent: #4ade80; --accent2: #22c55e;
-  --user-bubble: #1e3a2f; --ai-bubble: #1a1a1a; --border: #2a2a2a;
-  --danger: #ef4444; --code-bg: #0d1117; --radius: 16px; --radius-sm: 10px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+:root {:根 {
+  --bg: #0f0f0f; --surface—表面: #1a1a1a; --surface2—表面2: #242424;  --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;--背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424; --背景: #0f0f0f; --表面: #1a1a1a; --表面2: #242424;
+  --text: #e5e5e5; --text2: #a3a3a3; --accent: #4ade80; --accent2: #22c55e;  --文字: #e5e5e5; --文字2: #a3a3a3; --强调色: #4ade80; --强调色2: #22c55e; #e5e5e5; --text2: #a3a3a3; --accent: #4ade80; --accent2: #22c55e; --文字: #e5e5e5; --文字2: #a3a3a3; --强调色: #4ade80; --强调色2: #22c55e; #e5e5e5; --text2: #a3a3a3; --accent: #4ade80; --accent2: #22c55e; --文字: #e5e5e5; --文字2: #a3a3a3; --强调色: #4ade80; --强调色2: #22c55e; #e5e5e5; --text2: #a3a3a3; --accent: #4ade80; --accent2: #22c55e; --文字: #e5e5e5; --文字2: #a3a3a3; --强调色: #4ade80; --强调色2: #22c55e;
+  --user-bubble气泡: #1e3a2f; --ai-bubble气泡: #1a1a1a; --border: #2a2a2a;  --用户-bubble气泡--用户-气泡: #1e3a2f; --人工智能-bubble气泡: #1a1a1a; --border: #2a2a2a;--用户气泡：#1e3a2f；--AI气泡：#1a1a1a；--边框：#2a2a2a；--用户气泡：#1e3a2f；--人工智能气泡：#1a1a1a；--边框：#2a2a2a；--user-bubble气泡: #1e3a2f; --ai-bubble气泡: #1a1a1a; --border: #2a2a2a; --用户-bubble气泡--用户-气泡: #1e3a2f；--人工智能-bubble气泡: #1a1a1a；--边框：#2a2a2a；--用户气泡：#1e3a2f；--AI气泡：#1a1a1a；--边框：#2a2a2a；--user-bubble气泡: #1e3a2f;--ai-bubble气泡: #1a1a1a;--border: #2a2a2a;--用户-bubble气泡--用户-气泡: #1e3a2f;--人工智能-bubble气泡: #1a1a1a;--border: #2a2a2a;--用户气泡：#1e3a2f；--AI气泡：#1a1a1a；--边框：#2a2a2a；--用户气泡：#1e3a2f；——人工智能气泡：#1a1a1a；--边框：#2a2a2a；——用户气泡: #1e3a2f;--ai-bubble气泡: #1a1a1a;--border: #2a2a2a;--用户-bubble气泡--用户-气泡: #1e3a2f；——人工智能气泡: #1a1a1a；--边框：#2a2a2a；--用户气泡：#1e3a2f；--AI气泡：#1a1a1a；--边框：#2a2a2a；
+  --danger: #ef4444; --code-bg背景: #0d1117; --radius: 16px; --radius-sm: 10px;--危险：#ef4444；--代码背景：#0d1117；--圆角：16px；--小圆角：10px；--危险：#ef4444；--代码背景：#0d1117；--圆角：16px；--小圆角：10px；--危险：#ef4444；--代码背景：#0d1117；--圆角：16px；--小圆角：10px；--危险：#ef4444；--代码背景：#0d1117；--圆角：16px；--小圆角：10px；--危险：#ef4444；--代码背景：#0d1117；--圆角：16px；--小圆角：10px；--危险：#ef4444；--代码背景：#0d1117；--圆角：16px；--小圆角：10px；--危险：#ef4444；--代码背景：#0d1117；--圆角：16px；--小圆角：10px；--危险：#ef4444；--代码背景：#0d1117；——圆角：16px；——小圆角：10px；
+  --safe-bottom底部: env(safe-area-inset-bottom底部, 0  --安全-bottom底部--安全-底部: env(safe-area-inset-bottom底部, 0px);
 }
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin外边距:0; padding:0; box-sizing:border-box; }
 html, body {
-  height: 100%; overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg); color: var(--text);
-  -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
+  height: 100%; overflow: hidden;高度: 100%; 溢出: 隐藏;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;字体族: -apple-system, BlinkMacSystemFont, ‘Segoe UI’, Roboto, 无衬线字体;
+  background: var(--bg背景); color: var(--text);背景: 变量(--bg背景); 颜色: 变量(--text);
+  -webkit-tap-highlight-color: transparent透明; -webkit-font-smoothing: antialiased抗锯齿;
 }
-#app { height: 100%; display: flex; flex-direction: column; max-width: 720px; margin: 0 auto; position: relative; }
-#header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
-  flex-shrink: 0; z-index: 10;
+#app { height: 100%; display: flex; flex-direction: column列; max-width最大宽度: 720px; margin外边距: 0 auto自动; position: relative; }
+#header {#标题 {#标题 {#标题 {
+  display: flex; align-items: center; justify-content: space-between;显示: 弹性布局; 对齐方式: 居中; justify-content: 两端对齐;
+  padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border);内边距: 12px 16px; 背景: 变量(--表面); 下边框: 1px 实线 变量(--边框);
+  flex-shrink: 0; z-index: 10;弹性收缩: 0; z-index: 10;
 }
 #header h1 { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 #header h1 span { font-size: 1.3rem; }
