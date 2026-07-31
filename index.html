@@ -60,22 +60,27 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 .wc h2{color:#eee;margin-bottom:4px}
 .wc p{font-size:.82rem;line-height:1.5}
 .tt{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:8px 18px;border-radius:20px;font-size:.78rem;font-weight:600;z-index:200}
+.tag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:.6rem;font-weight:700;margin-left:4px;vertical-align:middle}
+.tag.ds{background:#4ade80;color:#000}
+.tag.cb{background:#8b5cf6;color:#fff}
 </style>
 </head>
 <body>
 <div id="app">
-<div id="hdr"><b>🧠 DeepSeek+</b><div><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro</h2><p>聊天 · Python执行 · 足球推演<br>点击 ⚙️ 设置 API Key 开始</p></div></div>
+<div id="hdr"><b>🧠 DeepSeek+</b><div><button class="hbtn" id="search-btn" title="搜索模式">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
+<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro</h2><p>双引擎：DeepSeek + ChatboxAI<br>聊天 | 搜索 | Python | 推演</p></div></div>
 <div id="ps" class="h"><div class="ld"><span></span><span></span><span></span></div><span id="pst">加载 Python...</span></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
 </div>
-<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek API Key</label><input type="password" id="sk" placeholder="sk-xxxx..."><label>DeepSeek Base URL</label><input id="su" placeholder="https://api.deepseek.com"><label>模型</label><select id="sm"><option value="deepseek-v4-pro">DeepSeek V4-Pro</option><option value="deepseek-v4-flash">DeepSeek V4-Flash</option></select><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
+<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek API Key</label><input type="password" id="sk_ds" placeholder="sk-xxxx..."><label>DeepSeek Base URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>ChatboxAI License Key</label><input type="password" id="sk_cb" placeholder="ChatboxAI License Key"><label>ChatboxAI Base URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><label>默认模型</label><select id="sm"><option value="deepseek-v4-pro">DeepSeek V4-Pro</option><option value="deepseek-v4-flash">DeepSeek V4-Flash</option><option value="deepseek-chat">DeepSeek Chat</option><option value="gemini-3-pro">Gemini 3 Pro (ChatboxAI)</option><option value="gpt-5">GPT-5 (ChatboxAI)</option></select><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
 <script>
-var apiKey=localStorage.getItem('dsk')||'';
-var baseUrl=localStorage.getItem('dsu')||'https://api.deepseek.com';
+var apiKeyDS=localStorage.getItem('dsk')||'';
+var baseUrlDS=localStorage.getItem('dsu')||'https://api.deepseek.com';
+var apiKeyCB=localStorage.getItem('cbk')||'';
+var baseUrlCB=localStorage.getItem('cbu')||'https://ai.chatboxai.app/v1';
 var model=localStorage.getItem('dsm')||'deepseek-v4-pro';
 var messages=JSON.parse(localStorage.getItem('dsmsg')||'[]');
-var busy=false,stopFlag=false;
+var busy=false,stopFlag=false,searchMode=false;
 var pyodide=null,pyReady=false,pyLoading=false;
 var chatEl=document.getElementById('chat');
 var inpEl=document.getElementById('ui');
@@ -97,18 +102,20 @@ function md2html(t){
   return ps.map(function(p){if(p.indexOf('<div class="cw">')===0)return p;return '<p style="margin-bottom:5px">'+p.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 function render(){
-  if(messages.length===0){chatEl.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro</h2><p>聊天 · Python执行 · 足球推演<br>点击 ⚙️ 设置 API Key 开始</p></div>';return;}
+  if(messages.length===0){chatEl.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro</h2><p>双引擎：DeepSeek + ChatboxAI<br>聊天 | 搜索 | Python | 推演</p></div>';return;}
   chatEl.innerHTML='';
-  messages.forEach(function(m){if(m.role==='system')return;var row=document.createElement('div');row.className='msg '+(m.role==='user'?'u':'a');row.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md2html(m.content)+'</div>';chatEl.appendChild(row);});
+  messages.forEach(function(m){if(m.role==='system')return;var row=document.createElement('div');row.className='msg '+(m.role==='user'?'u':'a');row.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+(m.tag||'')+md2html(m.content)+'</div>';chatEl.appendChild(row);});
   scrollBottom();
 }
-function updateLast(msg){var bubbles=chatEl.querySelectorAll('.msg.a .bub');var last=bubbles[bubbles.length-1];if(last)last.innerHTML=md2html(msg.content);scrollBottom();}
+function updateLast(msg){var bubbles=chatEl.querySelectorAll('.msg.a .bub');var last=bubbles[bubbles.length-1];if(last)last.innerHTML=(msg.tag||'')+md2html(msg.content);scrollBottom();}
 window.copyCode=function(btn){var code=btn.closest('.cw').querySelector('code').innerText;navigator.clipboard.writeText(code).then(function(){btn.textContent='✅';setTimeout(function(){btn.textContent='📋';},1800);});};
 window.runCode=function(btn){
-  var wrapper=btn.closest('.cw');var code=wrapper.querySelector('code').innerText;
+  var wrapper=btn.closest('.cw');
+  var code=wrapper.querySelector('code').innerText;
   var old=wrapper.querySelector('.er');if(old)old.remove();
   if(pyLoading){toast('Python 加载中，请稍候');return;}
-  btn.disabled=true;btn.textContent='⏳';loadPyodideAndRun(code,btn,wrapper);
+  btn.disabled=true;btn.textContent='⏳';
+  loadPyodideAndRun(code,btn,wrapper);
 };
 function loadPyodideAndRun(code,btn,wrapper){
   function run(){
@@ -155,18 +162,21 @@ function showExecResult(wrapper,text,isError,imgs){
   wrapper.appendChild(div);scrollBottom();
 }
 
+function getAPI(){if(searchMode&&apiKeyCB){return {key:apiKeyCB,url:baseUrlCB,model:'gemini-3-pro',tag:'<span class="tag cb">CB搜索</span>'};}return {key:apiKeyDS,url:baseUrlDS,model:model,tag:''};}
+
 function send(){
   var text=inpEl.value.trim();if(!text||busy)return;
-  if(!apiKey){toast('请先设置 API Key ⚙️');openModal();return;}
+  var api=getAPI();
+  if(!api.key){toast('请先设置 API Key ⚙️');openModal();return;}
   if(messages.length===0)chatEl.innerHTML='';
   messages.push({role:'user',content:text});save();render();
   inpEl.value='';inpEl.style.height='auto';
-  messages.push({role:'assistant',content:''});render();
+  messages.push({role:'assistant',content:'',tag:api.tag});render();
   var aiIdx=messages.length-1;
   busy=true;stopFlag=false;sendBtn.style.display='none';stopBtn.style.display='flex';
-  fetch(baseUrl.replace(/\/$/,'')+'/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-    body:JSON.stringify({model:model,messages:messages.filter(function(m){return m.role!=='system';}),stream:true,temperature:0.7})
+  fetch(api.url.replace(/\/$/,'')+'/chat/completions',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+api.key},
+    body:JSON.stringify({model:api.model,messages:messages.filter(function(m){return m.role!=='system';}),stream:true,temperature:0.7})
   }).then(function(res){
     if(!res.ok)return res.text().then(function(t){throw new Error('API '+res.status+': '+t);});
     var reader=res.body.getReader();var decoder=new TextDecoder();var buf='';
@@ -176,15 +186,32 @@ function send(){
 }
 
 function stopGen(){stopFlag=true;}
-function openModal(){document.getElementById('sk').value=apiKey;document.getElementById('su').value=baseUrl;document.getElementById('sm').value=model;modalEl.style.display='flex';}
+function openModal(){
+  document.getElementById('sk_ds').value=apiKeyDS;document.getElementById('su_ds').value=baseUrlDS;
+  document.getElementById('sk_cb').value=apiKeyCB;document.getElementById('su_cb').value=baseUrlCB;
+  document.getElementById('sm').value=model;modalEl.style.display='flex';
+}
 function closeModal(){modalEl.style.display='none';}
-document.getElementById('ms').addEventListener('click',function(){apiKey=document.getElementById('sk').value.trim();baseUrl=document.getElementById('su').value.trim()||'https://api.deepseek.com';model=document.getElementById('sm').value;localStorage.setItem('dsk',apiKey);localStorage.setItem('dsu',baseUrl);localStorage.setItem('dsm',model);closeModal();toast('✅ 已保存');});
+document.getElementById('ms').addEventListener('click',function(){
+  apiKeyDS=document.getElementById('sk_ds').value.trim();baseUrlDS=document.getElementById('su_ds').value.trim()||'https://api.deepseek.com';
+  apiKeyCB=document.getElementById('sk_cb').value.trim();baseUrlCB=document.getElementById('su_cb').value.trim()||'https://ai.chatboxai.app/v1';
+  model=document.getElementById('sm').value;
+  localStorage.setItem('dsk',apiKeyDS);localStorage.setItem('dsu',baseUrlDS);
+  localStorage.setItem('cbk',apiKeyCB);localStorage.setItem('cbu',baseUrlCB);
+  localStorage.setItem('dsm',model);closeModal();toast('✅ 已保存');
+});
 document.getElementById('mc').addEventListener('click',closeModal);
 modalEl.addEventListener('click',function(e){if(e.target===modalEl)closeModal();});
 document.getElementById('clr').addEventListener('click',function(){if(confirm('清空所有聊天记录？')){messages=[];save();render();closeModal();toast('🗑️ 已清空');}});
 document.getElementById('sbtn').addEventListener('click',openModal);
 document.getElementById('nbtn').addEventListener('click',function(){if(messages.length>0&&!confirm('开始新对话？'))return;messages=[];save();render();toast('✨ 新对话');});
-sendBtn.addEventListener('click',send);stopBtn.addEventListener('click',stopGen);
+document.getElementById('search-btn').addEventListener('click',function(){
+  searchMode=!searchMode;
+  if(searchMode){document.getElementById('search-btn').style.background='#8b5cf6';document.getElementById('search-btn').style.color='#fff';toast('🔍 搜索模式：ChatboxAI Gemini');}
+  else{document.getElementById('search-btn').style.background='';document.getElementById('search-btn').style.color='';toast('💬 聊天模式：DeepSeek V4-Pro');}
+});
+sendBtn.addEventListener('click',send);
+stopBtn.addEventListener('click',stopGen);
 inpEl.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
 inpEl.addEventListener('input',function(){inpEl.style.height='auto';inpEl.style.height=Math.min(inpEl.scrollHeight,110)+'px';});
 render();
