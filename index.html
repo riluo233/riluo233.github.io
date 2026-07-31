@@ -127,12 +127,16 @@ function loadPyodideAndRun(code,btn,wrapper){
       while((m=re.exec(code))!==null){var p=map[m[1]||m[2]];if(p&&pkgs.indexOf(p)===-1)pkgs.push(p);}
       pyodide.runPythonAsync(code).then(function(){
         try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
-        var imgData=null;
-        var mm=output.match(/___IMG___\s*([A-Za-z0-9+/=\s]{20,})/);
-        if(mm){imgData=mm[1].replace(/\s/g,'');output=output.replace(mm[0],'');}
+        var imgTags='';
+        output=output.replace(/_{2,3}IMG_{2,3}\s*([A-Za-z0-9+/=\s]+)/g,function(match,b64){
+          var clean=b64.replace(/\s/g,'');
+          if(clean.length>20){imgTags+='<img src="data:image/png;base64,'+clean+'" style="max-width:100%;border-radius:6px;margin-top:6px">';return'';}
+          return match;
+        });
         output=output.replace(/# --- auto save figures ---[\s\S]*$/,'').trim();
-        if(imgData&&imgData.length>100){showExecResult(wrapper,output||'(图表已生成)',false,imgData);}
-        else{showExecResult(wrapper,output||'(执行成功)',false);}
+        if(imgTags){output=(output||'')+'\n'+imgTags;}
+        if(output.trim()){showExecResult(wrapper,output,false);}
+        else{showExecResult(wrapper,'(执行成功)',false);}
         btn.disabled=false;btn.textContent='▶ 运行';
       }).catch(function(err){showExecResult(wrapper,output.trim()+'\n\n❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
     }catch(err){showExecResult(wrapper,'❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
@@ -158,7 +162,12 @@ function loadPyodideAndRun(code,btn,wrapper){
 function showExecResult(wrapper,text,isError,imgBase64){
   var div=document.createElement('div');div.className='er'+(isError?' e':'');
   div.innerHTML='<div style="font-size:.7rem;color:'+(isError?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(isError?'❌ 出错':'✅ 成功')+'</div>';
-  if(text){var pre=document.createElement('pre');pre.textContent=text;pre.style.cssText='margin:0;white-space:pre-wrap;font:inherit;';div.appendChild(pre);}
+  if(text){
+    var pre=document.createElement('pre');
+    pre.innerHTML=text;
+    pre.style.cssText='margin:0;white-space:pre-wrap;font:inherit;';
+    div.appendChild(pre);
+  }
   if(imgBase64){var img=document.createElement('img');img.src='data:image/png;base64,'+imgBase64;div.appendChild(img);}
   wrapper.appendChild(div);scrollBottom();
 }
