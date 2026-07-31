@@ -136,9 +136,14 @@ function loadPyodideAndRun(code,btn,wrapper){
         var imgData=null;
         var marker='___IMG___';
         var idx=output.indexOf(marker);
+        if(idx<0){marker='___PYODIDE_IMG_';idx=output.indexOf(marker);}
         if(idx>=0){
-          imgData=output.substring(idx+marker.length).split('\n')[0].trim();
-          output=output.substring(0,idx)+output.substring(idx+marker.length+imgData.length);
+          var rest=output.substring(idx+marker.length);
+          var numEnd=rest.search(/[^0-9]/);
+          if(numEnd>0)rest=rest.substring(numEnd);
+          if(rest.indexOf('___')===0)rest=rest.substring(3);
+          imgData=rest.split(/[\n\r]+/)[0].trim();
+          output=output.substring(0,idx)+output.substring(idx+marker.length+rest.indexOf(imgData)+imgData.length);
           if(imgData.length<100)imgData=null;
         }
         output=output.trim();
