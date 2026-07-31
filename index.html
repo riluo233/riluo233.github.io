@@ -128,10 +128,10 @@ function loadPyodideAndRun(code,btn,wrapper){
       pyodide.runPythonAsync(code).then(function(){
         try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
         var imgData=null;
-        var mm=output.match(/___IMG___([A-Za-z0-9+/=]{100,})/);
-        if(mm){imgData=mm[1];output=output.replace(mm[0],'');}
+        var mm=output.match(/___IMG___\s*([A-Za-z0-9+/=\s]{100,})/);
+        if(mm){imgData=mm[1].replace(/\s/g,'');output=output.replace(mm[0],'');}
         output=output.replace(/# --- auto save figures ---[\s\S]*$/,'').trim();
-        if(imgData){showExecResult(wrapper,output||'(图表已生成)',false,imgData);}
+        if(imgData&&imgData.length>100){showExecResult(wrapper,output||'(图表已生成)',false,imgData);}
         else{showExecResult(wrapper,output||'(执行成功)',false);}
         btn.disabled=false;btn.textContent='▶ 运行';
       }).catch(function(err){showExecResult(wrapper,output.trim()+'\n\n❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
