@@ -134,18 +134,10 @@ function loadPyodideAndRun(code,btn,wrapper){
       pyodide.runPythonAsync(code).then(function(){
         try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
         var imgData=null;
-        var marker='___IMG___';
-        var idx=output.indexOf(marker);
-        if(idx<0){marker='___PYODIDE_IMG_';idx=output.indexOf(marker);}
-        if(idx>=0){
-          var rest=output.substring(idx+marker.length);
-          var numEnd=rest.search(/[^0-9]/);
-          if(numEnd>0)rest=rest.substring(numEnd);
-          if(rest.indexOf('___')===0)rest=rest.substring(3);
-          imgData=rest.split(/[\n\r]+/)[0].trim();
-          output=output.substring(0,idx)+output.substring(idx+marker.length+rest.indexOf(imgData)+imgData.length);
-          if(imgData.length<100)imgData=null;
-        }
+        var re1=/___IMG___\s*:?\s*([A-Za-z0-9+/=]{100,})/;
+        var re2=/___PYODIDE_IMG_\d+___\s*:?\s*([A-Za-z0-9+/=]{100,})/;
+        var mm=output.match(re1)||output.match(re2);
+        if(mm){imgData=mm[1];output=output.replace(mm[0],'');}
         output=output.trim();
         if(imgData){showExecResult(wrapper,output||'(图表已生成)',false,imgData);}
         else{showExecResult(wrapper,output||'(执行成功)',false);}
