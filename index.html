@@ -180,7 +180,11 @@ function send(){
 function stopGen(){sf=true;}
 document.getElementById('srch').addEventListener('click',function(){
   srchOn=!srchOn;var b=document.getElementById('srch');
-  if(srchOn){b.classList.add('on');tst('🔍 自动搜索 ON');}else{b.classList.remove('on');tst('💬 普通模式');}
+    if(srchOn){
+    var needSearch=/推演|搜索|赔率|比赛|新闻|天气|比分|vs|最新|数据|实时/.test(t);
+    if(needSearch){sendSrch(t);return;}
+  }
+
 });
 function openMod(){document.getElementById('sk_ds').value=akDS;document.getElementById('su_ds').value=buDS;document.getElementById('sk_cb').value=akCB;document.getElementById('sm').value=mdl;mod.style.display='flex';}
 function closeMod(){mod.style.display='none';}
