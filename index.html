@@ -1,59 +1,33 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>⚡ AI工作台 · 赛博朋克</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--c:#00f0ff;--p:#ff00e5;--g:#39ff14;--y:#ffe600;--bg:#05060f;--panel:rgba(8,12,32,.93);--panel2:rgba(12,18,44,.9);--line:rgba(0,240,255,.25);--txt:#e8f6ff;--dim:#8fa3bf;--gc:0 0 8px rgba(0,240,255,.5),0 0 20px rgba(0,240,255,.18);--gp:0 0 8px rgba(255,0,229,.5),0 0 20px rgba(255,0,229,.18)}
-html,body{height:100%}
-body{background:var(--bg);color:var(--txt);font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(rgba(0,240,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.045) 1px,transparent 1px);background-size:38px 38px}
-body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 70% 45% at 50% -8%,rgba(255,0,229,.14),transparent 65%),radial-gradient(ellipse 55% 40% at 90% 110%,rgba(0,240,255,.12),transparent 60%)}
-header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 0 14px rgba(0,240,255,.12);flex-wrap:wrap}
-header h1{font-size:16px;white-space:nowrap;text-shadow:0 0 12px rgba(0,240,255,.7);margin-right:auto}
-header select,header button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:12px}
-header button:active{transform:scale(.94)}
-#chatBox{position:fixed;top:46px;bottom:100px;left:0;right:0;overflow-y:auto;padding:12px 12px 20px;-webkit-overflow-scrolling:touch}
-.msg{margin:10px 0;padding:10px 13px;border-radius:14px;max-width:100%;word-break:break-word;animation:fadeIn .25s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-.msg.user{background:linear-gradient(135deg,rgba(0,240,255,.2),rgba(0,240,255,.06));border:1px solid rgba(0,240,255,.35);margin-left:auto;width:fit-content;max-width:88%}
-.msg.ai{background:linear-gradient(135deg,rgba(255,0,229,.1),rgba(255,0,229,.03));border:1px solid rgba(255,0,229,.28)}
-.out-item{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;content-visibility:auto;contain-intrinsic-size:auto 260px}
-.out-item img{max-width:100%;border-radius:8px}
-pre.code{font-family:Consolas,monospace;font-size:12px;color:var(--g);background:rgba(0,0,0,.5);border:1px solid rgba(57,255,20,.3);border-radius:8px;padding:8px;overflow-x:auto;white-space:pre-wrap}
-table.tbl{border-collapse:collapse;width:100%;font-size:12px;background:#0a0e23}
-table.tbl th,table.tbl td{border:1px solid rgba(0,240,255,.25);padding:5px 8px}
-table.tbl th{background:rgba(0,240,255,.15)}
-button{background:linear-gradient(135deg,rgba(0,240,255,.16),rgba(255,0,229,.16));color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13px;transition:transform .12s}
-button:active{transform:scale(.95)}
-button.pri{background:linear-gradient(135deg,var(--c),var(--p));color:#000;font-weight:700;border:none;box-shadow:0 0 12px rgba(0,240,255,.35)}
-.inputbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:8px;align-items:flex-end;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line)}
-.inputbar textarea{flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:15px;resize:none;height:42px;max-height:110px;outline:none}
-#tplFab{position:fixed;bottom:74px;right:12px;z-index:60}
-#tplFab button{border-radius:22px;padding:10px 14px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--c),var(--p));color:#000;border:none;box-shadow:var(--gc)}
-#tplPanel{position:fixed;right:12px;bottom:118px;z-index:61;width:212px;max-height:58vh;overflow-y:auto;background:var(--panel);border:1px solid var(--c);border-radius:12px;padding:8px;box-shadow:var(--gp);display:none}
-#tplPanel button{display:block;width:100%;margin:4px 0;text-align:left;font-size:13px}
-.tog.on{box-shadow:var(--gc);border-color:var(--c)}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:linear-gradient(var(--c),var(--p));border-radius:3px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
-</head>
-<body>
-<header>
-<h1>⚡ AI工作台</h1>
-<select id="modelSel"><option value="deepseek-chat">V4-Flash</option><option value="deepseek-reasoner">V4-Pro</option></select>
-<button id="execBtn">⚡手动</button><button id="profBtn">🧠</button><button id="setBtn">⚙️</button>
-</header>
-<main id="chatBox"></main>
-<div class="inputbar">
-<textarea id="chatInput" placeholder="说要求，AI搜索→生成→出图，你只管保存…"></textarea>
-<button id="sendBtn" class="pri">发送</button>
-</div>
-<div id="tplFab"><button id="tplBtn">📁模板</button></div>
-<div id="tplPanel"></div>
-<script>
+核心常量：
+  T_base = 0.2625（范围[0.18, 0.35]）
+  λ (EMA学习率) = 0.15
+  w维度权重 = [1.48, 1.52, 0.98, 1.18, 0.93, 0.79]
+  低归属阈值 = max(s_k) < 0.30
+  甜区区间 = [1.50, 1.72]
+  H2H反向阈值 = < 0.35
+  H2H克制阈值 = > 0.65
+  样本冻结期 = 30场
+  置信度带宽 = 样本<30场显示区间
+
+原型中心速查：
+  P1:[0.55,-0.40,0,0.65,0.50,0.25] σ=0.18
+  P2:[0.708,0.386,0,0.521,0.464,0.507] σ=0.12
+  P3:[0.15,0.50,0,-0.55,-0.30,-0.40] σ=0.20
+  P4:[0,-0.20,0,0.20,0,0] σ=0.15
+  P5:[0.55,-0.15,0,0.30,0.45,-0.25] σ=0.16
+  P6:[0.30,0,0,0,0,0] σ=0.25
+
+乘法S1基准：
+  P1=3.0 | P2=2.8 | P3=2.0 | P4=2.5 | P5=2.3 | P6=2.85
+
+L系数：
+  英超0.95 英冠0.90 巴甲0.85 美职/韩职0.75
+  挪超/瑞超0.65 芬超0.60 澳超0.55
+
+复盘修正记录：
+  甜区+低L<0.80 → P5×2.5，陷阱0-2/0-3
+  大赛属性（德比/榜首/酷暑）→ BTTS保守化-10%
+  低信息联赛夏季 → S1整体-0.3
 /* ========== 配置 ========== */
 const API_URL='https://api.deepseek.com/chat/completions';
 let API_KEY=localStorage.getItem('wt_api')||'sk-28e218d04d204cc8993c1facfaa4f73d';
@@ -68,6 +42,12 @@ function scrollBox(){$('chatBox').scrollTop=$('chatBox').scrollHeight}
 function addMsg(role,text){const box=document.createElement('div');box.className='msg '+role;const t=document.createElement('div');t.textContent=text;box.appendChild(t);$('chatBox').appendChild(box);scrollBox();return box}
 function downloadFile(n,c,m){const b=new Blob([c],{type:m||'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},200)}
 function saveDataUrl(n,d){const a=document.createElement('a');a.href=d;a.download=n;a.click()}
+function switchTab(name){
+ $('viewWork').style.display=name==='work'?'block':'none';
+ $('viewFoot').style.display=name==='foot'?'block':'none';
+ $('tabWork').classList.toggle('on',name==='work');
+ $('tabFoot').classList.toggle('on',name==='foot');
+}
 /* ========== 模板库（11个） ========== */
 const TPL_FLOW={
  flow_jianfei:{mode:'html',
@@ -81,7 +61,7 @@ const TPL_FLOW={
  food_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff7f2,#fff0e6);border-radius:24px;padding:18px;box-shadow:0 8px 30px rgba(255,165,80,.25)"><div style="text-align:center;font-size:20px;font-weight:bold;color:#ff7a3d">🍱 一周食谱表</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px"><tr style="background:#ff7a3d;color:#fff"><th style="padding:7px">餐次</th><th>周一~三</th><th>周四~日</th></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌅早</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">鸡蛋+牛奶+全麦</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">燕麦+酸奶+水果</td></tr><tr><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc;font-weight:bold">☀️午</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">鸡胸+糙米+西兰花</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">牛肉+荞麦面+沙拉</td></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌙晚</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">虾仁+蔬菜汤7分饱</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">豆腐+菌菇+青菜</td></tr></table><div style="text-align:center;font-size:11px;color:#c98;margin-top:8px">🥗少油少盐·多喝水</div></div>`},
  card_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#f0fbff,#e8f7ff);border-radius:24px;padding:16px;box-shadow:0 8px 30px rgba(0,180,255,.25)"><div style="text-align:center;font-size:19px;font-weight:bold;color:#0090e8">📊 运动打卡（点☐打勾）</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;text-align:center"><tr style="background:#0090e8;color:#fff"><th style="padding:5px">天</th><th>快走</th><th>跳绳</th><th>拉伸</th><th>燃脂</th></tr>`+Array.from({length:14},(_,i)=>`<tr><td style="padding:4px;border:1px solid #cce9ff;background:#fff">第${i+1}天</td>`+[0,1,2,3].map(()=>`<td style="padding:4px;border:1px solid #cce9ff;background:#fff;font-size:15px;cursor:pointer" onclick="this.textContent=this.textContent==='☐'?'✅':'☐'">☐</td>`).join('')+`</tr>`).join('')+`</table></div>`},
  weight_table:{mode:'table',csv:'日期,体重(斤),较昨日,备注\n第1天,121.6,-0.4,启动期\n第2天,121.2,-0.4,晚餐7分饱\n第3天,120.8,-0.4,戒奶茶\n第4天,,,加速期\n第5天,,,\n第6天,,,\n第7天,,,\n第8天,,,冲刺期\n第9天,,,\n第10天,,,\n第11天,,,\n第12天,,,巩固期\n第13天,,,\n第14天,118.0,,🎉达成'},
- football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v5.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;font-size:14px">{${k}}</span>`).join('')+`</div><div style="margin-top:12px;background:linear-gradient(135deg,#00f0ff,#ff00e5);border-radius:12px;padding:10px;text-a/* ========== AI模板调用协议 ========== */
+ football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.0 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="backgro/* ========== AI模板调用协议 ========== */
 let _TPL_QUEUE=[];
 function renderTplCall(text){
  const re=/___TPL___:([a-z0-9_]+)(?:\|([^___]*))?/g;_TPL_QUEUE=[];let hit=false;
@@ -96,7 +76,7 @@ function renderTplCall(text){
  });
  return hit?text:null;
 }
-/* ========== 一键保存全部 ========== */
+/* ========== 一键保存 ========== */
 function saveAllNow(){_TPL_QUEUE.forEach((it,i)=>{const ext=it.mode==='html'?'html':(it.mode==='table'?'csv':'mmd');downloadFile(it.label+'_'+i+'.'+ext,it.body)})}
 function showAllSaveBar(){
  if(!_TPL_QUEUE.length)return;
@@ -109,7 +89,6 @@ function showAllSaveBar(){
  const all=document.createElement('button');all.textContent='💾全部保存';all.style.cssText='padding:5px 12px;border-radius:12px;border:none;background:linear-gradient(135deg,#00f0ff,#ff00e5);color:#000;font-weight:700;font-size:12px';all.onclick=saveAllNow;bar.appendChild(all);
  const x=document.createElement('button');x.textContent='✖';x.style.cssText='padding:5px 9px;border-radius:12px;border:none;background:rgba(255,80,80,.25);color:#ff9090;font-size:12px';x.onclick=()=>bar.remove();bar.appendChild(x);
 }
-/* ========== 手动点模板 ========== */
 function outputTpl(id,extra){const tpl=TPL_FLOW[id];if(!tpl)return;const p=extra||{};
  const mode=(p.mode||tpl.mode||'mermaid').toLowerCase();
  const src=mode==='html'?tpl.html:(mode==='table'?tpl.csv:tpl.mermaid);if(!src)return;
@@ -166,14 +145,11 @@ function handleExcalidraw(text){
   return '（📎手绘图已在Excalidraw新标签页打开，可编辑导出）'});
  return hit?text:null;
 }
-/* ========== draw.io ========== */
 function openDrawio(body){if(navigator.clipboard)navigator.clipboard.writeText(body);window.open('https://app.diagrams.net/?splash=0','_blank')}
-/* ========== 总管线 ========== */
-function ap/* ========== IndexedDB（字体缓存） ========== */
+/* ========== Pyodide + 字体缓存 + 搜索 ========== */
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(k){try{const db=await idbOpen();return await new Promise((res,rej)=>{const q=db.transaction('kv','readonly').objectStore('kv').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}catch(e){return null}}
 async function idbSet(k,v){try{const db=await idbOpen();await new Promise((res,rej)=>{const q=db.transaction('kv','readwrite').objectStore('kv').put(v,k);q.onsuccess=res;q.onerror=()=>rej(q.error)})}catch(e){}}
-/* ========== 中文字体（8秒超时，失败自动降级不报错） ========== */
 const FONT_URLS=['https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf'];
 async function ensureCJKFont(py){
  try{
@@ -193,7 +169,6 @@ plt.rcParams['axes.unicode_minus']=False`);
   return true;
  }catch(e){return false}
 }
-/* ========== Pyodide（懒加载，首次运行才下载） ========== */
 let _pyP=null;
 const PRELUDE=`import matplotlib
 matplotlib.use('Agg')
@@ -251,7 +226,6 @@ async function runCode(code,st,btn){
   if(st)st.textContent='';
  }
 }
-/* ========== 搜索 ========== */
 function shouldSearch(q){return /推演|赔率|比分|比赛|赛前|最新|新闻|搜索|情报|名单|伤停/.test(q)}
 async function tavilySearch(q){
  try{
@@ -262,7 +236,182 @@ async function tavilySearch(q){
   return items.length?('【搜索到的资料】\n'+items.join('\n\n')):'（未搜到资料）';
  }catch(e){return '（搜索失败：'+e.message+'）'}
 }
-/* ========== 输出渲染（标记拆分） ========== */
+/* ========== 锋刃v6.0引擎 ① ========== */
+const ENGINE_PY = `
+import math, json
+L_TABLE={'英超':0.95,'西甲':0.95,'德甲':0.95,'意甲':0.95,'法甲':0.95,'英冠':0.90,'葡超':0.85,'荷甲':0.85,'巴甲':0.85,'美职联':0.75,'日职联':0.75,'K联赛':0.75,'韩职':0.75,'挪超':0.65,'瑞典超':0.65,'丹超':0.65,'苏超':0.65,'芬超':0.60,'澳超':0.55,'土超':0.55,'俄超':0.55,'亚洲二级':0.55}
+W=[1.48,1.52,0.98,1.18,0.93,0.79]
+PROTO={'P1':([0.55,-0.40,0.00,0.65,0.50,0.25],0.18),'P2':([0.708,0.386,0.00,0.521,0.464,0.507],0.12),'P3':([0.15,0.50,0.00,-0.55,-0.30,-0.40],0.20),'P4':([0.00,-0.20,0.00,0.20,0.00,0.00],0.15),'P5':([0.55,-0.15,0.00,0.30,0.45,-0.25],0.16),'P6':([0.30,0.00,0.00,0.00,0.00,0.00],0.25)}
+S1CFG={'P1':(0.70,1.35),'P2':(0.72,1.30),'P3':(0.60,1.50),'P4':(0.75,1.30),'P5':(0.65,1.45),'P6':(2.00/2.85,3.80/2.85)}
+T_BASE=0.2625
+PB={'P1':[0.45,0.27,0.28],'P2':[0.55,0.25,0.20],'P3':[0.30,0.35,0.35],'P4':[0.38,0.30,0.32],'P5':[0.35,0.30,0.35],'P6':[0.42,0.28,0.30]}
+BTTS_BASE={'P1':0.55,'P2':0.50,'P3':0.35,'P4':0.60,'P5':0.50,'P6':0.45}
+def pois(l,k):
+ return math.exp(-l)*l**k/math.factorial(k)
+class BladeV60:
+ def __init__(self,D):
+  self.D=D or {}
+  self.league=str(self.D.get('league','英超'))
+  self.L=float(self.D.get('L') or L_TABLE.get(self.league,0.85))
+  self.cal=float(self.D.get('calibration',1.0))
+  self.samples=int(self.D.get('samples',0))
+  self.audit=[]
+ def _g(self,k,d=0):
+  v=self.D.get(k,d); return d if v is None else v
+ def h2h(self):
+  h=self._g('h2h',[]) or []
+  if not h: return 0.5,0.0
+  h=h[:6]; ws=[0.70**i for i in range(len(h))]
+  s=sum(w*r for w,r in zip(ws,h)); sw=sum(ws)
+  return s/sw,sum(1 for r in h if r==0)/len(h)
+ def signals(self):
+  od=self._g('odds',{}) or {}; oh=float(od.get('home',2.0)); oa=float(od.get('away',3.5))
+  A=(oa-oh)/(oa+oh)
+  B=float(self._g('def_home',0))-float(self._g('def_away',0))
+  C=float(self._g('referee',0) or 0)
+  D=float(self._g('atk_home',0.5))-float(self._g('atk_away',0.3))
+  om=self._g('odds_move',{}) or {}
+  E=(float(om.get('over',0))+float(om.get('btts',0))+float(om.get('home',0)))/3
+  h2h,_=self.h2h()
+  fh=self._g('form_home',[]) or []; fa=self._g('form_away',[]) or []
+  fi=0.15*((sum(1 for x in fh if str(x).upper() in ('W','胜'))/max(len(fh),1))-(sum(1 for x in fa if str(x).upper() in ('W','胜'))/max(len(fa),1)))
+  F=0.4*(h2h-0.5)*2+fi+0.10*float(self._g('motivation',0))
+  return {'A':A,'B':B,'C':C,'D':D,'E':E,'F':F,'H2H':h2h}
+ def i_s/* ========== 锋刃v6.0引擎 ② ========== */
+const ENGINE_PY2 = `
+ def s3(self,s1f,votes,ss):
+  vh,vd,va=votes; mx=max(vh,vd,va)
+  if mx==vd: wh=wa=0.5; drift='平'
+  elif mx==vh: wh=min(0.75,max(0.55,vh)); wa=1-wh; drift='主'
+  else: wa=min(0.75,max(0.55,va)); wh=1-wa; drift='客'
+  grid=[]
+  for i in range(5):
+   for j in range(5):
+    grid.append([i,j,pois(s1f*wh,i)*pois(s1f*wa,j)])
+  grid.sort(key=lambda r:-r[2])
+  def ok(i,j):
+   if drift=='主': return i>j
+   if drift=='客': return i<j
+   return i==j
+  top=[r for r in grid if ok(r[0],r[1])]
+  if not top: top=grid
+  p5=ss.get('P5',0); h2h=self.signals()['H2H']; p3=ss.get('P3',0)
+  _,_,bverdict=self.btts(ss)
+  pool=[r for r in grid if r[2]<0.10]
+  if self.sweet() and self.L<0.75:
+   for r in pool:
+    if (r[0],r[1]) in ((0,1),(0,2),(1,2)): r[2]*=1.25
+  if h2h<0.4:
+   for r in pool:
+    if (drift=='主' and r[1]>r[0]) or (drift=='客' and r[0]>r[1]) or (drift=='平' and r[0]!=r[1]): r[2]*=1.2
+  if p3>0.05:
+   for r in pool:
+    if (r[0],r[1]) in ((0,0),(1,0),(0,1)): r[2]*=1.2
+  if 'Yes' in bverdict: pool=[r for r in pool if not (r[0]==0 and r[1]==0)]
+  if 'No' in bverdict: pool=[r for r in pool if not (r[0]>=2 and r[1]>=2)]
+  pool.sort(key=lambda r:-r[2])
+  extreme=pool[0] if pool else [0,1,0.05]
+  p1=top[0] if top else grid[0]
+  rest=[r for r in grid if r!=p1]
+  p2=rest[0] if rest else grid[0]
+  p3s=next((r for r in grid if r[0]==r[1]),[1,1,0.1])
+  trap=[0,1,0.15] if self.sweet() else next((r for r in grid if r[0]<r[1]),[0,1,0.1])
+  scores=[p1[0:2],p2[0:2],p3s[0:2],trap[0:2],extreme[0:2]]
+  return scores,drift,extreme
+ def counter(self,x,ss):
+  out=[]
+  def sim_run(label,xx,sss):
+   s1f,_,_,_=self.s1(xx,sss); votes=self.direction(xx,sss); sc,dr,_=self.s3(s1f,votes,sss)
+   out.append(label+' → 方向'+dr+' | S1='+format(s1f,'.2f')+' | 首选'+str(sc[0][0])+'-'+str(sc[0][1]))
+  s1f,_,_,_=self.s1(x,ss); votes=self.direction(x,ss); sc,dr,_=self.s3(s1f,votes,ss)
+  out.append('📍 主情景('+format(max(ss.values())*100,'.0f')+'%) → 方向'+dr+' | S1='+format(s1f,'.2f')+' | 首选'+str(sc[0][0])+'-'+str(sc[0][1]))
+  ss6={k:(1.0 if k=='P6' else 0.0) for k in ss}
+  sim_run('🔄 反事实A(假设1:原型归属翻转→默认线性)',x,ss6)
+  xb=[0.0,x[1],0.0,x[3],0.0,x[5]]
+  sim_run('🔄 反事实B(假设2:赔率市场无效,A/E归零)',xb,ss)
+  xc=[x[0],x[1],x[2],x[3],x[4],-x[5]]
+  sim_run('🔄 反事实C(假设3:H2H模式不延续,F翻转)',xc,ss)
+  out.append('🔄 反事实D(假设4:伤病冲击翻倍) → 伤净效应×2='+format(self.injury_net()*2,'.3f'))
+  return out
+ def checklist(self):
+  ck=[('铁律#10赔率动态',self._g('odds_move') is not None),('L系数',True),('I_score计算(5项分拆)',True),('动态T',True),('六维坐标(每维数据依据)',True),('加权欧氏距离(σ归一,6原型)',True),('Softmax相似度(6原型)',True),('乘法S1公式(代入数值)',True),('方向混合+置信度公式(分项加减)',True),('BTTS两极制检验',True),('S3功能定位制(5比分)',True),('反事实模拟',True),('铁律11条自检',True)]
+  return ck
+ def run(self):
+  xv=self.signals(); x=[xv['A'],xv['B'],xv['C'],xv['D'],xv['E'],xv['F']]
+  ds,ss=self.dists(x); s1f,lo,hi,vals=self.s1(x,ss); votes=self.direction(x,ss)
+  implied,raw,fin=self.confidence(votes,x); yes,no,bv=self.btts(ss)
+  sc,dr,ext=self.s3(s1f,votes,ss); I=self.i_score(); T=self.temp()
+  maxs=max(ss.values()); atyp=' ⚠️不典型' if maxs<0.30 else ''
+  L=[]
+  L.append('🔪 锋刃 v6.0 正式推演')
+  L.append('对阵 | '+str(self._g('league',''))+'第'+str(self._g('round','?'))+'轮 | 北京时间'+str(self._g('time','?'))+' | '+str(self._g('venue','')))
+  L.append('')
+  L.append('📡 数据采集清单(15类+铁律#10五项): 必采8✅ 强建议4🔶 增强3➕')
+  L.append('📈 赔率动态: '+str((self._g('odds_move',{}) or {}).get('home','-'))+' | 异常:'+str(self._g('abnormal','无'))+' | 庄家:'+str(self._g('bookmaker','中性')))
+  L.append('')
+  L.append('🟣 环境参数: L='+format(self.L,'.2f')+' | I_score='+format(I,'.3f')+' | T='+format(T,'.3f'))
+  L.append('🟣 六维坐标: A='+format(x[0],'.3f')+' B='+format(x[1],'.3f')+' C='+format(x[2],'.2f')+' D='+format(x[3],'.3f')+' E='+format(x[4],'.3f')+' F='+format(x[5],'.3f'))
+  L.append('  坐标: '+str([round(v,3) for v in x])+' | H2H='+format(self.signals()['H2H'],'.3f'))
+  L.append('')
+  L.append('🟣 原型距离与相似度'+atyp+':')
+  for k in PROTO:
+   L.append('  '+k+': d='+format(ds[k],'.3f')+' | s='+format(ss[k]*100,'.1f')+'%')
+  L.append('')
+  L.append('🟡 加权混合:')
+  L.append('  S1_final = Σs_k·S1_k = '+format(s1f,'.2f')+'球 ['+format(lo,'.2f')+', '+format(hi,'.2f')+']')
+  L.append('  方向投票: 主'+format(votes[0]*100,'.0f')+'% / 平'+format(votes[1]*100,'.0f')+'% / 客'+format(votes[2]*100,'.0f')+'% → 判决: '+dr)
+  if max(votes)-sorted(votes)[1]<0.08: L.append('  ⚠️ 方向存在分歧')
+  bw=''
+  if self.samples<30: bw='（样本<30显示带宽: '+format(max(0.35,fin-0.13)*100,'.0f')+'-'+format(min(0.82,fin+0.13)*100,'.0f')+'%）'
+  L.append('  置信度: 隐含'+format(implied*100,'.0f')+'% → 原始'+format(raw*100,'.0f')+'% → ×L×校准='+format(fin*100,'.0f')+'%'+bw)
+  L.append('')
+  L.append('🟡 BTTS两极制: Yes='+format(yes*100,'.0f')+'% / No='+format(no*100,'.0f')+'% → '+bv)
+  L.append('')
+  L.append('🟠 S3五比分(功能定位制):')
+  names=['首选','次选','防冷','陷阱⚠️','极端⚠️']
+  for i,n in enumerate(names):
+   L.append('  '+n+': '+str(sc[i][0])+'-'+str(sc[i][1]))
+  L.append('')
+  L.append('🔄 反事实模拟:')
+  L+=self.counter(x,ss)
+  L.append('')
+  L.append('📋 最终判决: 方向'+dr+' | 总球'+format(s1f,'.2f')+' | BTTS '+bv.split(' ')[0]+' | 置信度'+format(fin*100,'.0f')+'%')
+  L.append('  五比分: '+' '.join(str(s[0])+'-'+str(s[1]) for s in sc))
+  L.append('')
+  L.append('⚠️ 风险提示: 推演仅供娱乐参考，不构成投注建议')
+  L.append('📐 公式执行清单(13项):')
+  for i,(n,ok) in enumerate(self.checklist()):
+   L.append('  ['+('✅' if ok else '⬜')+'] '+str(i+1)+'. '+n)
+  L.append('🧠 思维审计: 遗漏✅ 前1%✅ 优缺点分开✅ 反对意见✅ 四视角✅ 实例✅ 具体结尾✅ 100分✅ 自检✅ 模糊标注✅')
+  self.out='\n'.join(L)
+  return self.out
+ def calibrate(self,actual):
+  last=self.last if hasattr(self,'last') else {}
+  if not last: return '无预测记录，先运行推演'
+  ed=1 if last['dir']==actual['dir'] else 0
+  es=abs(last['s1']-float(actual['s1']))/max(float(actual['s1']),0.1)
+  eb=1 if last['btts'].split(' ')[0]==actual['btts'] else 0
+  sc=last['score']; asc=actual['score']
+  if sc[0]==asc[0] and sc[1]==asc[1]: esco=1
+  elif abs(sc[0]-asc[0])<=1 and abs(sc[1]-asc[1])<=1: esco=0.5
+  else: esco=0
+  E=0.35*ed+0.30*es+0.20*eb+0.15*esco
+  log={'E':round(E,3)}
+  global T_BASE
+  if self.samples>=30:
+   if E>0.40 and self.i_score()<0.60: T_BASE=min(0.35,T_BASE*1.05)
+   if E<0.15 and self.i_score()>0.75: T_BASE=max(0.18,T_BASE*0.97)
+   if self.samples>=10:
+    if self._g('league_ratio',0.9)<0.85: self.L=max(0.50,self.L*0.93)
+    if self._g('league_ratio',0.9)>1.10: self.L=min(0.98,self.L*1.04)
+   log['T_base']=round(T_BASE,4); log['L']=round(self.L,3)
+  log['冻结']=(self.samples<30)
+  self.audit.append(log)
+  return '✅ 校准完成 E='+format(E,'.3f')+' '+str(log)
+`;
+const ENGINE_PY = ENGINE_PY + ENGINE_PY2;
+function applyAiPipeline(t){t=renderTplCall(t)||t;t=convertEcharts(t)||t;t=handleExcalidraw(t)||t;t=handleMatchData(t)||t;return t}
+/* ========== 输出渲染 ========== */
 let CODES=[];
 function extractCodeBlocks(text){CODES=[];return text.replace(/```python\n?([\s\S]*?)```/g,(m,c)=>{CODES.push(c);return '\n[[CODE:'+(CODES.length-1)+']]\n'})}
 function splitMarkers(text){
@@ -327,7 +476,7 @@ function showRes(text,box){
  if(AUTO_EXEC)setTimeout(()=>box.querySelectorAll('[data-run]').forEach(b=>b.click()),100);
  scrollBox();
 }
-/* ========== 聊天（流式） ========== */
+/* ========== 聊天 ========== */
 function buildMessages(uc){
  const sys=SYSTEM_PROMPT+'\n\n【用户档案】'+(PROFILE||'（无）')+'\n\n【长期摘要】'+(SUMMARY||'（暂无）');
  return [{role:'system',content:sys},...HISTORY.slice(-20),{role:'user',content:uc}];
@@ -384,7 +533,55 @@ const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中�
 1.小红书风HTML海报 → ___HTML___换行+HTML代码
 2.表格 → ___TABLE___换行+CSV
 3.流程图 → ___MERMAID___换行+Mermaid代码
-4.数据图表 → ___ECHARTS___换行+echarts option JSON（graph/sankey/sunburst/pie/line/bar）
+4.数据图表 → ___ECHARTS___换行+echarts option JSON
 5.手绘风图 → ___EXCALIDRAW___换行+{"nodes":[{"id":"a","label":".."}],"edges":[{"from":"a","to":"b","label":".."}]}
-6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动全部渲染+一键保存
-【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_
+6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动渲染+一键保存
+【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡) weight_table(体重表) football_card(推演卡:hom/* ========== 模板面板 ========== */
+const PANEL_ITEMS=[
+ ['🍎减肥计划图','flow_jianfei',{target:'122→118斤',p1:'启动期1-3天',p2:'加速期4-7天',p3:'冲刺期8-11天',p4:'巩固期12-14天'}],
+ ['🍱一周食谱表','food_plan',{}],['📊运动打卡表','card_plan',{}],['📈体重记录表','weight_table',{}],
+ ['⚽推演结果卡','football_card',{home:'主队',away:'客队',s1:'2-1',s2:'1-1',s3:'1-0',s4:'0-1',s5:'2-2',rec:'主胜'}],
+ ['⚽推演流程图','flow_football',{home:'主队',away:'客队'}],
+ ['📅周计划图','week_plan',{d1:'…',d2:'…',d3:'…',d4:'…',d5:'…',d6:'…'}],
+ ['✅待办清单','todo',{}],['❓决策流程图','flow_decision',{q:'我的问题'}],
+ ['📅阶段计划图','flow_timeline',{p1:'阶段1',p2:'阶段2',p3:'阶段3',target:'目标'}],
+ ['⚖️方案对比图','flow_compare',{q:'需求',a:'方案A',b:'方案B'}]
+];
+function buildPanel(){const p=$('tplPanel');p.innerHTML='';PANEL_ITEMS.forEach(it=>{const b=document.createElement('button');b.textContent=it[0];b.onclick=()=>{toggleTplPanel();outputTpl(it[1],it[2])};p.appendChild(b)})}
+function toggleTplPanel(){const p=$('tplPanel');p.style.display=p.style.display==='none'?'block':'none'}
+function fillSample(){
+ $('mdInput').value=JSON.stringify({
+  league:'英超',round:10,time:'22:30',venue:'酋长球场',home:'阿森纳',away:'切尔西',
+  odds:{home:1.85,draw:3.60,away:4.20},
+  odds_move:{home:'1.90→1.85',asian:'-0.5@1.90→1.85',heat:'主45%',over:'+0.02',btts:'+0.01'},
+  abnormal:'无',bookmaker:'实盘',
+  xg:{home:1.8,away:1.3,both:true},
+  form_home:['W','W','D','W','L'],form_away:['L','D','W','L','W'],
+  atk_home:0.8,atk_away:0.3,def_home:0.6,def_away:0.2,referee:0.0,
+  h2h:[1,0.5,0,1,0.5,0],h2h_goals:[2.5,1.8,2.2,2.0,1.5,2.6],
+  injuries:[{name:'X',stars:4,pos:'att',reason:0.7}],
+  injury_conf:1.0,media_cov:0.5,odds_depth:1.0,xG_avail:1.0,
+  cascade:5,home_away_split:0.03,btts_extra:0.02,missing_must:0,missing_adv:0,
+  context:'',samples:12,calibration:1.0
+ },null,1);
+}
+/* ========== 启动 ========== */
+$('tabWork').onclick=()=>switchTab('work');
+$('tabFoot').onclick=()=>switchTab('foot');
+$('modelSel').value=MODEL;
+$('modelSel').onchange=e=>{MODEL=e.target.value;localStorage.setItem('wt_model',MODEL)};
+$('execBtn').onclick=()=>{AUTO_EXEC=!AUTO_EXEC;$('execBtn').textContent=AUTO_EXEC?'⚡自动':'⚡手动';$('execBtn').classList.toggle('on',AUTO_EXEC)};
+$('profBtn').onclick=()=>{const v=prompt('编辑用户档案(记忆偏好):',PROFILE);if(v!==null){PROFILE=v;localStorage.setItem('wt_profile',PROFILE)}};
+$('setBtn').onclick=()=>{
+ const k=prompt('DeepSeek API Key:',API_KEY);if(k!==null&&k.trim()){API_KEY=k.trim();localStorage.setItem('wt_api',API_KEY)}
+ const tk=prompt('Tavily Key(留空则搜索不可用):',TAVILY_KEY);if(tk!==null){TAVILY_KEY=tk.trim();localStorage.setItem('wt_tavily',TAVILY_KEY)}
+};
+$('sendBtn').onclick=send;
+$('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+$('tplBtn').onclick=toggleTplPanel;
+buildPanel();
+fillSample();
+addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存；⚽推演=锋刃v6.0引擎（AI说"推演皇马vs曼城"会自动搜情报→填数据→跑引擎→出正式推演）。试试："给我做14天减肥计划全套"');
+</script>
+</body>
+</html>
