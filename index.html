@@ -9,13 +9,12 @@
 <title>DeepSeek+</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-system,BlinkMacSystemFont,sans-serif;-webkit-tap-highlight-color:transparent}
 #app{height:100%;display:flex;flex-direction:column;max-width:700px;margin:0 auto}
-#hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0;z-index:10}
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0}
 #hdr b{font-size:1rem}
 #hdr div{display:flex;gap:8px}
-.hbtn{width:36px;height:36px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
-.hbtn.on{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
+.hbtn{width:36px;height:36px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
 #chat{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
 .msg{display:flex;margin-bottom:14px;gap:6px}
 .msg.u{flex-direction:row-reverse}
@@ -31,14 +30,8 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 .cw pre{margin:0;padding:10px;background:#0d1117;overflow-x:auto}
 .cw pre code{font-family:monospace;font-size:.75rem;color:#c9d1d9;white-space:pre-wrap}
 .er{margin-top:-1px;padding:8px 12px;background:#0d1117;border-top:1px solid #333;font-size:.75rem;max-height:300px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;color:#c9d1d9}
-.er.e{color:#ef4444;border-top-color:#ef4444}
-.er img{max-width:100%;border-radius:6px;margin-top:6px}
-.ld{display:inline-flex;gap:4px}
-.ld span{width:5px;height:5px;border-radius:50%;background:#999;animation:d 1.4s infinite}
-.ld span:nth-child(2){animation-delay:.2s}.ld span:nth-child(3){animation-delay:.4s}
-@keyframes d{0%,60%,100%{opacity:.3}30%{opacity:1}}
-#ps{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#252525;border:1px solid #4ade80;padding:8px 16px;border-radius:20px;font-size:.75rem;display:flex;align-items:center;gap:6px;z-index:20}
-#ps.h{display:none}
+.er.e{color:#ef4444}
+#ps{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#252525;border:1px solid #4ade80;padding:8px 16px;border-radius:20px;font-size:.75rem;z-index:20;display:none}
 #inp{padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));background:#1a1a1a;border-top:1px solid #333;display:flex;gap:6px;align-items:flex-end;flex-shrink:0}
 #inp textarea{flex:1;background:#252525;border:1px solid #333;border-radius:12px;padding:10px 12px;color:#eee;font-size:.88rem;font-family:inherit;resize:none;max-height:110px;min-height:40px;outline:none;line-height:1.3}
 #inp textarea:focus{border-color:#4ade80}
@@ -64,19 +57,18 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 </head>
 <body>
 <div id="app">
-<div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="auto-btn" title="自动搜索">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>点 🔍 开启自动搜索<br>说「推演 曼联 vs 切尔西」即可</p></div></div>
-<div id="ps" class="h"><div class="ld"><span></span><span></span><span></span></div><span id="pst">加载 Python...</span></div>
+<div id="hdr"><b>🧠 DeepSeek+</b><div><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
+<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro</h2><p>聊天 + Python 代码执行<br>点击 ⚙️ 设置 API Key 开始</p></div></div>
+<div id="ps"><span id="pst">加载 Python...</span></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
 </div>
-<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek API Key</label><input type="password" id="sk_ds" placeholder="sk-xxxx..."><label>DeepSeek Base URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>ChatboxAI License Key</label><input type="password" id="sk_cb" placeholder="1c0964a1-..."><label>ChatboxAI Base URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
+<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>API Key</label><input type="password" id="sk" placeholder="sk-xxxx..."><label>API Base URL</label><input id="su" placeholder="https://api.deepseek.com"><label>模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
 <script>
-var apiDS=localStorage.getItem('dsk')||'';
-var urlDS=localStorage.getItem('dsu')||'https://api.deepseek.com';
-var apiCB=localStorage.getItem('cbk')||'';
-var urlCB=localStorage.getItem('cbu')||'https://ai.chatboxai.app/v1';
-var messages=JSON.parse(localStorage.getItem('dsmsg')||'[]');
-var busy=false,stopFlag=false,searchOn=false;
+var apiKey=localStorage.getItem('dsk')||'';
+var baseUrl=localStorage.getItem('dsu')||'https://api.deepseek.com';
+var model=localStorage.getItem('dsm')||'deepseek-v4-pro';
+var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]');
+var busy=false,stopFlag=false;
 var pyodide=null,pyReady=false,pyLoading=false;
 var chatEl=document.getElementById('chat');
 var inpEl=document.getElementById('ui');
@@ -85,166 +77,18 @@ var stopBtn=document.getElementById('stop');
 var modalEl=document.getElementById('mo');
 var psEl=document.getElementById('ps');
 var pstEl=document.getElementById('pst');
-var autoBtn=document.getElementById('auto-btn');
 
-function save(){localStorage.setItem('dsmsg',JSON.stringify(messages));}
+function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
 function scrollBottom(){chatEl.scrollTop=chatEl.scrollHeight;}
 function toast(t){var d=document.createElement('div');d.className='tt';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove();},2200);}
 function escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 function md2html(t){
-  t=t.replace(/```(\w*)\n([\s\S]*?)```/g,function(_,lang,code){var isPy=lang==='python'||lang==='py';return '<div class="cw"><div class="ch"><span>'+(lang||'code')+'</span><div style="display:flex;gap:3px"><button class="cb c" onclick="copyCode(this)">📋</button>'+(isPy?'<button class="cb r" onclick="runCode(this)">▶ 运行</button>':'')+'</div></div><pre><code>'+escHTML(code.trim())+'</code></pre></div>';});
-  t=t.replace(/`([^`]+)`/g,'<code style="background:#0d1117;padding:2px 5px;border-radius:4px;font-size:.8rem">$1</code>');
-  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-  var ps=t.split('\n\n');
-  return ps.map(function(p){if(p.indexOf('<div class="cw">')===0)return p;return '<p style="margin-bottom:5px">'+p.replace(/\n/g,'<br>')+'</p>';}).join('');
-}
-function render(){
-  if(messages.length===0){chatEl.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>点 🔍 开启自动搜索<br>说「推演 曼联 vs 切尔西」即可</p></div>';return;}
-  chatEl.innerHTML='';
-  messages.forEach(function(m){if(m.role==='system')return;var row=document.createElement('div');row.className='msg '+(m.role==='user'?'u':'a');row.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md2html(m.content)+'</div>';chatEl.appendChild(row);});
-  scrollBottom();
-}
-function updateLast(msg){var bubbles=chatEl.querySelectorAll('.msg.a .bub');var last=bubbles[bubbles.length-1];if(last)last.innerHTML=md2html(msg.content);scrollBottom();}
-window.copyCode=function(btn){var code=btn.closest('.cw').querySelector('code').innerText;navigator.clipboard.writeText(code).then(function(){btn.textContent='✅';setTimeout(function(){btn.textContent='📋';},1800);});};
-window.runCode=function(btn){
-  var wrapper=btn.closest('.cw');var code=wrapper.querySelector('code').innerText;
-  var old=wrapper.querySelector('.er');if(old)old.remove();
-  if(pyLoading){toast('Python 加载中，请稍候');return;}
-  btn.disabled=true;btn.textContent='⏳';loadPyodideAndRun(code,btn,wrapper);
-};
-function loadPyodideAndRun(code,btn,wrapper){
-  function run(){
-    var output='';btn.textContent='⚡';
-    try{
-      pyodide.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
-      var isChart=code.includes('plt.')||code.includes('matplotlib');
-      if(isChart){code+='\n_ds_imgs=[]\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  _ds_imgs.append(base64.b64encode(__b.read()).decode())\nexcept: pass\n';}
-      var pkgs=[];var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;
-      var map={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
-      while((m=re.exec(code))!==null){var p=map[m[1]||m[2]];if(p&&pkgs.indexOf(p)===-1)pkgs.push(p);}
-      pyodide.runPythonAsync(code).then(function(){
-        try{output=pyodide.runPython('_so.getvalue()');}catch(e){}
-        var imgs=[];if(isChart){try{var pyImgs=pyodide.runPython('_ds_imgs');if(pyImgs&&pyImgs.toJs){imgs=pyImgs.toJs();}else if(Array.isArray(pyImgs)){imgs=pyImgs;}}catch(e){}}
-        output=output.replace(/_ds_imgs[\s\S]*$/,'').trim();
-        showExecResult(wrapper,output||'(执行成功)',imgs);
-        btn.disabled=false;btn.textContent='▶ 运行';
-      }).catch(function(err){showExecResult(wrapper,output.trim()+'\n\n❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
-    }catch(err){showExecResult(wrapper,'❌ '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
-  }
-
-  if(pyReady){run();return;}
-  if(pyLoading)return;
-  pyLoading=true;psEl.classList.remove('h');pstEl.textContent='加载 Python 环境... (首次约20秒)';
-  var script=document.createElement('script');
-  script.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
-  script.onload=function(){
-    pstEl.textContent='加载 Python 核心... (~50MB)';
-    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(py){
-      pyodide=py;pyReady=true;pyLoading=false;psEl.classList.add('h');
-      pyodide.loadPackage(['numpy','matplotlib']).catch(function(){});
-      run();
-    }).catch(function(err){pyLoading=false;psEl.classList.add('h');showExecResult(wrapper,'❌ 加载失败: '+err.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
-  };
-  script.onerror=function(){pyLoading=false;psEl.classList.add('h');showExecResult(wrapper,'❌ 网络错误',true);btn.disabled=false;btn.textContent='▶ 运行';};
-  document.head.appendChild(script);
-}
-function showExecResult(wrapper,text,isError,imgs){
-  var div=document.createElement('div');div.className='er'+(isError?' e':'');
-  div.innerHTML='<div style="font-size:.7rem;color:'+(isError?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(isError?'❌ 出错':'✅ 成功')+'</div>';
-  if(text){var pre=document.createElement('pre');pre.textContent=text;pre.style.cssText='margin:0;white-space:pre-wrap;font:inherit;';div.appendChild(pre);}
-  if(imgs&&imgs.length>0){imgs.forEach(function(b64){var img=document.createElement('img');img.src='data:image/png;base64,'+b64;img.style.cssText='max-width:100%;border-radius:6px;margin-top:6px;display:block';div.appendChild(img);});}
-  wrapper.appendChild(div);scrollBottom();
-}
-
-// ========== API调用（含CORS代理）==========
-function callAPI(api,url,model,msgs,stream,cb){
-  var targetUrl=url.replace(/\/$/,'')+'/chat/completions';
-  if(url.indexOf('chatboxai')>-1){
-    targetUrl='https://corsproxy.io/?'+encodeURIComponent(targetUrl);
-  }
-  fetch(targetUrl,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+api},
-    body:JSON.stringify({model:model,messages:msgs,stream:stream,temperature:0.7})
-  }).then(function(res){
-    if(!res.ok)return res.text().then(function(t){cb('❌ '+res.status+': '+t.substring(0,100),null);});
-    if
-var SYS_PROMPT='你是DeepSeek V4-Pro，配有自动搜索能力。需要实时数据时输出 [SEARCH:关键词]，系统会自动执行搜索并返回实时结果。收到结果后继续回答。';
-
-function doSearch(query,callback){
-  if(!apiCB){callback(null,'搜索未配置');return;}
-  callAPI(apiCB,urlCB,'gemini-3-pro',[{role:'user',content:'请搜索以下信息并返回详细结果：'+query}],false,function(err,result){callback(err,result||'(无结果)');});
-}
-
-function finishSend(){busy=false;sendBtn.style.display='flex';stopBtn.style.display='none';}
-
-function sendWithSearch(userText){
-  var searchMsgs=[{role:'system',content:SYS_PROMPT},{role:'user',content:userText}];
-  messages.push({role:'assistant',content:'🔍 分析中...'});render();var aiIdx=messages.length-1;
-  callAPI(apiDS,urlDS,'deepseek-v4-pro',searchMsgs,false,function(err,reply){
-    if(err){messages[aiIdx].content=err;render();save();finishSend();return;}
-    var sm=reply.match(/\[SEARCH:\s*([^\]]+)\]/);
-    if(sm){
-      var sq=sm[1].trim();
-      messages[aiIdx].content='🔍 搜索：'+sq+'...';render();
-      doSearch(sq,function(serr,sresult){
-        if(serr){messages[aiIdx].content=serr;render();save();finishSend();return;}
-        var finalMsgs=[{role:'system',content:SYS_PROMPT},{role:'user',content:userText},{role:'user',content:'实时搜索结果：\n'+sresult+'\n\n请根据以上数据回答。'}];
-        messages[aiIdx].content='';render();
-        callAPI(apiDS,urlDS,'deepseek-v4-pro',finalMsgs,true,function(ferr,full){
-          if(ferr){messages[aiIdx].content=ferr;}else{messages[aiIdx].content=full||'(无响应)';}
-          render();save();finishSend();
-        });
-      });
-    }else{
-      messages[aiIdx].content=reply||'(无响应)';render();save();finishSend();
-    }
+  t=t.replace(/```(\w*)\n([\s\S]*?)```/g,function(_,lang,code){
+    var isPy=lang==='python'||lang==='py';
+    return '<div class="cw"><div class="ch"><span>'+(lang||'code')+'</span><div style="display:flex;gap:3px"><button class="cb c" onclick="copyCode(this)">📋</button>'+(isPy?'<button class="cb r" onclick="runCode(this)">▶ 运行</button>':'')+'</div></div><pre><code>'+escHTML(code.trim())+'</code></pre></div>';
   });
-}
-
-function send(){
-  var text=inpEl.value.trim();if(!text||busy)return;
-  if(!apiDS){toast('请先设置 API Key ⚙️');openModal();return;}
-  if(messages.length===0)chatEl.innerHTML='';
-  messages.push({role:'user',content:text});save();render();
-  inpEl.value='';inpEl.style.height='auto';
-  busy=true;stopFlag=false;sendBtn.style.display='none';stopBtn.style.display='flex';
-  if(searchOn){sendWithSearch(text);}
-  else{
-    messages.push({role:'assistant',content:''});render();
-    var aiIdx=messages.length-1;
-    callAPI(apiDS,urlDS,'deepseek-v4-pro',messages.filter(function(m){return m.role!=='system';}),true,function(err,full){
-      if(err){messages[aiIdx].content=err;}else{messages[aiIdx].content=full||'(无响应)';}
-      render();save();finishSend();
-    });
-  }
-}
-
-function stopGen(){stopFlag=true;}
-
-autoBtn.addEventListener('click',function(){
-  searchOn=!searchOn;
-  if(searchOn){autoBtn.classList.add('on');toast('🔍 自动搜索已开启');}
-  else{autoBtn.classList.remove('on');toast('💬 普通模式');}
-});
-
-function openModal(){document.getElementById('sk_ds').value=apiDS;document.getElementById('su_ds').value=urlDS;document.getElementById('sk_cb').value=apiCB;document.getElementById('su_cb').value=urlCB;modalEl.style.display='flex';}
-function closeModal(){modalEl.style.display='none';}
-document.getElementById('ms').addEventListener('click',function(){
-  apiDS=document.getElementById('sk_ds').value.trim();urlDS=document.getElementById('su_ds').value.trim()||'https://api.deepseek.com';
-  apiCB=document.getElementById('sk_cb').value.trim();urlCB=document.getElementById('su_cb').value.trim()||'https://ai.chatboxai.app/v1';
-  localStorage.setItem('dsk',apiDS);localStorage.setItem('dsu',urlDS);localStorage.setItem('cbk',apiCB);localStorage.setItem('cbu',urlCB);
-  closeModal();toast('✅ 已保存');
-});
-document.getElementById('mc').addEventListener('click',closeModal);
-modalEl.addEventListener('click',function(e){if(e.target===modalEl)closeModal();});
-document.getElementById('clr').addEventListener('click',function(){if(confirm('清空所有聊天记录？')){messages=[];save();render();closeModal();toast('🗑️ 已清空');}});
-document.getElementById('sbtn').addEventListener('click',openModal);
-document.getElementById('nbtn').addEventListener('click',function(){if(messages.length>0&&!confirm('开始新对话？'))return;messages=[];save();render();toast('✨ 新对话');});
-sendBtn.addEventListener('click',send);stopBtn.addEventListener('click',stopGen);
-inpEl.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
-inpEl.addEventListener('input',function(){inpEl.style.height='auto';inpEl.style.height=Math.min(inpEl.scrollHeight,110)+'px';});
-render();
-</script>
-</body>
-</html>
+  t=t.replace(/`([^`]+)`/g,'<code style="background:#0d1117;padding:2px 5px;border-radius:4px;font-size:.8rem">\$1</code>');
+  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>\$1</strong>');
+  var ps=t.split('\n\n');
+  return ps.map(function(p){if(p.indexOf('<div class="cw">')===0)return p;return
