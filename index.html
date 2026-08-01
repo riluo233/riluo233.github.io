@@ -70,6 +70,7 @@ var chat=document.getElementById('chat'),inp=document.getElementById('ui');
 var snd=document.getElementById('send'),stp=document.getElementById('stop');
 var mod=document.getElementById('mo'),ps=document.getElementById('ps'),pst=document.getElementById('pst');
 var PRELOAD=['numpy','pandas','matplotlib','scipy','scikit-learn','pillow'];
+var FONT_SETUP='import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport os\n_fp="/tmp/CNfont.ttf"\nif not os.path.exists(_fp):\n import pyodide.http\n try:\n  _r=await pyodide.http.pyfetch("https://raw.githubusercontent.com/anthonyfok/fonts-wqy-microhei/master/wqy-microhei.ttc")\n  _d=await _r.bytes()\n  open(_fp,"wb").write(_d)\n  fm.fontManager.addfont(_fp)\n except Exception:\n  pass\nelse:\n try: fm.fontManager.addfont(_fp)\n except Exception: pass\nplt.rcParams["font.sans-serif"]=["WenQuanYi Micro Hei","sans-serif"]\nplt.rcParams["axes.unicode_minus"]=False';
 
 function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
 function scb(){chat.scrollTop=chat.scrollHeight;}
@@ -93,11 +94,11 @@ window.runCode=function(btn){
 };
 function runPy(code,btn,w){
   function go(){
-    var out='';btn.textContent='⏳ 加载包...';
+    var out='';btn.textContent='⏳ 准备环境...';
     Promise.all(PRELOAD.map(function(p){return py.loadPackage(p).catch(function(){});})).then(function(){
+      py.runPythonAsync(FONT_SETUP).then(function(){
     btn.textContent='⚡ 执行中...';
     try{
-      py.runPython('import matplotlib\nmatplotlib.use("Agg")');
       py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
       var ic=code.includes('plt.')||code.includes('matplotlib');
       if(ic)code+='\n_ds_imgs=[]\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  _ds_imgs.append(base64.b64encode(__b.read()).decode())\nexcept: pass\n';
@@ -118,6 +119,7 @@ function runPy(code,btn,w){
         showRes(w,out||'(执行成功)',false,allImgs);btn.disabled=false;btn.textContent='▶ 运行';
       }).catch(function(e){showRes(w,out+'\n\n❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
     }catch(e){showRes(w,'❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
+      }).catch(function(e){btn.disabled=false;btn.textContent='▶ 运行';showRes(w,'❌ 字体加载失败',true);});
     });
   }
   if(pyOk){go();return;}
@@ -149,17 +151,7 @@ function showRes(w,t,er,im){
       d.appendChild(tb);
       var a=document.createElement('a');
       a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-      a.download='data.csv';a.textContent='💾 保存CSV';a.className='svbtn';d.appendChild(a);
-    }
-  }
-  if(t){var p=document.createElement('pre');p.textContent=t;p.style.cssText='margin:0;white-space:pre-wrap;font:inherit;';d.appendChild(p);}
-  if(im&&im.length>0)im.forEach(function(b,idx){
-    var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:6px;margin-top:6px;display:block';d.appendChild(i);
-    var a=document.createElement('a');a.href='data:image/png;base64,'+b;a.download='chart_'+(idx+1)+'.png';a.textContent='💾 保存图'+(idx+1);a.className='svbtn';d.appendChild(a);
-  });
-  w.appendChild(d);scb();
-}
-// ====== API 调用（ChatboxAI走CORS代理）======
+      // ====== API 调用（ChatboxAI走CORS代理）======
 function callAPI(ak,bu,mdl2,mArr,str,cb){
   var u=bu.replace(/\/$/,'')+'/chat/completions';
   if(bu.indexOf('chatboxai')>-1)u='https://corsproxy.io/?'+encodeURIComponent(u);
