@@ -97,8 +97,13 @@ function runPy(code,btn,w){
       var ic=code.includes('plt.')||code.includes('matplotlib');
       if(ic)code+='\n_ds_imgs=[]\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  _ds_imgs.append(base64.b64encode(__b.read()).decode())\nexcept: pass\n';
       py.runPythonAsync(code).then(function(){
-        try{out=py.runPython('_so.getvalue()');}catch(e){}var im=[];if(ic){try{var pi=py.runPython('_ds_imgs');if(pi&&pi.toJs)im=pi.toJs();else if(Array.isArray(pi))im=pi;}catch(e){}}
-        out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();showRes(w,out||'(执行成功)',false,im);btn.disabled=false;btn.textContent='▶ 运行';
+        try{out=py.runPython('_so.getvalue()');}catch(e){}
+        var im=[];if(ic){try{var pi=py.runPython('_ds_imgs');if(pi&&pi.toJs)im=pi.toJs();else if(Array.isArray(pi))im=pi;}catch(e){}}
+        var im2=[];
+        out=out.replace(/_{2,3}IMG_{2,3}([A-Za-z0-9+/=\s]+?)(?=\n_{2,3}IMG|$)/g,function(mt,b64){var cl=b64.replace(/\s/g,'');if(cl.length>100){im2.push(cl);return'';}return mt;});
+        out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();
+        var allImgs=im.concat(im2);
+        showRes(w,out||'(执行成功)',false,allImgs);btn.disabled=false;btn.textContent='▶ 运行';
       }).catch(function(e){showRes(w,out+'\n\n❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
     }catch(e){showRes(w,'❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
     });
