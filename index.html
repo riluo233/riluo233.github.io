@@ -1,278 +1,390 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><meta name="theme-color" content="#111"><title>DS+ Agent</title><script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script><style>
-*{margin:0;padding:0;box-sizing:border-box}body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:sans-serif;-webkit-tap-highlight-color:transparent}#app{height:100%;display:flex;flex-direction:column;max-width:700px;margin:0 auto}
-#hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0}.hbtn{width:34px;height:34px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}.hbtn.on{background:#8b5cf6;color:#fff}.hbtn.g.on{background:#22c55e;color:#fff;border-color:#22c55e}
-#chat{flex:1;overflow-y:auto;padding:10px;-webkit-overflow-scrolling:touch}.msg{display:flex;margin-bottom:12px;gap:6px}.msg.u{flex-direction:row-reverse}.av{width:28px;height:28px;border-radius:50%;background:#252525;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}.bub{max-width:85%;padding:8px 12px;border-radius:12px;font-size:.9rem;line-height:1.5;word-break:break-word}.msg.u .bub{background:#1e3a2f}.msg.a .bub{background:#1a1a1a;border:1px solid #333}
-.st{color:#8b5cf6;font-style:italic;font-size:.75rem;margin:2px 0}
-.cw{margin:6px 0;border-radius:8px;overflow:hidden;border:1px solid #333}.ch{display:flex;justify-content:space-between;padding:4px 8px;background:#252525;font-size:.65rem;color:#999}.cb{padding:2px 8px;border-radius:4px;border:none;font-size:.65rem;cursor:pointer}.cb.r{background:#4ade80;color:#000}.cb.c{background:#1a1a1a;color:#999}.cw pre{margin:0;padding:8px;background:#0d1117;overflow-x:auto}.cw pre code{font-family:monospace;font-size:.72rem;white-space:pre-wrap}
-.er{margin-top:-1px;padding:6px 10px;background:#0d1117;border-top:1px solid #333;font-size:.72rem;font-family:monospace;white-space:pre-wrap}.er.e{color:#ef4444}.er img{max-width:100%;border-radius:4px;margin-top:4px}.er table{width:100%;border-collapse:collapse;font-size:.7rem}.er td,.er th{border:1px solid #333;padding:4px 6px}.er th{background:#252525;color:#4ade80}.er .mermaid{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:10px;margin:6px 0}.svbtn{display:inline-block;margin:4px 6px 6px 0;padding:5px 10px;background:#252525;color:#4ade80;border:1px solid #4ade80;border-radius:6px;font-size:.7rem;text-decoration:none}
-#inp{display:flex;gap:6px;padding:6px;background:#1a1a1a;border-top:1px solid #333}#inp textarea{flex:1;background:#252525;border:1px solid #333;border-radius:10px;padding:8px;color:#eee;font-size:.85rem;resize:none;max-height:100px;min-height:38px;outline:none}#send{width:38px;height:38px;border-radius:50%;background:#4ade80;color:#000;border:none;font-size:1rem}#stop{width:38px;height:38px;border-radius:50%;background:#ef4444;color:#fff;border:none;display:none}
-#mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:100}#mb{background:#1a1a1a;border-radius:16px 16px 0 0;padding:14px;width:100%;max-width:480px}#mb h3{font-size:1rem;margin-bottom:8px}#mb label{font-size:.7rem;color:#999;display:block;margin:8px 0 2px}#mb input,#mb select{width:100%;padding:8px;background:#252525;border:1px solid #333;border-radius:6px;color:#eee;font-size:.8rem;outline:none}.ma{display:flex;gap:6px;margin-top:10px}.btn{flex:1;padding:10px;border-radius:6px;border:none;font-weight:600;cursor:pointer}.btn.p{background:#4ade80;color:#000}.btn.s{background:#252525;color:#eee}.btn.d{background:#252525;color:#ef4444;border:1px solid #333;margin-top:10px;display:block;width:100%;padding:10px;border-radius:6px}
-.tt{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:6px 14px;border-radius:16px;font-size:.75rem;z-index:200}
-</style></head><body><div id="app">
-<div id="hdr"><b>🤖 DS+ Agent</b><div style="display:flex;gap:6px"><button class="hbtn g" id="autox" title="自动执行">⚡</button><button class="hbtn" id="srch">🔍</button><button class="hbtn" id="mem" title="记忆">🧠</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">🧠记忆 | ⚡手动执行 | 🔍搜索 | 小红书出图</p></div></div>
-<div id="inp"><textarea id="ui" rows="1" placeholder="输入需求，AI生成代码..."></textarea><button id="send">↑</button><button id="stop">■</button></div></div>
-<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds"><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><label>Tavily Key（搜索）</label><input type="password" id="sk_cb" placeholder="tvly-..."><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空</button></div></div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>⚡ AI工作台 · 赛博朋克</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--c:#00f0ff;--p:#ff00e5;--g:#39ff14;--y:#ffe600;--bg:#05060f;--panel:rgba(8,12,32,.93);--panel2:rgba(12,18,44,.9);--line:rgba(0,240,255,.25);--txt:#e8f6ff;--dim:#8fa3bf;--gc:0 0 8px rgba(0,240,255,.5),0 0 20px rgba(0,240,255,.18);--gp:0 0 8px rgba(255,0,229,.5),0 0 20px rgba(255,0,229,.18)}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(rgba(0,240,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.045) 1px,transparent 1px);background-size:38px 38px}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 70% 45% at 50% -8%,rgba(255,0,229,.14),transparent 65%),radial-gradient(ellipse 55% 40% at 90% 110%,rgba(0,240,255,.12),transparent 60%)}
+header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 0 14px rgba(0,240,255,.12);flex-wrap:wrap}
+header h1{font-size:16px;white-space:nowrap;text-shadow:0 0 12px rgba(0,240,255,.7);margin-right:auto}
+header select,header button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:12px}
+header button:active{transform:scale(.94)}
+#chatBox{position:fixed;top:46px;bottom:100px;left:0;right:0;overflow-y:auto;padding:12px 12px 20px;-webkit-overflow-scrolling:touch}
+.msg{margin:10px 0;padding:10px 13px;border-radius:14px;max-width:100%;word-break:break-word;animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.msg.user{background:linear-gradient(135deg,rgba(0,240,255,.2),rgba(0,240,255,.06));border:1px solid rgba(0,240,255,.35);margin-left:auto;width:fit-content;max-width:88%}
+.msg.ai{background:linear-gradient(135deg,rgba(255,0,229,.1),rgba(255,0,229,.03));border:1px solid rgba(255,0,229,.28)}
+.out-item{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;content-visibility:auto;contain-intrinsic-size:auto 260px}
+.out-item img{max-width:100%;border-radius:8px}
+pre.code{font-family:Consolas,monospace;font-size:12px;color:var(--g);background:rgba(0,0,0,.5);border:1px solid rgba(57,255,20,.3);border-radius:8px;padding:8px;overflow-x:auto;white-space:pre-wrap}
+table.tbl{border-collapse:collapse;width:100%;font-size:12px;background:#0a0e23}
+table.tbl th,table.tbl td{border:1px solid rgba(0,240,255,.25);padding:5px 8px}
+table.tbl th{background:rgba(0,240,255,.15)}
+button{background:linear-gradient(135deg,rgba(0,240,255,.16),rgba(255,0,229,.16));color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13px;transition:transform .12s}
+button:active{transform:scale(.95)}
+button.pri{background:linear-gradient(135deg,var(--c),var(--p));color:#000;font-weight:700;border:none;box-shadow:0 0 12px rgba(0,240,255,.35)}
+.inputbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:8px;align-items:flex-end;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line)}
+.inputbar textarea{flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:15px;resize:none;height:42px;max-height:110px;outline:none}
+#tplFab{position:fixed;bottom:74px;right:12px;z-index:60}
+#tplFab button{border-radius:22px;padding:10px 14px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--c),var(--p));color:#000;border:none;box-shadow:var(--gc)}
+#tplPanel{position:fixed;right:12px;bottom:118px;z-index:61;width:212px;max-height:58vh;overflow-y:auto;background:var(--panel);border:1px solid var(--c);border-radius:12px;padding:8px;box-shadow:var(--gp);display:none}
+#tplPanel button{display:block;width:100%;margin:4px 0;text-align:left;font-size:13px}
+.tog.on{box-shadow:var(--gc);border-color:var(--c)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:linear-gradient(var(--c),var(--p));border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+<h1>⚡ AI工作台</h1>
+<select id="modelSel"><option value="deepseek-chat">V4-Flash</option><option value="deepseek-reasoner">V4-Pro</option></select>
+<button id="execBtn">⚡手动</button><button id="profBtn">🧠</button><button id="setBtn">⚙️</button>
+</header>
+<main id="chatBox"></main>
+<div class="inputbar">
+<textarea id="chatInput" placeholder="说要求，AI搜索→生成→出图，你只管保存…"></textarea>
+<button id="sendBtn" class="pri">发送</button>
+</div>
+<div id="tplFab"><button id="tplBtn">📁模板</button></div>
+<div id="tplPanel"></div>
 <script>
-var akDS=localStorage.getItem('dsk')||'',buDS=localStorage.getItem('dsu')||'https://api.deepseek.com',mdl=localStorage.getItem('dsm')||'deepseek-v4-pro';
-var akCB=localStorage.getItem('cbk')||'';
-var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]'),busy=false,sf=false,srchOn=false,autoExec=false;
-var py=null,pyOk=false,pyBusy=false,agentBusy=false;
-var chat=document.getElementById('chat'),inp=document.getElementById('ui');
-var snd=document.getElementById('send'),stp=document.getElementById('stop');
-var mod=document.getElementById('mo');
-var PRELOAD=['numpy','pandas','matplotlib','scipy','scikit-learn','pillow'];
-var FONT_SETUP='import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport os\n_fp="/tmp/SimHei.ttf"\nif os.path.exists(_fp):\n fm.fontManager.addfont(_fp)\n plt.rcParams["font.sans-serif"]=["SimHei","sans-serif"]\n plt.rcParams["axes.unicode_minus"]=False\nelse:\n try:\n  _b=__import__("js").fontData\n  if _b:\n   open(_fp,"wb").write(_b.to_py())\n   fm.fontManager.addfont(_fp)\n   plt.rcParams["font.sans-serif"]=["SimHei","sans-serif"]\n   plt.rcParams["axes.unicode_minus"]=False\n except Exception:\n  pass';
-var fontReady=false,fontLoading=false;
-function loadFontData(cb){
-  if(fontReady){if(cb)cb();return;}
-  if(fontLoading){setTimeout(function(){loadFontData(cb);},500);return;}
-  fontLoading=true;
-  var req=indexedDB.open('DSFont',1);
-  req.onupgradeneeded=function(){req.result.createObjectStore('f');};
-  req.onsuccess=function(){
-    var db=req.result;
-    var tx=db.transaction('f','readonly').objectStore('f').get('simhei');
-    tx.onsuccess=function(){
-      if(tx.result){
-        window.fontData=tx.result;fontReady=true;if(cb)cb();
-      }else{
-        fetch('https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf').then(function(r){return r.arrayBuffer();}).then(function(buf){
-          window.fontData=new Uint8Array(buf);
-          try{db.transaction('f','readwrite').objectStore('f').put(new Uint8Array(buf),'simhei');}catch(e){}
-          fontReady=true;if(cb)cb();
-        }).catch(function(){fontReady=true;if(cb)cb();});
-      }
-    };
-    tx.onerror=function(){fontReady=true;if(cb)cb();};
-  };
-  req.onerror=function(){fontReady=true;if(cb)cb();};
+/* ========== 配置 ========== */
+const API_URL='https://api.deepseek.com/chat/completions';
+let API_KEY=localStorage.getItem('wt_api')||'sk-28e218d04d204cc8993c1facfaa4f73d';
+let TAVILY_KEY=localStorage.getItem('wt_tavily')||'';
+let MODEL=localStorage.getItem('wt_model')||'deepseek-chat';
+let AUTO_EXEC=false;
+let HISTORY=[],PROFILE=localStorage.getItem('wt_profile')||'',SUMMARY=localStorage.getItem('wt_summary')||'';
+/* ========== 工具 ========== */
+function $(id){return document.getElementById(id)}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function scrollBox(){$('chatBox').scrollTop=$('chatBox').scrollHeight}
+function addMsg(role,text){const box=document.createElement('div');box.className='msg '+role;const t=document.createElement('div');t.textContent=text;box.appendChild(t);$('chatBox').appendChild(box);scrollBox();return box}
+function downloadFile(n,c,m){const b=new Blob([c],{type:m||'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},200)}
+function saveDataUrl(n,d){const a=document.createElement('a');a.href=d;a.download=n;a.click()}
+/* ========== 模板库（11个） ========== */
+const TPL_FLOW={
+ flow_jianfei:{mode:'html',
+  mermaid:`graph TD\n A["🎯目标：{target}"] --> B["🚀{p1}<br/>戒奶茶·晚餐7分饱"]\n B --> C["⚡{p2}<br/>加蛋白·跳绳15分钟"]\n C --> D["🔥{p3}<br/>16+8·喝水2L"]\n D --> E["🏆{p4}<br/>恢复三餐·保持运动"]\n E --> F["✅达成{target}"]`,
+  html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff5f7,#fff0f5);border-radius:24px;padding:22px;box-shadow:0 8px 30px rgba(255,105,180,.25)"><div style="text-align:center;font-size:21px;font-weight:bold;color:#ff4d94">🍎 减肥计划 · 目标{target}</div><div style="background:linear-gradient(135deg,#ff9a9e,#ff4d94);border-radius:16px;padding:13px;color:#fff;margin:10px 0">🚀 <b>{p1}</b><br><span style="font-size:13px">戒奶茶宵夜 · 晚餐7分饱</span></div><div style="background:linear-gradient(135deg,#ffb199,#ff6b6b);border-radius:16px;padding:13px;color:#fff;margin:10px 0">⚡ <b>{p2}</b><br><span style="font-size:13px">早餐加蛋白 · 跳绳15分钟</span></div><div style="background:linear-gradient(135deg,#f6d365,#fda085);border-radius:16px;padding:13px;color:#fff;margin:10px 0">🔥 <b>{p3}</b><br><span style="font-size:13px">16+8轻断食 · 喝水2L</span></div><div style="background:linear-gradient(135deg,#84fab0,#4ecdc4);border-radius:16px;padding:13px;color:#fff;margin:10px 0">🏆 <b>{p4}</b><br><span style="font-size:13px">恢复三餐 · 保持运动</span></div><div style="text-align:center;font-size:15px;font-weight:bold;color:#ff4d94;margin-top:12px">✅ 达成 {target}</div></div>`},
+ flow_football:{mode:'mermaid',mermaid:`graph TD\n A["⚽ {home} vs {away}"] --> B["📡搜索情报"]\n B --> C["🧩R1-R12模块"]\n C --> D["🌌六维场景"]\n D --> E["🎲S3v3五比分"]\n E --> F["📊输出结果"]`},
+ flow_decision:{mode:'mermaid',mermaid:`graph TD\n A["❓{q}"] --> B{"风险可承受？"}\n B -->|是| C["✅执行"]\n B -->|否| D["🔍替代方案"]\n D --> B\n C --> E["📈复盘"]`},
+ flow_timeline:{mode:'mermaid',mermaid:`graph LR\n A["{p1}"] --> B["{p2}"]\n B --> C["{p3}"]\n C --> D["🎯{target}"]`},
+ flow_compare:{mode:'mermaid',mermaid:`graph TD\n A["📌{q}"] --> B["A:{a}"]\n A --> C["B:{b}"]\n B --> D{"对比"}\n C --> D\n D --> E["✅选定"]`},
+ week_plan:{mode:'mermaid',mermaid:`graph TD\n A["📅本周"] --> B["周一{d1}"]\n A --> C["周二{d2}"]\n A --> D["周三{d3}"]\n A --> E["周四{d4}"]\n A --> F["周五{d5}"]\n A --> G["周末{d6}"]`},
+ food_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff7f2,#fff0e6);border-radius:24px;padding:18px;box-shadow:0 8px 30px rgba(255,165,80,.25)"><div style="text-align:center;font-size:20px;font-weight:bold;color:#ff7a3d">🍱 一周食谱表</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px"><tr style="background:#ff7a3d;color:#fff"><th style="padding:7px">餐次</th><th>周一~三</th><th>周四~日</th></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌅早</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">鸡蛋+牛奶+全麦</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">燕麦+酸奶+水果</td></tr><tr><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc;font-weight:bold">☀️午</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">鸡胸+糙米+西兰花</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">牛肉+荞麦面+沙拉</td></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌙晚</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">虾仁+蔬菜汤7分饱</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">豆腐+菌菇+青菜</td></tr></table><div style="text-align:center;font-size:11px;color:#c98;margin-top:8px">🥗少油少盐·多喝水</div></div>`},
+ card_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#f0fbff,#e8f7ff);border-radius:24px;padding:16px;box-shadow:0 8px 30px rgba(0,180,255,.25)"><div style="text-align:center;font-size:19px;font-weight:bold;color:#0090e8">📊 运动打卡（点☐打勾）</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;text-align:center"><tr style="background:#0090e8;color:#fff"><th style="padding:5px">天</th><th>快走</th><th>跳绳</th><th>拉伸</th><th>燃脂</th></tr>`+Array.from({length:14},(_,i)=>`<tr><td style="padding:4px;border:1px solid #cce9ff;background:#fff">第${i+1}天</td>`+[0,1,2,3].map(()=>`<td style="padding:4px;border:1px solid #cce9ff;background:#fff;font-size:15px;cursor:pointer" onclick="this.textContent=this.textContent==='☐'?'✅':'☐'">☐</td>`).join('')+`</tr>`).join('')+`</table></div>`},
+ weight_table:{mode:'table',csv:'日期,体重(斤),较昨日,备注\n第1天,121.6,-0.4,启动期\n第2天,121.2,-0.4,晚餐7分饱\n第3天,120.8,-0.4,戒奶茶\n第4天,,,加速期\n第5天,,,\n第6天,,,\n第7天,,,\n第8天,,,冲刺期\n第9天,,,\n第10天,,,\n第11天,,,\n第12天,,,巩固期\n第13天,,,\n第14天,118.0,,🎉达成'},
+ football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v5.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;font-size:14px">{${k}}</span>`).join('')+`</div><div style="margin-top:12px;background:linear-gradient(135deg,#00f0ff,#ff00e5);border-radius:12px;padding:10px;text-a/* ========== AI模板调用协议 ========== */
+let _TPL_QUEUE=[];
+function renderTplCall(text){
+ const re=/___TPL___:([a-z0-9_]+)(?:\|([^___]*))?/g;_TPL_QUEUE=[];let hit=false;
+ text=text.replace(re,(mm,id,q)=>{
+  const tpl=TPL_FLOW[id];if(!tpl)return mm;hit=true;
+  const p={};if(q)q.split('&').forEach(x=>{const i=x.indexOf('=');if(i>0)p[x.slice(0,i).trim()]=x.slice(i+1).trim()});
+  const mode=(p.mode||tpl.mode||'mermaid').toLowerCase();
+  const src=mode==='html'?tpl.html:(mode==='table'?tpl.csv:tpl.mermaid);if(!src)return mm;
+  const marker=mode==='html'?'___HTML___':(mode==='table'?'___TABLE___':'___MERMAID___');
+  const body=fillTpl(src,p);_TPL_QUEUE.push({mode,body,label:id});
+  return marker+'\n'+body;
+ });
+ return hit?text:null;
 }
-// ===== 记忆系统：长期摘要 + 用户档案 =====
-var longMem=localStorage.getItem('dsmem')||'';
-var userProfile=localStorage.getItem('dsprof')||'';
-function saveMem(m){if(m){longMem=m;localStorage.setItem('dsmem',m);}}
-function getMemPrompt(){
-  var p='';
-  if(userProfile)p+='【用户档案】'+userProfile+'\n';
-  if(longMem)p+='【历史记忆摘要】'+longMem+'\n';
-  return p;
+/* ========== 一键保存全部 ========== */
+function saveAllNow(){_TPL_QUEUE.forEach((it,i)=>{const ext=it.mode==='html'?'html':(it.mode==='table'?'csv':'mmd');downloadFile(it.label+'_'+i+'.'+ext,it.body)})}
+function showAllSaveBar(){
+ if(!_TPL_QUEUE.length)return;
+ let bar=document.getElementById('tplSaveBar');
+ if(!bar){bar=document.createElement('div');bar.id='tplSaveBar';bar.style.cssText='position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:9999;background:rgba(8,12,32,.96);border:1px solid #00f0ff;border-radius:18px;padding:8px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:96vw;box-shadow:0 0 15px rgba(0,240,255,.35)';document.body.appendChild(bar)}
+ bar.innerHTML='';
+ const lab=document.createElement('span');lab.style.cssText='color:#8fa3bf;font-size:11px';lab.textContent='共'+_TPL_QUEUE.length+'个';bar.appendChild(lab);
+ _TPL_QUEUE.forEach((it,i)=>{const b=document.createElement('button');b.textContent='💾'+it.label;b.style.cssText='padding:5px 9px;border-radius:12px;border:1px solid #00f0ff;background:rgba(0,240,255,.12);color:#fff;font-size:12px';
+  b.onclick=()=>{const ext=it.mode==='html'?'html':(it.mode==='table'?'csv':'mmd');downloadFile(it.label+'_'+i+'.'+ext,it.body)};bar.appendChild(b)});
+ const all=document.createElement('button');all.textContent='💾全部保存';all.style.cssText='padding:5px 12px;border-radius:12px;border:none;background:linear-gradient(135deg,#00f0ff,#ff00e5);color:#000;font-weight:700;font-size:12px';all.onclick=saveAllNow;bar.appendChild(all);
+ const x=document.createElement('button');x.textContent='✖';x.style.cssText='padding:5px 9px;border-radius:12px;border:none;background:rgba(255,80,80,.25);color:#ff9090;font-size:12px';x.onclick=()=>bar.remove();bar.appendChild(x);
 }
-var AGENT_PROMPT='你是智能Agent，以下规则永远生效：\n【输出格式铁律】\n1.小红书风格精美图→print("___HTML___"+HTML代码)，包在print里\n2.简单流程图→print("___MERMAID___"+mermaid语法)\n3.数据表格→print("___TABLE___"+CSV)\n4.数据图表→matplotlib画图后print("___IMG___"+base64)\n5.代码里不要用plt.show()\n6.需要实时数据时输出 [SEARCH:关键词]\n【记忆】系统会提供"用户档案"和"历史记忆摘要"，这些是长期记忆，务必参考。同时你也有最近对话的上下文。\n【工作方式】用户发需求→判断输出格式→生成完整代码→提示"点▶运行"';
-var agentMsgs=[];
-function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
-function scb(){chat.scrollTop=chat.scrollHeight;}
-function tst(t){var d=document.createElement('div');d.className='tt';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove();},2200);}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function md(t){
-  t=t.replace(/```(\w*)\n([\s\S]*?)```/g,function(_,l,c){var ip=l==='python'||l==='py';return '<div class="cw"><div class="ch"><span>'+(l||'code')+'</span><div style="display:flex;gap:3px"><button class="cb c" onclick="copyCode(this)">📋</button>'+(ip?'<button class="cb r" onclick="runCode(this)">▶ 运行</button>':'')+'</div></div><pre><code>'+esc(c.trim())+'</code></pre></div>';});
-  t=t.replace(/`([^`]+)`/g,'<code style="background:#0d1117;padding:2px 5px;border-radius:4px;font-size:.8rem">$1</code>');
-  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-  var p=t.split('\n\n');return p.map(function(x){if(x.indexOf('<div class="cw">')===0)return x;return '<p style="margin-bottom:5px">'+x.replace(/\n/g,'<br>')+'</p>';}).join('');
+/* ========== 手动点模板 ========== */
+function outputTpl(id,extra){const tpl=TPL_FLOW[id];if(!tpl)return;const p=extra||{};
+ const mode=(p.mode||tpl.mode||'mermaid').toLowerCase();
+ const src=mode==='html'?tpl.html:(mode==='table'?tpl.csv:tpl.mermaid);if(!src)return;
+ const marker=mode==='html'?'___HTML___':(mode==='table'?'___TABLE___':'___MERMAID___');
+ _TPL_QUEUE=[{mode,body:fillTpl(src,p),label:id}];
+ showRes(marker+'\n'+fillTpl(src,p));
+ showAllSaveBar();
 }
-function addStatus(txt){
-  var last=chat.querySelector('.msg.a .bub');
-  if(!last){var row=document.createElement('div');row.className='msg a';row.innerHTML='<div class="av">🤖</div><div class="bub"></div>';chat.appendChild(row);last=row.querySelector('.bub');}
-  var s=document.createElement('div');s.className='st';s.textContent=txt;last.appendChild(s);scb();
+/* ========== ECharts ========== */
+let _EC_QUEUE=[],_echartsLoaded=null;
+function loadECharts(){if(_echartsLoaded)return _echartsLoaded;
+ _echartsLoaded=new Promise((res,rej)=>{if(window.echarts){res();return}
+  const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js';
+  s.onload=()=>res();s.onerror=()=>{_echartsLoaded=null;rej(new Error('echarts加载失败'))};document.head.appendChild(s)});
+ return _echartsLoaded}
+function convertEcharts(text){
+ const re=/___ECHARTS___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
+ text=text.replace(re,(mm,js)=>{let opt=null;try{opt=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
+  const id='ec_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  opt.backgroundColor=opt.backgroundColor||'#0a0e23';if(!opt.textStyle)opt.textStyle={color:'#e8f6ff'};
+  _EC_QUEUE.push({id,option:opt});
+  return '___HTML___\n<div id="'+id+'" style="position:relative;width:100%;height:420px;background:#0a0e23;border-radius:14px;border:1px solid rgba(0,240,255,.25)"></div>'});
+ return hit?text:null}
+async function flushEcharts(){if(!_EC_QUEUE.length)return;
+ try{await loadECharts()}catch(e){return}
+ _EC_QUEUE.forEach(it=>{const el=document.getElementById(it.id);if(!el||!window.echarts)return;
+  const c=echarts.init(el);c.setOption(it.option);window.addEventListener('resize',()=>c.resize());
+  const b=document.createElement('button');b.textContent='💾PNG';b.style.cssText='position:absolute;top:8px;right:8px;z-index:9;padding:5px 10px;border-radius:12px;border:1px solid #00f0ff;background:rgba(0,240,255,.15);color:#fff;font-size:12px';
+  b.onclick=()=>saveDataUrl('图表_'+Date.now()+'.png',c.getDataURL({pixelRatio:2,backgroundColor:'#0a0e23'}));
+  el.appendChild(b)});
+ _EC_QUEUE=[]}
+/* ========== Excalidraw ========== */
+function buildExcalidrawElements(data){
+ const els=[],nodes=[];
+ (data.nodes||[]).forEach((n,i)=>{
+  const col=i%3,row=Math.floor(i/3),w=180,h=60,x=60+col*(w+40),y=60+row*(h+80),id='n'+i;
+  els.push({type:'rectangle',id,x,y,width:w,height:h,angle:0,strokeColor:'#1e1e2e',backgroundColor:'#a5d8ff',fillStyle:'solid',strokeWidth:2,roughness:1,opacity:100,groupIds:[],frameId:null,roundness:{type:3}});
+  els.push({type:'text',id:'t'+i,x:x+10,y:y+h/2-12,width:w-20,height:24,angle:0,strokeColor:'#1e1e2e',backgroundColor:'transparent',fillStyle:'solid',strokeWidth:1,roughness:1,opacity:100,fontSize:16,fontFamily:1,textAlign:'center',verticalAlign:'middle',text:n.label||'',groupIds:[],frameId:null});
+  nodes.push({id,x,y,w,h});
+ });
+ (data.edges||[]).forEach((e,idx)=>{
+  const a=nodes.find(n=>n.id===e.from),b=nodes.find(n=>n.id===e.to);if(!a||!b)return;
+  const axc=a.x+a.w/2,ayc=a.y+a.h/2,bxc=b.x+b.w/2,byc=b.y+b.h/2;
+  const x=Math.min(axc,bxc),y=Math.min(ayc,byc),w=Math.abs(bxc-axc),h=Math.abs(byc-ayc);
+  els.push({type:'arrow',id:'e'+idx,x,y,width:Math.max(w,1),height:Math.max(h,1),angle:0,strokeColor:'#1971c2',backgroundColor:'transparent',fillStyle:'solid',strokeWidth:2,roughness:1,opacity:100,groupIds:[],frameId:null,points:[[axc-x,ayc-y],[bxc-x,byc-y]],startBinding:{elementId:a.id,focus:0,gap:5},endBinding:{elementId:b.id,focus:0,gap:5}});
+ });
+ return els;
 }
-function addAI(txt){
-  var row=document.createElement('div');row.className='msg a';row.innerHTML='<div class="av">🤖</div><div class="bub"></div>';chat.appendChild(row);row.querySelector('.bub').innerHTML=md(txt);scb();
-  return row.querySelector('.bub');
+function handleExcalidraw(text){
+ const re=/___EXCALIDRAW___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
+ text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
+  const file={type:'excalidraw',version:2,source:'ai-app',elements:buildExcalidrawElements(d),elementsMap:{},appState:{viewBackgroundColor:'#f8f9fa'},files:{}};
+  window.open('https://excalidraw.com/#json='+btoa(unescape(encodeURIComponent(JSON.stringify(file))))+',AI1','_blank');
+  return '（📎手绘图已在Excalidraw新标签页打开，可编辑导出）'});
+ return hit?text:null;
 }
-window.copyCode=function(btn){var c=btn.closest('.cw').querySelector('code').innerText;navigator.clipboard.writeText(c).then(function(){btn.textContent='✅';setTimeout(function(){btn.textContent='📋';},1800);});};
-window.runCode=function(btn){
-  var w=btn.closest('.cw'),c=w.querySelector('code').innerText,o=w.querySelector('.er');if(o)o.remove();
-  if(pyBusy){tst('Python加载中...');return;}btn.disabled=true;btn.textContent='⏳';execPy(c,w,btn,null);
-};
-function execPy(code,w,btn,cb){
-  function go(){
-    var out='';if(btn)btn.textContent='⚡';
-    Promise.all(PRELOAD.map(function(p){return py.loadPackage(p).catch(function(){});})).then(function(){
-      py.runPythonAsync(FONT_SETUP).then(function(){
-    try{
-      py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
-      var ic=code.includes('plt.')||code.includes('matplotlib');
-      if(ic)code+='\n_ds_imgs=[]\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  _ds_imgs.append(base64.b64encode(__b.read()).decode())\nexcept: pass\n';
-      py.runPythonAsync(code).then(function(){
-        try{out=py.runPython('_so.getvalue()');}catch(e){}
-        var im=[];if(ic){try{var pi=py.runPython('_ds_imgs');if(pi&&pi.toJs)im=pi.toJs();else if(Array.isArray(pi))im=pi;}catch(e){}}
-        var im2=[];if(out.indexOf('IMG_')>-1){var parts=out.split(/_{2,3}IMG_{2,3}/);for(var i=1;i<parts.length;i++){var cl=parts[i].replace(/\s/g,'');if(cl.length>100)im2.push(cl);}out=parts[0];}
-        out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();
-        var allImgs=im.concat(im2);
-        if(w)showRes(w,out||'(执行成功)',false,allImgs);
-        if(btn){btn.disabled=false;btn.textContent='▶ 运行';}
-        if(cb)cb(out,allImgs);
-      }).catch(function(e){if(w)showRes(w,out+'\n\n❌ '+e.message,true);if(btn){btn.disabled=false;btn.textContent='▶ 运行';}if(cb)cb('❌ '+e.message,[]);});
-    }catch(e){if(w)showRes(w,'❌ '+e.message,true);if(btn){btn.disabled=false;btn.textContent='▶ 运行';}if(cb)cb('❌ '+e.message,[]);}
-      }).catch(function(){if(cb)cb('❌ 字体加载失败',[]);});
-    });
+/* ========== draw.io ========== */
+function openDrawio(body){if(navigator.clipboard)navigator.clipboard.writeText(body);window.open('https://app.diagrams.net/?splash=0','_blank')}
+/* ========== 总管线 ========== */
+function ap/* ========== IndexedDB（字体缓存） ========== */
+function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbGet(k){try{const db=await idbOpen();return await new Promise((res,rej)=>{const q=db.transaction('kv','readonly').objectStore('kv').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}catch(e){return null}}
+async function idbSet(k,v){try{const db=await idbOpen();await new Promise((res,rej)=>{const q=db.transaction('kv','readwrite').objectStore('kv').put(v,k);q.onsuccess=res;q.onerror=()=>rej(q.error)})}catch(e){}}
+/* ========== 中文字体（8秒超时，失败自动降级不报错） ========== */
+const FONT_URLS=['https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf'];
+async function ensureCJKFont(py){
+ try{
+  let buf=await idbGet('simhei_v1');
+  if(!buf){
+   const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),8000);let ok=false;
+   for(const u of FONT_URLS){try{const r=await fetch(u,{signal:ctrl.signal});if(r.ok){buf=await r.arrayBuffer();ok=true;break}}catch(e){}}
+   clearTimeout(t);if(!ok)return false;
+   await idbSet('simhei_v1',buf);
   }
-  if(pyOk){go();return;}
-  if(pyBusy){setTimeout(function(){execPy(code,w,btn,cb);},1000);return;}
-  pyBusy=true;tst('首次加载Python (~50MB)...');
-  loadFontData(function(){});
-  var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
-  s.onload=function(){loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;go();}).catch(function(e){pyBusy=false;if(cb)cb('❌ 加载失败',[]);});};
-  s.onerror=function(){pyBusy=false;if(cb)cb('❌ 网络错误',[]);};document.head.appendChild(s);
+  py.FS.writeFile('/SimHei.ttf',new Uint8Array(buf));
+  py.runPython(`import matplotlib.font_manager as fm
+fm.fontManager.addfont('/SimHei.ttf')
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif']=['SimHei','DejaVu Sans']
+plt.rcParams['axes.unicode_minus']=False`);
+  return true;
+ }catch(e){return false}
 }
-function showRes(w,t,er,im){
-  var d=document.createElement('div');d.className='er'+(er?' e':'');
-  d.innerHTML='<div style="font-size:.7rem;color:'+(er?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(er?'❌ 出错':'✅ 成功')+'</div>';
-  if(t&&t.indexOf('___HTML___')>-1){
-    var hp=t.split('___HTML___');
-    t=hp[0].trim();
-    var hdiv=document.createElement('div');
-    hdiv.innerHTML=hp[1].trim();
-    hdiv.style.cssText='overflow-x:auto;background:#fff;border-radius:12px;padding:12px;margin:8px 0';
-    d.appendChild(hdiv);
-    var ha=document.createElement('a');
-    ha.href='data:text/html;charset=utf-8,'+encodeURIComponent(hp[1].trim());
-    ha.download='poster.html';ha.textContent='💾 保存为HTML';ha.className='svbtn';d.appendChild(ha);
+/* ========== Pyodide（懒加载，首次运行才下载） ========== */
+let _pyP=null;
+const PRELUDE=`import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+_ds_imgs=[]
+def _ds_save(fig=None):
+ import base64,io
+ if fig is None: fig=plt.gcf()
+ buf=io.BytesIO()
+ fig.savefig(buf,format='png',dpi=110,bbox_inches='tight')
+ _ds_imgs.append(base64.b64encode(buf.getvalue()).decode())
+ plt.close(fig)
+`;
+function getPyodide(){
+ if(_pyP)return _pyP;
+ _pyP=(async()=>{
+  if(!window.loadPyodide)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';s.onload=res;s.onerror=()=>rej(new Error('Pyodide加载失败'));document.head.appendChild(s)});
+  const py=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'});
+  await py.loadPackages(['numpy','pandas','matplotlib','scipy']);
+  await ensureCJKFont(py);
+  return py;
+ })();
+ return _pyP;
+}
+async function runCode(code,st,btn){
+ if(btn){btn.disabled=true;btn.textContent='⏳…'}
+ if(st)st.textContent='首次需下载Python引擎(约50MB)…';
+ try{
+  const py=await getPyodide();
+  if(st)st.textContent='运行中…';
+  let out='';
+  py.setStdout({write:s=>out+=s});py.setStderr({write:s=>out+=s});
+  py.runPython(PRELUDE);
+  py.runPython(code);
+  const imgs=py.globals.get('_ds_imgs').toJs();
+  const res=document.createElement('div');res.className='msg ai';
+  let html='';
+  if(out.trim())html+='<pre style="font-size:12px;color:#39ff14;background:rgba(0,0,0,.5);border-radius:8px;padding:8px;white-space:pre-wrap">'+escapeHtml(out)+'</pre>';
+  imgs.forEach((b,i)=>{html+='<div style="margin-top:8px"><img src="data:image/png;base64,'+b+'" style="max-width:100%;border-radius:8px"><div style="margin-top:4px"><button onclick="saveDataUrl(\'图'+(i+1)+'.png\',\'data:image/png;base64,'+b+'\')">💾保存图'+(i+1)+'</button></div></div>'});
+  if(!html)html='<div style="color:#8fa3bf">✅ 运行完成（无输出）</div>';
+  res.innerHTML=html;
+  const box=btn?btn.closest('.msg'):null;
+  if(box)box.insertAdjacentElement('afterend',res);else $('chatBox').appendChild(res);
+  scrollBox();
+ }catch(e){
+  if(st)st.textContent='';
+  const res=document.createElement('div');res.className='msg ai';
+  res.innerHTML='<div style="color:#ff9090">❌ 出错：'+escapeHtml(e.message||String(e))+'</div>';
+  const box=btn?btn.closest('.msg'):null;
+  if(box)box.insertAdjacentElement('afterend',res);else $('chatBox').appendChild(res);
+  scrollBox();
+ }finally{
+  if(btn){btn.disabled=false;btn.textContent='▶重新运行'}
+  if(st)st.textContent='';
+ }
+}
+/* ========== 搜索 ========== */
+function shouldSearch(q){return /推演|赔率|比分|比赛|赛前|最新|新闻|搜索|情报|名单|伤停/.test(q)}
+async function tavilySearch(q){
+ try{
+  const c=new AbortController();const t=setTimeout(()=>c.abort(),10000);
+  const r=await fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:TAVILY_KEY,query:q,max_results:5,search_depth:'basic'}),signal:c.signal});
+  clearTimeout(t);const j=await r.json();
+  const items=(j.results||[]).slice(0,5).map(x=>'【'+x.title+'】'+(x.content||'').slice(0,400));
+  return items.length?('【搜索到的资料】\n'+items.join('\n\n')):'（未搜到资料）';
+ }catch(e){return '（搜索失败：'+e.message+'）'}
+}
+/* ========== 输出渲染（标记拆分） ========== */
+let CODES=[];
+function extractCodeBlocks(text){CODES=[];return text.replace(/```python\n?([\s\S]*?)```/g,(m,c)=>{CODES.push(c);return '\n[[CODE:'+(CODES.length-1)+']]\n'})}
+function splitMarkers(text){
+ const parts=[];let cur='';const re=/(___HTML___\n|___TABLE___\n|___MERMAID___\n|___IMG___\n)/g;
+ let m,last=0;
+ while((m=re.exec(text))){
+  if(m.index>last)cur+=text.slice(last,m.index);
+  if(cur.trim()){parts.push({type:'text',content:cur});cur=''}
+  const s=m.index+m[0].length;
+  const e=text.indexOf('___',s);
+  const c=(e===-1)?text.slice(s):text.slice(s,e);
+  parts.push({type:m[1].replace(/\n/,'').replace(/^___|___$/g,'').toLowerCase(),content:c});
+  if(e===-1){last=text.length;break}
+  last=e;
+ }
+ if(last<text.length){cur+=text.slice(last);if(cur.trim())parts.push({type:'text',content:cur})}
+ return parts;
+}
+function renderTable(csv,wrap){
+ const t=document.createElement('table');t.className='tbl';
+ csv.trim().split('\n').forEach((r,i)=>{const tr=document.createElement('tr');r.split(',').forEach(c=>{const cell=document.createElement(i===0?'th':'td');cell.textContent=c;tr.appendChild(cell)});t.appendChild(tr)});
+ wrap.appendChild(t);
+ const b=document.createElement('button');b.textContent='💾保存CSV';b.style.cssText='margin-top:6px';
+ b.onclick=()=>downloadFile('表格_'+Date.now()+'.csv',csv,'text/csv;charset=utf-8');
+ wrap.appendChild(b);
+}
+function renderMermaid(code,wrap){
+ const body=code.trim();
+ const b64=btoa(unescape(encodeURIComponent(body)));
+ const img=document.createElement('img');
+ img.src='https://mermaid.ink/img/base64:'+b64;
+ img.style.cssText='max-width:100%;background:#fff;border-radius:8px';
+ img.onerror=()=>{img.outerHTML='<div style="color:#ff9090;font-size:13px">流程图渲染失败，可保存.mmd后用mermaid.live查看</div>'};
+ wrap.appendChild(img);
+ const bar=document.createElement('div');bar.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:6px';
+ const b1=document.createElement('button');b1.textContent='💾.mmd';b1.onclick=()=>downloadFile('流程图_'+Date.now()+'.mmd',body);
+ const b2=document.createElement('button');b2.textContent='🖼️PNG';b2.onclick=()=>window.open('https://mermaid.ink/img/base64:'+b64,'_blank');
+ const b3=document.createElement('button');b3.textContent='📐draw.io';b3.onclick=()=>openDrawio(body);
+ const b4=document.createElement('button');b4.textContent='✏️编辑';b4.onclick=()=>window.open('https://mermaid.live/edit?raw='+encodeURIComponent(body),'_blank');
+ [b1,b2,b3,b4].forEach(b=>bar.appendChild(b));
+ wrap.appendChild(bar);
+}
+function showRes(text,box){
+ if(!box)box=addMsg('ai','');
+ box.innerHTML='';
+ splitMarkers(text).forEach(s=>{
+  if(s.type==='text'){
+   const d=document.createElement('div');
+   let t=escapeHtml(s.content).replace(/\[\[CODE:(\d+)\]\]/g,(mm,i)=>{const code=CODES[+i];return '<div class="out-item"><div style="font-size:11px;color:#8fa3bf;margin-bottom:4px">🐍 Python</div><pre class="code">'+escapeHtml(code.length>400?code.slice(0,400)+'…':code)+'</pre><button data-run="'+i+'" style="margin-top:6px">▶运行</button><span class="runStatus" style="font-size:12px;color:#8fa3bf;margin-left:8px"></span></div>'});
+   d.innerHTML=t.replace(/\n/g,'<br>');
+   box.appendChild(d);
+  }else if(s.type==='html'){const d=document.createElement('div');d.className='out-item';d.innerHTML=s.content;box.appendChild(d)}
+  else if(s.type==='table'){const d=document.createElement('div');d.className='out-item';renderTable(s.content,d);box.appendChild(d)}
+  else if(s.type==='mermaid'){const d=document.createElement('div');d.className='out-item';renderMermaid(s.content,d);box.appendChild(d)}
+  else if(s.type==='img'){
+   const d=document.createElement('div');d.className='out-item';const b64=s.content.trim().replace(/\s/g,'');
+   d.innerHTML='<img src="data:image/png;base64,'+b64+'" style="max-width:100%;border-radius:8px"><div style="margin-top:6px"><button onclick="saveDataUrl(\'图表_'+Date.now()+'.png\',\'data:image/png;base64,'+b64+'\')">💾保存PNG</button></div>';
+   box.appendChild(d);
   }
-  if(t&&t.indexOf('___TABLE___')>-1){
-    var tp=t.split('___TABLE___');
-    t=tp[0].trim();
-    var csv=tp[1].replace(/^\s+|\s+$/g,'');
-    var rows=csv.split('\n').map(function(r){return r.split(',');});
-    if(rows.length>0){
-      var tb=document.createElement('table');
-      rows.forEach(function(r,ri){
-        var tr=document.createElement('tr');
-        r.forEach(function(cell){
-          var c=document.createElement(ri===0?'th':'td');
-          c.textContent=cell.trim();
-          tr.appendChild(c);
-        });
-        tb.appendChild(tr);
-      });
-      d.appendChild(tb);
-      var a=document.createElement('a');
-      a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-      a.download='data.csv';a.textContent='💾 保存CSV';a.className='svbtn';d.appendChild(a);
-    }
+ });
+ box.querySelectorAll('[data-run]').forEach(b=>{b.onclick=()=>runCode(CODES[+b.dataset.run],b.nextElementSibling,b)});
+ if(AUTO_EXEC)setTimeout(()=>box.querySelectorAll('[data-run]').forEach(b=>b.click()),100);
+ scrollBox();
+}
+/* ========== 聊天（流式） ========== */
+function buildMessages(uc){
+ const sys=SYSTEM_PROMPT+'\n\n【用户档案】'+(PROFILE||'（无）')+'\n\n【长期摘要】'+(SUMMARY||'（暂无）');
+ return [{role:'system',content:sys},...HISTORY.slice(-20),{role:'user',content:uc}];
+}
+async function send(){
+ const inp=$('chatInput');const q=inp.value.trim();if(!q)return;
+ inp.value='';
+ addMsg('user',q);
+ HISTORY.push({role:'user',content:q});
+ const box=addMsg('ai','');
+ let full='';
+ try{
+  let uc=q;
+  if(shouldSearch(q)){
+   if(!TAVILY_KEY)uc+='\n\n(提示：未配置Tavily Key，直接根据知识回答)';
+   else{box.firstChild.textContent='🔍 正在搜索…';const info=await tavilySearch(q);if(info)uc+='\n\n'+info}
   }
-  if(t&&t.indexOf('___MERMAID___')>-1){
-    var mp=t.split('___MERMAID___');
-    t=mp[0].trim();
-    var mc=mp[1].trim();
-    var dv=document.createElement('div');
-    dv.className='mermaid';dv.textContent=mc;d.appendChild(dv);
-    try{mermaid.initialize({startOnLoad:false,theme:'dark'});mermaid.run({nodes:[dv]}).catch(function(){});}catch(e){}
-    var sb=document.createElement('a');
-    sb.href='data:text/plain;charset=utf-8,'+encodeURIComponent(mc);
-    sb.download='flow.mmd';sb.textContent='💾 保存源码';sb.className='svbtn';d.appendChild(sb);
+  const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY},body:JSON.stringify({model:MODEL,messages:buildMessages(uc),stream:true})});
+  if(!res.ok){let m='HTTP '+res.status;try{const j=await res.json();m=(j&&j.error&&j.error.message)||m}catch(e){}throw new Error(m)}
+  const rd=res.body.getReader(),dec=new TextDecoder();let buf='',last=0;
+  while(true){
+   const {done,value}=await rd.read();if(done)break;
+   buf+=dec.decode(value,{stream:true});
+   const lines=buf.split('\n');buf=lines.pop();
+   for(const l of lines){
+    const t=l.trim();if(!t.startsWith('data:'))continue;
+    const d=t.slice(5).trim();if(d==='[DONE]')continue;
+    try{const j=JSON.parse(d);full+=(j.choices[0].delta&&j.choices[0].delta.content)||''}catch(e){}
+   }
+   const now=Date.now();if(now-last>80){last=now;box.firstChild.textContent=full;scrollBox()}
   }
-  if(t){var p=document.createElement('pre');p.textContent=t;p.style.cssText='margin:0;white-space:pre-wrap';d.appendChild(p);}
-  if(im&&im.length>0)im.forEach(function(b,idx){
-    var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:4px;margin-top:4px;display:block';d.appendChild(i);
-    var a=document.createElement('a');a.href='data:image/png;base64,'+b;a.download='chart_'+(idx+1)+'.png';a.textContent='💾 保存图'+(idx+1);a.className='svbtn';d.appendChild(a);
-  });
-  w.appendChild(d);scb();
+  if(!full)throw new Error('AI返回为空');
+ }catch(e){full='⚠️ '+(e.message||'网络错误')}
+ finalizeReply(full,box);
 }
-function callAPI(ak,bu,mdl2,mArr,str,cb){
-  var u=bu.replace(/\/$/,'')+'/chat/completions';
-  fetch(u,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ak},body:JSON.stringify({model:mdl2,messages:mArr,stream:str,temperature:0.7})})
-  .then(function(r){
-    if(!r.ok)return r.text().then(function(t){cb('❌ '+r.status,null);});
-    if(!str)return r.json().then(function(j){cb(null,j.choices[0].message.content);});
-    var rd=r.body.getReader(),dc=new TextDecoder(),bf='',full='';
-    function pump(){rd.read().then(function(x){if(x.done){cb(null,full);return;}bf+=dc.decode(x.value,{stream:true});var ls=bf.split('\n');bf=ls.pop()||'';ls.forEach(function(l){if(!l.startsWith('data: '))return;var d=l.slice(6).trim();if(d==='[DONE]')return;try{var j=JSON.parse(d),dt=(j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content)||'';if(dt)full+=dt;}catch(e){}});if(sf){cb(null,full);return;}pump();}).catch(function(){cb(null,full);});}pump();
-  }).catch(function(e){cb('❌ 网络:'+e.message,null);});
+function finalizeReply(full,box){
+ full=extractCodeBlocks(full);
+ full=applyAiPipeline(full);
+ box.firstChild.textContent='';
+ showRes(full,box);
+ showAllSaveBar();
+ setTimeout(flushEcharts,300);
+ saveMemory(full);
 }
-function doSearch(q,cb){
-  if(!akCB){cb(null,'搜索未配置');return;}
-  fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:akCB,query:q,max_results:5,search_depth:'basic'})})
-  .then(function(r){return r.json();}).then(function(j){
-    var txt='';if(j.results)j.results.forEach(function(p){txt+='📌 '+p.title+'\n'+p.content+'\n'+p.url+'\n\n';});
-    cb(null,txt||'(无结果)');
-  }).catch(function(e){cb('❌ 搜索失败:'+e.message,null);});
+function saveMemory(full){
+ const plain=full.replace(/___\w+___/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,200);
+ if(plain){SUMMARY=(SUMMARY?SUMMARY+'\n':'')+plain;if(SUMMARY.length>2000)SUMMARY=SUMMARY.slice(-2000);localStorage.setItem('wt_summary',SUMMARY)}
+ HISTORY.push({role:'assistant',content:full});
+ if(HISTORY.length>40)HISTORY=HISTORY.slice(-40);
 }
-function updateMem(finalReply){
-  // 简单摘要：取AI最后回复的前200字存入长期记忆
-  if(finalReply){
-    var s=finalReply.replace(/```[\s\S]*?```/g,'').replace(/___\w+___/g,'').trim();
-    var summary=s.length>200?s.slice(0,200):s;
-    saveMem(summary);
-  }
-}
-function agentStep(depth){
-  if(depth>3){addStatus('⚠️ 达到最大循环次数');agentBusy=false;snd.style.display='flex';stp.style.display='none';return;}
-  callAPI(akDS,buDS,mdl,agentMsgs,false,function(err,reply){
-    if(err){addStatus('❌ '+err);agentBusy=false;snd.style.display='flex';stp.style.display='none';return;}
-    var sm=reply.match(/\[SEARCH:\s*([^\]]+)\]/);
-    if(sm){
-      var sq=sm[1].trim();addStatus('🔍 搜索：'+sq);
-      doSearch(sq,function(se,sr){
-        if(se){addStatus('❌ '+se);}
-        else{agentMsgs.push({role:'assistant',content:reply});agentMsgs.push({role:'user',content:'搜索结果：\n'+sr});}
-        agentStep(depth+1);
-      });
-      return;
-    }
-    var cm=reply.match(/```(?:python|py)\n([\s\S]*?)```/);
-    if(cm&&autoExec){
-      var code=cm[1].trim();addStatus('⚡ 自动执行代码...');
-      var bub=addAI('```python\n'+code+'\n```');
-      var w=bub.querySelector('.cw');
-      execPy(code,w,null,function(out,im){
-        addStatus('✅ 执行完成，继续分析...');
-        agentMsgs.push({role:'assistant',content:reply});
-        agentMsgs.push({role:'user',content:'代码执行结果：\n'+out});
-        agentStep(depth+1);
-      });
-      return;
-    }
-    if(reply.indexOf('___HTML___')>-1||reply.indexOf('___TABLE___')>-1||reply.indexOf('___MERMAID___')>-1){
-      addAI(reply);updateMem(reply);agentBusy=false;snd.style.display='flex';stp.style.display='none';return;
-    }
-    addAI(reply);updateMem(reply);
-    agentBusy=false;snd.style.display='flex';stp.style.display='none';
-  });
-}
-function send(){
-  var t=inp.value.trim();if(!t||agentBusy)return;
-  if(!akDS){tst('请先设置Key ⚙️');openMod();return;}
-  if(msgs.length===0)chat.innerHTML='';
-  msgs.push({role:'user',content:t});save();
-  var row=document.createElement('div');row.className='msg u';row.innerHTML='<div class="av">👤</div><div class="bub">'+esc(t)+'</div>';chat.appendChild(row);scb();
-  addStatus('🤖 思考中...');
-  agentBusy=true;sf=false;snd.style.display='none';stp.style.display='flex';
-  // 上下文记忆：长期摘要 + 最近20条 + 当前问题
-  var hist=msgs.slice(-20).filter(function(m){return m.role!=='system';});
-  agentMsgs=[{role:'system',content:AGENT_PROMPT+'\n'+getMemPrompt()}].concat(hist,{role:'user',content:t});
-  agentStep(0);
-}
-function stopGen(){sf=true;agentBusy=false;agentMsgs=[];snd.style.display='flex';stp.style.display='none';tst('⏹ 已停止');}
-function render(){if(msgs.length===0){chat.innerHTML='<div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">🧠记忆 | ⚡手动执行 | 🔍搜索 | 小红书出图<br>输入需求，AI生成代码</p></div>';}}
-document.getElementById('autox').addEventListener('click',function(){
-  autoExec=!autoExec;var b=document.getElementById('autox');
-  if(autoExec){b.classList.add('on');tst('⚡ 自动执行 ON');}else{b.classList.remove('on');tst('⚡ 手动执行（点▶运行）');}
-});
-document.getElementById('srch').addEventListener('click',function(){
-  srchOn=!srchOn;var b=document.getElementById('srch');
-  if(srchOn){b.classList.add('on');tst('🔍 自动搜索 ON');}else{b.classList.remove('on');tst('💬 普通模式');}
-});
-document.getElementById('mem').addEventListener('click',function(){
-  var info='🧠 长期记忆：\n'+(longMem||'（空）')+'\n\n📝 用户档案：\n'+(userProfile||'（空）')+'\n\n💾 当前对话：'+msgs.length+'条';
-  var nm=prompt('📝 编辑用户档案（例如：名字=小明, 减肥目标=122→118, 偏好=小红书风格）：\n'+info);
-  if(nm!==null&&nm.trim()!==''){userProfile=nm.trim();localStorage.setItem('dsprof',userProfile);tst('🧠 档案已保存');}
-  else if(nm!==null){alert('当前记忆：\n'+info);}
-});
-function openMod(){document.getElementById('sk_ds').value=akDS;document.getElementById('su_ds').value=buDS;document.getElementById('sk_cb').value=akCB;document.getElementById('sm').value=mdl;mod.style.display='flex';}
-function closeMod(){mod.style.display='none';}
-document.getElementById('ms').addEventListener('click',function(){
-  akDS=document.getElementById('sk_ds').value.trim();buDS=document.getElementById('su_ds').value.trim()||'https://api.deepseek.com';
-  akCB=document.getElementById('sk_cb').value.trim();mdl=document.getElementById('sm').value;
-  localStorage.setItem('dsk',akDS);localStorage.setItem('dsu',buDS);localStorage.setItem('cbk',akCB);localStorage.setItem('dsm',mdl);
-  closeMod();tst('✅ 已保存');
-});
-document.getElementById('mc').addEventListener('click',closeMod);
-mod.addEventListener('click',function(e){if(e.target===mod)closeMod();});
-document.getElementById('clr').addEventListener('click',function(){if(confirm('清空？')){msgs=[];agentMsgs=[];save();render();closeMod();tst('🗑️ 已清空');}});
-document.getElementById('sbtn').addEventListener('click',openMod);
-document.getElementById('nbtn').addEventListener('click',function(){if(msgs.length>0&&!confirm('新对话？'))return;msgs=[];agentMsgs=[];save();render();tst('✨ 新对话');});
-snd.addEventListener('click',send);stp.addEventListener('click',stopGen);
-inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
-inp.addEventListener('input',function(){inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,100)+'px';});
-render();
-</script></body></html>
+/* ========== 系统提示词 ========== */
+const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中文回答，直接给成品，不啰嗦。
+【输出协议】
+1.小红书风HTML海报 → ___HTML___换行+HTML代码
+2.表格 → ___TABLE___换行+CSV
+3.流程图 → ___MERMAID___换行+Mermaid代码
+4.数据图表 → ___ECHARTS___换行+echarts option JSON（graph/sankey/sunburst/pie/line/bar）
+5.手绘风图 → ___EXCALIDRAW___换行+{"nodes":[{"id":"a","label":".."}],"edges":[{"from":"a","to":"b","label":".."}]}
+6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动全部渲染+一键保存
+【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_
