@@ -52,13 +52,13 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 <body>
 <div id="app">
 <div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="srch" title="搜索">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
+<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
 <div id="ps"><span id="pst">加载Python...</span></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
 </div>
-<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds" placeholder="sk-..."><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>ChatboxAI Key</label><input type="password" id="sk_cb" placeholder="1c0964a1-..."><label>ChatboxAI URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
+<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds" placeholder="sk-..."><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>DeepSeek 模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><label>ChatboxAI Key</label><input type="password" id="sk_cb" placeholder="1c0964a1-..."><label>ChatboxAI URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
 <script>
-var akDS=localStorage.getItem('dsk')||'',buDS=localStorage.getItem('dsu')||'https://api.deepseek.com';
+var akDS=localStorage.getItem('dsk')||'',buDS=localStorage.getItem('dsu')||'https://api.deepseek.com',mdl=localStorage.getItem('dsm')||'deepseek-v4-pro';
 var akCB=localStorage.getItem('cbk')||'',buCB=localStorage.getItem('cbu')||'https://ai.chatboxai.app/v1';
 var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]'),busy=false,sf=false,srchOn=false;
 var py=null,pyOk=false,pyBusy=false;
@@ -77,7 +77,7 @@ function md(t){
   var p=t.split('\n\n');return p.map(function(x){if(x.indexOf('<div class="cw">')===0)return x;return '<p style="margin-bottom:5px">'+x.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 function render(){
-  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
+  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
   chat.innerHTML='';msgs.forEach(function(m){if(m.role==='system')return;var r=document.createElement('div');r.className='msg '+(m.role==='user'?'u':'a');r.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md(m.content)+'</div>';chat.appendChild(r);});scb();
 }
 function upd(m){var b=chat.querySelectorAll('.msg.a .bub'),l=b[b.length-1];if(l)l.innerHTML=md(m.content);scb();}
@@ -114,11 +114,11 @@ function showRes(w,t,er,im){
   if(im&&im.length>0)im.forEach(function(b){var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:6px;margin-top:6px;display:block';d.appendChild(i);});
   w.appendChild(d);scb();
 }
-// ====== API 调用 ======
-function callAPI(ak,bu,mdl,mArr,str,cb){
+// ====== API 调用（ChatboxAI走CORS代理）======
+function callAPI(ak,bu,mdl2,mArr,str,cb){
   var u=bu.replace(/\/$/,'')+'/chat/completions';
   if(bu.indexOf('chatboxai')>-1)u='https://corsproxy.io/?'+encodeURIComponent(u);
-  fetch(u,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ak},body:JSON.stringify({model:mdl,messages:mArr,stream:str,temperature:0.7})})
+  fetch(u,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ak},body:JSON.stringify({model:mdl2,messages:mArr,stream:str,temperature:0.7})})
   .then(function(r){
     if(!r.ok)return r.text().then(function(t){cb('❌ '+r.status,null);});
     if(!str)return r.json().then(function(j){cb(null,j.choices[0].message.content);});
@@ -127,17 +127,17 @@ function callAPI(ak,bu,mdl,mArr,str,cb){
   }).catch(function(e){cb('❌ 网络:'+e.message,null);});
 }
 
-// ====== 搜索 ======
-var SP='你是DeepSeek V4-Pro。需要实时数据时输出 [SEARCH:关键词]，系统自动搜索后返回结果。收到结果后继续回答。不需要搜索就直接回答。';
+// ====== 自动搜索 ======
+var SP='你是DeepSeek。需要实时数据时输出 [SEARCH:关键词]，系统自动搜索后返回结果。收到结果后继续回答。不需要搜索就直接回答。';
 
 function doSearch(q,cb){
-  if(!akCB){cb(null,'搜索未配置');return;}
+  if(!akCB){cb(null,'搜索未配置，请在设置填ChatboxAI Key');return;}
   callAPI(akCB,buCB,'gemini-3-pro',[{role:'user',content:'搜索并返回详细信息：'+q}],false,cb);
 }
 
 function sendSrch(txt){
   msgs.push({role:'assistant',content:'🔍 分析...'});render();var ai=msgs.length-1;
-  callAPI(akDS,buDS,'deepseek-v4-pro',[{role:'system',content:SP},{role:'user',content:txt}],false,function(err,re){
+  callAPI(akDS,buDS,mdl,[{role:'system',content:SP},{role:'user',content:txt}],false,function(err,re){
     if(err){msgs[ai].content=err;render();save();fin();return;}
     var sm=re.match(/\[SEARCH:\s*([^\]]+)\]/);
     if(sm){
@@ -145,7 +145,7 @@ function sendSrch(txt){
       doSearch(sq,function(se,sr){
         if(se){msgs[ai].content=se;render();save();fin();return;}
         msgs[ai].content='';render();
-        callAPI(akDS,buDS,'deepseek-v4-pro',[{role:'system',content:SP},{role:'user',content:txt},{role:'user',content:'搜索结果：\n'+sr+'\n请据此回答。'}],true,function(fe,fr){
+        callAPI(akDS,buDS,mdl,[{role:'system',content:SP},{role:'user',content:txt},{role:'user',content:'搜索结果：\n'+sr+'\n请据此回答。'}],true,function(fe,fr){
           if(fe)msgs[ai].content=fe;else msgs[ai].content=fr||'(空)';
           render();save();fin();
         });
@@ -163,7 +163,7 @@ function send(){
   busy=true;sf=false;snd.style.display='none';stp.style.display='flex';
   if(srchOn){sendSrch(t);return;}
   msgs.push({role:'assistant',content:''});render();var ai=msgs.length-1;
-  callAPI(akDS,buDS,'deepseek-v4-pro',msgs.filter(function(m){return m.role!=='system';}),true,function(e,f){if(e)msgs[ai].content=e;else msgs[ai].content=f||'(空)';render();save();fin();});
+  callAPI(akDS,buDS,mdl,msgs.filter(function(m){return m.role!=='system';}),true,function(e,f){if(e)msgs[ai].content=e;else msgs[ai].content=f||'(空)';render();save();fin();});
 }
 
 function stopGen(){sf=true;}
@@ -173,9 +173,15 @@ document.getElementById('srch').addEventListener('click',function(){
   if(srchOn){b.classList.add('on');tst('🔍 自动搜索 ON');}else{b.classList.remove('on');tst('💬 普通模式');}
 });
 
-function openMod(){document.getElementById('sk_ds').value=akDS;document.getElementById('su_ds').value=buDS;document.getElementById('sk_cb').value=akCB;document.getElementById('su_cb').value=buCB;mod.style.display='flex';}
+function openMod(){document.getElementById('sk_ds').value=akDS;document.getElementById('su_ds').value=buDS;document.getElementById('sk_cb').value=akCB;document.getElementById('su_cb').value=buCB;document.getElementById('sm').value=mdl;mod.style.display='flex';}
 function closeMod(){mod.style.display='none';}
-document.getElementById('ms').addEventListener('click',function(){akDS=document.getElementById('sk_ds').value.trim();buDS=document.getElementById('su_ds').value.trim()||'https://api.deepseek.com';akCB=document.getElementById('sk_cb').value.trim();buCB=document.getElementById('su_cb').value.trim()||'https://ai.chatboxai.app/v1';localStorage.setItem('dsk',akDS);localStorage.setItem('dsu',buDS);localStorage.setItem('cbk',akCB);localStorage.setItem('cbu',buCB);closeMod();tst('✅ 已保存');});
+document.getElementById('ms').addEventListener('click',function(){
+  akDS=document.getElementById('sk_ds').value.trim();buDS=document.getElementById('su_ds').value.trim()||'https://api.deepseek.com';
+  akCB=document.getElementById('sk_cb').value.trim();buCB=document.getElementById('su_cb').value.trim()||'https://ai.chatboxai.app/v1';
+  mdl=document.getElementById('sm').value;
+  localStorage.setItem('dsk',akDS);localStorage.setItem('dsu',buDS);localStorage.setItem('cbk',akCB);localStorage.setItem('cbu',buCB);localStorage.setItem('dsm',mdl);
+  closeMod();tst('✅ 已保存');
+});
 document.getElementById('mc').addEventListener('click',closeMod);
 mod.addEventListener('click',function(e){if(e.target===mod)closeMod();});
 document.getElementById('clr').addEventListener('click',function(){if(confirm('清空？')){msgs=[];save();render();closeMod();tst('🗑️ 已清空');}});
