@@ -1,3 +1,4 @@
+<!--SEG1-->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -96,14 +97,14 @@ button.pri::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:
 </div>
 <div id="tplFab"><button id="tplBtn">📁模板</button></div>
 <div id="tplPanel"></div>
-/* ========== 配置 ========== */
+<script>
+<!--SEG2-->
 const API_URL='https://api.deepseek.com/chat/completions';
 let API_KEY=localStorage.getItem('wt_api')||'sk-28e218d04d204cc8993c1facfaa4f73d';
 let TAVILY_KEY=localStorage.getItem('wt_tavily')||'';
 let MODEL=localStorage.getItem('wt_model')||'deepseek-chat';
 let AUTO_EXEC=false;
 let HISTORY=[],PROFILE=localStorage.getItem('wt_profile')||'',SUMMARY=localStorage.getItem('wt_summary')||'';
-/* ========== 工具 ========== */
 function $(id){return document.getElementById(id)}
 function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function scrollBox(){$('chatBox').scrollTop=$('chatBox').scrollHeight}
@@ -116,7 +117,6 @@ function switchTab(name){
  $('tabWork').classList.toggle('on',name==='work');
  $('tabFoot').classList.toggle('on',name==='foot');
 }
-/* ========== 模板库（11个） ========== */
 const TPL_FLOW={
  flow_jianfei:{mode:'html',
   mermaid:`graph TD\n A["🎯目标：{target}"] --> B["🚀{p1}<br/>戒奶茶·晚餐7分饱"]\n B --> C["⚡{p2}<br/>加蛋白·跳绳15分钟"]\n C --> D["🔥{p3}<br/>16+8·喝水2L"]\n D --> E["🏆{p4}<br/>恢复三餐·保持运动"]\n E --> F["✅达成{target}"]`,
@@ -129,7 +129,7 @@ const TPL_FLOW={
  food_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff7f2,#fff0e6);border-radius:24px;padding:18px;box-shadow:0 8px 30px rgba(255,165,80,.25)"><div style="text-align:center;font-size:20px;font-weight:bold;color:#ff7a3d">🍱 一周食谱表</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px"><tr style="background:#ff7a3d;color:#fff"><th style="padding:7px">餐次</th><th>周一~三</th><th>周四~日</th></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌅早</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">鸡蛋+牛奶+全麦</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">燕麦+酸奶+水果</td></tr><tr><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc;font-weight:bold">☀️午</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">鸡胸+糙米+西兰花</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">牛肉+荞麦面+沙拉</td></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌙晚</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">虾仁+蔬菜汤7分饱</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">豆腐+菌菇+青菜</td></tr></table><div style="text-align:center;font-size:11px;color:#c98;margin-top:8px">🥗少油少盐·多喝水</div></div>`},
  card_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#f0fbff,#e8f7ff);border-radius:24px;padding:16px;box-shadow:0 8px 30px rgba(0,180,255,.25)"><div style="text-align:center;font-size:19px;font-weight:bold;color:#0090e8">📊 运动打卡（点☐打勾）</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;text-align:center"><tr style="background:#0090e8;color:#fff"><th style="padding:5px">天</th><th>快走</th><th>跳绳</th><th>拉伸</th><th>燃脂</th></tr>`+Array.from({length:14},(_,i)=>`<tr><td style="padding:4px;border:1px solid #cce9ff;background:#fff">第${i+1}天</td>`+[0,1,2,3].map(()=>`<td style="padding:4px;border:1px solid #cce9ff;background:#fff;font-size:15px;cursor:pointer" onclick="this.textContent=this.textContent==='☐'?'✅':'☐'">☐</td>`).join('')+`</tr>`).join('')+`</table></div>`},
  weight_table:{mode:'table',csv:'日期,体重(斤),较昨日,备注\n第1天,121.6,-0.4,启动期\n第2天,121.2,-0.4,晚餐7分饱\n第3天,120.8,-0.4,戒奶茶\n第4天,,,加速期\n第5天,,,\n第6天,,,\n第7天,,,\n第8天,,,冲刺期\n第9天,,,\n第10天,,,\n第11天,,,\n第12天,,,巩固期\n第13天,,,\n第14天,118.0,,🎉达成'},
- football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="backgro/* ========== AI模板调用协议 ========== */
+ football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;fo<!--SEG3-->
 let _TPL_QUEUE=[];
 function renderTplCall(text){
  const re=/___TPL___:([a-z0-9_]+)(?:\|([^___]*))?/g;_TPL_QUEUE=[];let hit=false;
@@ -144,7 +144,6 @@ function renderTplCall(text){
  });
  return hit?text:null;
 }
-/* ========== 一键保存 ========== */
 function saveAllNow(){_TPL_QUEUE.forEach((it,i)=>{const ext=it.mode==='html'?'html':(it.mode==='table'?'csv':'mmd');downloadFile(it.label+'_'+i+'.'+ext,it.body)})}
 function showAllSaveBar(){
  if(!_TPL_QUEUE.length)return;
@@ -165,7 +164,6 @@ function outputTpl(id,extra){const tpl=TPL_FLOW[id];if(!tpl)return;const p=extra
  showRes(marker+'\n'+fillTpl(src,p));
  showAllSaveBar();
 }
-/* ========== ECharts ========== */
 let _EC_QUEUE=[],_echartsLoaded=null;
 function loadECharts(){if(_echartsLoaded)return _echartsLoaded;
  _echartsLoaded=new Promise((res,rej)=>{if(window.echarts){res();return}
@@ -188,7 +186,6 @@ async function flushEcharts(){if(!_EC_QUEUE.length)return;
   b.onclick=()=>saveDataUrl('图表_'+Date.now()+'.png',c.getDataURL({pixelRatio:2,backgroundColor:'#0a0e23'}));
   el.appendChild(b)});
  _EC_QUEUE=[]}
-/* ========== Excalidraw ========== */
 function buildExcalidrawElements(data){
  const els=[],nodes=[];
  (data.nodes||[]).forEach((n,i)=>{
@@ -214,7 +211,7 @@ function handleExcalidraw(text){
  return hit?text:null;
 }
 function openDrawio(body){if(navigator.clipboard)navigator.clipboard.writeText(body);window.open('https://app.diagrams.net/?splash=0','_blank')}
-/* ========== Pyodide + 字体缓存 ========== */
+<!--SEG4-->
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(k){try{const db=await idbOpen();return await new Promise((res,rej)=>{const q=db.transaction('kv','readonly').objectStore('kv').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}catch(e){return null}}
 async function idbSet(k,v){try{const db=await idbOpen();await new Promise((res,rej)=>{const q=db.transaction('kv','readwrite').objectStore('kv').put(v,k);q.onsuccess=res;q.onerror=()=>rej(q.error)})}catch(e){}}
@@ -295,7 +292,6 @@ async function runCode(code,st,btn){
  }
 }
 function shouldSearch(q){return /推演|赔率|比分|比赛|赛前|最新|新闻|搜索|情报|名单|伤停/.test(q)}
-/* ========== 📡可视化实时搜索（过程全程可见） ========== */
 async function tavilySearch(q){
  const box=document.querySelector('#chatBox .msg.ai:last-child .txt');
  const steps=['赔率走势','近期状态','H2H交锋','伤停名单','最新情报'];
@@ -319,7 +315,6 @@ async function tavilySearch(q){
  show('📡 搜索完成，共'+out.length+'条资料 ✅');
  return res;
 }
-/* ========== 锋刃v6.1引擎 ① ========== */
 var ENGINE_PY = `
 import math, json
 L_TABLE={'英超':0.95,'西甲':0.95,'德甲':0.95,'意甲':0.95,'法甲':0.95,'英冠':0.90,'葡超':0.85,'荷甲':0.85,'巴甲':0.85,'美职联':0.75,'日职联':0.75,'K联赛':0.75,'韩职':0.75,'挪超':0.65,'瑞典超':0.65,'丹超':0.65,'苏超':0.65,'芬超':0.60,'澳超':0.55,'土超':0.55,'俄超':0.55,'亚洲二级':0.55}
@@ -350,7 +345,9 @@ class BladeV60:
  def signals(self):
   od=self._g('odds',{}) or {}; oh=float(od.get('home',2.0)); oa=float(od.get('away',3.5))
   A=(oa-oh)/(oa+oh)
-  B=float(self._g('def_home',0))-float(self./* ========== 锋刃v6.1引擎 ②（含自进化calibrate） ========== */
+  B=float(self._g('def_home',0))-float(self._g('def_away',0))
+  C=float(self._g('referee',0) or 0)
+  D=float(self._g('atk_home',0.5))-float(self._g('atk_away',0<!--SEG5-->
 const ENGINE_PY2 = `
  def s3(self,s1f,votes,ss):
   vh,vd,va=votes; mx=max(vh,vd,va)
@@ -489,7 +486,8 @@ const ENGINE_PY2 = `
     if self._g('league_ratio',0.9)>1.10: self.L=min(0.98,self.L*1.04)
    log['T_base']=round(T_BASE,4); log['L']=round(self.L,3)
    log['w']=[round(w,3) for w in W]; log['ema']='原型EMA+权重梯度已更新'
-/* ========== 输出渲染 ========== */
+  else: log['冻结']=True
+  self.state={'T_ba<!--SEG6-->
 let CODES=[];
 function extractCodeBlocks(text){CODES=[];return text.replace(/```python\n?([\s\S]*?)```/g,(m,c)=>{CODES.push(c);return '\n[[CODE:'+(CODES.length-1)+']]\n'})}
 function splitMarkers(text){
@@ -554,7 +552,6 @@ function showRes(text,box){
  if(AUTO_EXEC)setTimeout(()=>box.querySelectorAll('[data-run]').forEach(b=>b.click()),100);
  scrollBox();
 }
-/* ========== 聊天 ========== */
 function buildMessages(uc){
  const sys=SYSTEM_PROMPT+'\n\n【用户档案】'+(PROFILE||'（无）')+'\n\n【长期摘要】'+(SUMMARY||'（暂无）');
  return [{role:'system',content:sys},...HISTORY.slice(-20),{role:'user',content:uc}];
@@ -606,7 +603,6 @@ function saveMemory(full){
  HISTORY.push({role:'assistant',content:full});
  if(HISTORY.length>40)HISTORY=HISTORY.slice(-40);
 }
-/* ========== 系统提示词 ========== */
 const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中文回答，直接给成品，不啰嗦。
 【输出协议】
 1.小红书风HTML海报 → ___HTML___换行+HTML代码
@@ -615,7 +611,7 @@ const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中�
 4.数据图表 → ___ECHARTS___换行+echarts option JSON
 5.手绘风图 → ___EXCALIDRAW___换行+{"nodes":[{"id":"a","label":".."}],"edges":[{"from":"a","to":"b","label":".."}]}
 6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动渲染+一键保存
-【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡/* ========== v6.1工具区UI（赛果/批量/升级/评分/重构） ========== */
+【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡) weight_table(体重表) football_card(推演卡:home,away,s1-s5,rec) flow_football(推演流程:home,awa<!--SEG7-->
 (function(){
  if(document.getElementById('calSec'))return;
  const foot=$('viewFoot');
@@ -728,7 +724,7 @@ async function dailyEvolve(){
    lines2.push('🧬 '+msg);
   }catch(e){lines2.push('🧬 重构失败: '+escapeHtml(e.message||String(e)))}
  }
- window.FOOT/* ========== 模板面板 ========== */
+ window.FOOT_STATE.lastEvolve=new Date().toLocaleDateS<!--SEG8-->
 const PANEL_ITEMS=[
  ['🍎减肥计划图','flow_jianfei',{target:'122→118斤',p1:'启动期1-3天',p2:'加速期4-7天',p3:'冲刺期8-11天',p4:'巩固期12-14天'}],
  ['🍱一周食谱表','food_plan',{}],['📊运动打卡表','card_plan',{}],['📈体重记录表','weight_table',{}],
@@ -757,7 +753,6 @@ function fillSample(){
   context:'',samples:12,calibration:1.0
  },null,1);
 }
-/* ========== 启动 ========== */
 $('tabWork').onclick=()=>switchTab('work');
 $('tabFoot').onclick=()=>switchTab('foot');
 $('modelSel').value=MODEL;
@@ -774,7 +769,6 @@ $('tplBtn').onclick=toggleTplPanel;
 buildPanel();
 fillSample();
 addMsg('ai','👋 锋刃v6.1工作台：说"推演XXvsXX"→可视化实时搜索→自动跑引擎（自进化+影轨+FMEA）；赛后录赛果→每日自动升级→越用越准。试试："给我做14天减肥计划全套"');
-/* 每日自动升级（打开页面自动检测） */
 if(window.FOOT_STATE.lastEvolve!==new Date().toLocaleDateString()){
  setTimeout(function(){try{dailyEvolve()}catch(e){}},1500);
 }
