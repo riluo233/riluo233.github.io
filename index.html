@@ -98,16 +98,16 @@ function runPy(code,btn,w){
       while((m=re.exec(code))!==null){var p=mp[m[1]||m[2]];if(p&&pk.indexOf(p)===-1)pk.push(p);}
       py.runPythonAsync(code).then(function(){
         try{out=py.runPython('_so.getvalue()');}catch(e){}var im=[];if(ic){try{var pi=py.runPython('_ds_imgs');if(pi&&pi.toJs)im=pi.toJs();else if(Array.isArray(pi))im=pi;}catch(e){}}
-        out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();showRes(w,out||'(执行成功)',im);btn.disabled=false;btn.textContent='▶ 运行';
-      }).catch(function(e){showRes(w,out+'\n\n❌ '+e.message,[]);btn.disabled=false;btn.textContent='▶ 运行';});
-    }catch(e){showRes(w,'❌ '+e.message,[]);btn.disabled=false;btn.textContent='▶ 运行';}
+        out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();showRes(w,out||'(执行成功)',false,im);btn.disabled=false;btn.textContent='▶ 运行';
+      }).catch(function(e){showRes(w,out+'\n\n❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
+    }catch(e){showRes(w,'❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
   }
   if(pyOk){go();return;}
   if(pyBusy)return;pyBusy=true;ps.style.display='block';pst.textContent='加载Python(~20s)...';
   var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
   s.onload=function(){pst.textContent='加载核心(~50MB)...';
-    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;ps.style.display='none';py.loadPackage(['numpy','matplotlib']).catch(function(){});go();}).catch(function(e){pyBusy=false;ps.style.display='none';showRes(w,'❌ 加载失败',[]);btn.disabled=false;btn.textContent='▶ 运行';});
-  };s.onerror=function(){pyBusy=false;ps.style.display='none';showRes(w,'❌ 网络错误',[]);btn.disabled=false;btn.textContent='▶ 运行';};document.head.appendChild(s);
+    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;ps.style.display='none';py.loadPackage(['numpy','matplotlib']).catch(function(){});go();}).catch(function(e){pyBusy=false;ps.style.display='none';showRes(w,'❌ 加载失败',true);btn.disabled=false;btn.textContent='▶ 运行';});
+  };s.onerror=function(){pyBusy=false;ps.style.display='none';showRes(w,'❌ 网络错误',true);btn.disabled=false;btn.textContent='▶ 运行';};document.head.appendChild(s);
 }
 function showRes(w,t,er,im){
   var d=document.createElement('div');d.className='er'+(er?' e':'');d.innerHTML='<div style="font-size:.7rem;color:'+(er?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(er?'❌ 出错':'✅ 成功')+'</div>';
