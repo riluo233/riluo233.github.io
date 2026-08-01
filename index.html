@@ -70,7 +70,7 @@ var chat=document.getElementById('chat'),inp=document.getElementById('ui');
 var snd=document.getElementById('send'),stp=document.getElementById('stop');
 var mod=document.getElementById('mo'),ps=document.getElementById('ps'),pst=document.getElementById('pst');
 var PRELOAD=['numpy','pandas','matplotlib','scipy','scikit-learn','pillow'];
-var FONT_SETUP='import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport os\n_fp="/tmp/CNfont.ttf"\nif not os.path.exists(_fp):\n import pyodide.http\n try:\n  _r=await pyodide.http.pyfetch("https://raw.githubusercontent.com/anthonyfok/fonts-wqy-microhei/master/wqy-microhei.ttc")\n  _d=await _r.bytes()\n  open(_fp,"wb").write(_d)\n  fm.fontManager.addfont(_fp)\n except Exception:\n  pass\nelse:\n try: fm.fontManager.addfont(_fp)\n except Exception: pass\nplt.rcParams["font.sans-serif"]=["WenQuanYi Micro Hei","sans-serif"]\nplt.rcParams["axes.unicode_minus"]=False';
+var FONT_SETUP='import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport os\n_fp="/tmp/SimHei.ttf"\nif not os.path.exists(_fp):\n import pyodide.http\n try:\n  _r=await pyodide.http.pyfetch("https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf")\n  _d=await _r.bytes()\n  open(_fp,"wb").write(_d)\n  fm.fontManager.addfont(_fp)\n except Exception:\n  pass\nelse:\n try: fm.fontManager.addfont(_fp)\n except Exception: pass\nplt.rcParams["font.sans-serif"]=["SimHei","sans-serif"]\nplt.rcParams["axes.unicode_minus"]=False';
 
 function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
 function scb(){chat.scrollTop=chat.scrollHeight;}
@@ -151,7 +151,7 @@ function showRes(w,t,er,im){
       d.appendChild(tb);
       var a=document.createElement('a');
       a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-      // ====== API 调用（ChatboxAI走CORS代理）======
+      a.download='data.csv';a.textCont// ====== API 调用（ChatboxAI走CORS代理）======
 function callAPI(ak,bu,mdl2,mArr,str,cb){
   var u=bu.replace(/\/$/,'')+'/chat/completions';
   if(bu.indexOf('chatboxai')>-1)u='https://corsproxy.io/?'+encodeURIComponent(u);
