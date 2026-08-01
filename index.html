@@ -97,8 +97,8 @@ button.pri::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:
 </div>
 <div id="tplFab"><button id="tplBtn">📁模板</button></div>
 <div id="tplPanel"></div>
+ <script>window.onerror=function(a,b,c){document.title='ERR行'+c+':'+a;alert('行'+c+':'+a)};</script>
 <script>
- window.onerror=function(a,b,c){alert('行'+c+':'+a)};
 <!--SEG2-->
 const API_URL='https://api.deepseek.com/chat/completions';
 let API_KEY=localStorage.getItem('wt_api')||'sk-28e218d04d204cc8993c1facfaa4f73d';
