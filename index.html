@@ -9,8 +9,8 @@
 #mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:100}#mb{background:#1a1a1a;border-radius:16px 16px 0 0;padding:14px;width:100%;max-width:480px}#mb h3{font-size:1rem;margin-bottom:8px}#mb label{font-size:.7rem;color:#999;display:block;margin:8px 0 2px}#mb input,#mb select{width:100%;padding:8px;background:#252525;border:1px solid #333;border-radius:6px;color:#eee;font-size:.8rem;outline:none}.ma{display:flex;gap:6px;margin-top:10px}.btn{flex:1;padding:10px;border-radius:6px;border:none;font-weight:600;cursor:pointer}.btn.p{background:#4ade80;color:#000}.btn.s{background:#252525;color:#eee}.btn.d{background:#252525;color:#ef4444;border:1px solid #333;margin-top:10px;display:block;width:100%;padding:10px;border-radius:6px}
 .tt{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:6px 14px;border-radius:16px;font-size:.75rem;z-index:200}
 </style></head><body><div id="app">
-<div id="hdr"><b>🤖 DS+ Agent</b><div style="display:flex;gap:6px"><button class="hbtn g" id="autox" title="自动执行">⚡</button><button class="hbtn" id="srch">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">⚡手动执行(默认) | 🔍搜索 | 小红书风格出图</p></div></div>
+<div id="hdr"><b>🤖 DS+ Agent</b><div style="display:flex;gap:6px"><button class="hbtn g" id="autox" title="自动执行">⚡</button><button class="hbtn" id="srch">🔍</button><button class="hbtn" id="mem" title="记忆">🧠</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
+<div id="chat"><div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">🧠记忆 | ⚡手动执行 | 🔍搜索 | 小红书出图</p></div></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入需求，AI生成代码..."></textarea><button id="send">↑</button><button id="stop">■</button></div></div>
 <div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds"><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><label>Tavily Key（搜索）</label><input type="password" id="sk_cb" placeholder="tvly-..."><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空</button></div></div>
 <script>
@@ -48,7 +48,17 @@ function loadFontData(cb){
   };
   req.onerror=function(){fontReady=true;if(cb)cb();};
 }
-var AGENT_PROMPT='你是智能Agent。规则：\n1.需要实时数据时输出 [SEARCH:关键词]\n2.需要计算/画图/分析时输出 python代码块（```python ... ```）\n3.代码里不要用plt.show()，画图用plt.savefig到BytesIO后print("___IMG___"+base64)\n4.表格用print("___TABLE___"+CSV)\n5.流程图用print("___MERMAID___"+mermaid语法)\n6.小红书风格精美图用print("___HTML___"+HTML代码)，支持渐变linear-gradient、阴影box-shadow、圆角border-radius、白底、max-width:360px\n7.收到搜索结果后继续分析，直到完成任务';
+// ===== 记忆系统：长期摘要 + 用户档案 =====
+var longMem=localStorage.getItem('dsmem')||'';
+var userProfile=localStorage.getItem('dsprof')||'';
+function saveMem(m){if(m){longMem=m;localStorage.setItem('dsmem',m);}}
+function getMemPrompt(){
+  var p='';
+  if(userProfile)p+='【用户档案】'+userProfile+'\n';
+  if(longMem)p+='【历史记忆摘要】'+longMem+'\n';
+  return p;
+}
+var AGENT_PROMPT='你是智能Agent，以下规则永远生效：\n【输出格式铁律】\n1.小红书风格精美图→print("___HTML___"+HTML代码)，包在print里\n2.简单流程图→print("___MERMAID___"+mermaid语法)\n3.数据表格→print("___TABLE___"+CSV)\n4.数据图表→matplotlib画图后print("___IMG___"+base64)\n5.代码里不要用plt.show()\n6.需要实时数据时输出 [SEARCH:关键词]\n【记忆】系统会提供"用户档案"和"历史记忆摘要"，这些是长期记忆，务必参考。同时你也有最近对话的上下文。\n【工作方式】用户发需求→判断输出格式→生成完整代码→提示"点▶运行"';
 var agentMsgs=[];
 function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
 function scb(){chat.scrollTop=chat.scrollHeight;}
@@ -115,6 +125,9 @@ function showRes(w,t,er,im){
     hdiv.innerHTML=hp[1].trim();
     hdiv.style.cssText='overflow-x:auto;background:#fff;border-radius:12px;padding:12px;margin:8px 0';
     d.appendChild(hdiv);
+    var ha=document.createElement('a');
+    ha.href='data:text/html;charset=utf-8,'+encodeURIComponent(hp[1].trim());
+    ha.download='poster.html';ha.textContent='💾 保存为HTML';ha.className='svbtn';d.appendChild(ha);
   }
   if(t&&t.indexOf('___TABLE___')>-1){
     var tp=t.split('___TABLE___');
@@ -174,6 +187,14 @@ function doSearch(q,cb){
     cb(null,txt||'(无结果)');
   }).catch(function(e){cb('❌ 搜索失败:'+e.message,null);});
 }
+function updateMem(finalReply){
+  // 简单摘要：取AI最后回复的前200字存入长期记忆
+  if(finalReply){
+    var s=finalReply.replace(/```[\s\S]*?```/g,'').replace(/___\w+___/g,'').trim();
+    var summary=s.length>200?s.slice(0,200):s;
+    saveMem(summary);
+  }
+}
 function agentStep(depth){
   if(depth>3){addStatus('⚠️ 达到最大循环次数');agentBusy=false;snd.style.display='flex';stp.style.display='none';return;}
   callAPI(akDS,buDS,mdl,agentMsgs,false,function(err,reply){
@@ -202,9 +223,9 @@ function agentStep(depth){
       return;
     }
     if(reply.indexOf('___HTML___')>-1||reply.indexOf('___TABLE___')>-1||reply.indexOf('___MERMAID___')>-1){
-      addAI(reply);agentBusy=false;snd.style.display='flex';stp.style.display='none';return;
+      addAI(reply);updateMem(reply);agentBusy=false;snd.style.display='flex';stp.style.display='none';return;
     }
-    addAI(reply);
+    addAI(reply);updateMem(reply);
     agentBusy=false;snd.style.display='flex';stp.style.display='none';
   });
 }
@@ -216,11 +237,13 @@ function send(){
   var row=document.createElement('div');row.className='msg u';row.innerHTML='<div class="av">👤</div><div class="bub">'+esc(t)+'</div>';chat.appendChild(row);scb();
   addStatus('🤖 思考中...');
   agentBusy=true;sf=false;snd.style.display='none';stp.style.display='flex';
-  agentMsgs=[{role:'system',content:AGENT_PROMPT},{role:'user',content:t}];
+  // 上下文记忆：长期摘要 + 最近20条 + 当前问题
+  var hist=msgs.slice(-20).filter(function(m){return m.role!=='system';});
+  agentMsgs=[{role:'system',content:AGENT_PROMPT+'\n'+getMemPrompt()}].concat(hist,{role:'user',content:t});
   agentStep(0);
 }
 function stopGen(){sf=true;agentBusy=false;agentMsgs=[];snd.style.display='flex';stp.style.display='none';tst('⏹ 已停止');}
-function render(){if(msgs.length===0){chat.innerHTML='<div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">⚡手动执行(默认) | 小红书风格出图<br>输入需求，AI生成代码</p></div>';}}
+function render(){if(msgs.length===0){chat.innerHTML='<div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">🧠记忆 | ⚡手动执行 | 🔍搜索 | 小红书出图<br>输入需求，AI生成代码</p></div>';}}
 document.getElementById('autox').addEventListener('click',function(){
   autoExec=!autoExec;var b=document.getElementById('autox');
   if(autoExec){b.classList.add('on');tst('⚡ 自动执行 ON');}else{b.classList.remove('on');tst('⚡ 手动执行（点▶运行）');}
@@ -228,6 +251,12 @@ document.getElementById('autox').addEventListener('click',function(){
 document.getElementById('srch').addEventListener('click',function(){
   srchOn=!srchOn;var b=document.getElementById('srch');
   if(srchOn){b.classList.add('on');tst('🔍 自动搜索 ON');}else{b.classList.remove('on');tst('💬 普通模式');}
+});
+document.getElementById('mem').addEventListener('click',function(){
+  var info='🧠 长期记忆：\n'+(longMem||'（空）')+'\n\n📝 用户档案：\n'+(userProfile||'（空）')+'\n\n💾 当前对话：'+msgs.length+'条';
+  var nm=prompt('📝 编辑用户档案（例如：名字=小明, 减肥目标=122→118, 偏好=小红书风格）：\n'+info);
+  if(nm!==null&&nm.trim()!==''){userProfile=nm.trim();localStorage.setItem('dsprof',userProfile);tst('🧠 档案已保存');}
+  else if(nm!==null){alert('当前记忆：\n'+info);}
 });
 function openMod(){document.getElementById('sk_ds').value=akDS;document.getElementById('su_ds').value=buDS;document.getElementById('sk_cb').value=akCB;document.getElementById('sm').value=mdl;mod.style.display='flex';}
 function closeMod(){mod.style.display='none';}
