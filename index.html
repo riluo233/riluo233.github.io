@@ -3,47 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>⚡ AI工作台 · 锋刃v6.0</title>
+<title>⚡ AI工作台 · 赛博朋克PRO</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--c:#00f0ff;--p:#ff00e5;--g:#39ff14;--y:#ffe600;--bg:#05060f;--panel:rgba(8,12,32,.93);--panel2:rgba(12,18,44,.9);--line:rgba(0,240,255,.25);--txt:#e8f6ff;--dim:#8fa3bf;--gc:0 0 8px rgba(0,240,255,.5),0 0 20px rgba(0,240,255,.18);--gp:0 0 8px rgba(255,0,229,.5),0 0 20px rgba(255,0,229,.18)}
+:root{--c:#00f0ff;--p:#ff00e5;--g:#39ff14;--y:#ffe600;--bg:#03040a;--panel:rgba(8,12,32,.88);--panel2:rgba(14,20,48,.92);--line:rgba(0,240,255,.28);--txt:#e8f6ff;--dim:#8fa3bf;--gc:0 0 8px rgba(0,240,255,.55),0 0 24px rgba(0,240,255,.22);--gp:0 0 8px rgba(255,0,229,.55),0 0 24px rgba(255,0,229,.22)}
 html,body{height:100%}
 body{background:var(--bg);color:var(--txt);font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(rgba(0,240,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.045) 1px,transparent 1px);background-size:38px 38px}
-body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 70% 45% at 50% -8%,rgba(255,0,229,.14),transparent 65%),radial-gradient(ellipse 55% 40% at 90% 110%,rgba(0,240,255,.12),transparent 60%)}
-header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:5px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 0 14px rgba(0,240,255,.12);flex-wrap:wrap}
-header h1{font-size:15px;white-space:nowrap;text-shadow:0 0 12px rgba(0,240,255,.7);margin-right:auto}
+/* 霓虹网格（流动） */
+.bg-grid{position:fixed;inset:-30% -30%;z-index:-3;pointer-events:none;
+ background:linear-gradient(rgba(0,240,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.07) 1px,transparent 1px),linear-gradient(rgba(255,0,229,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,229,.05) 1px,transparent 1px);
+ background-size:48px 48px,48px 48px,240px 240px,240px 240px;
+ animation:gridMove 26s linear infinite;opacity:.85}
+@keyframes gridMove{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(48px,48px,0)}}
+/* 漂浮霓虹光球（无blur，纯渐变，GPU友好） */
+.orb{position:fixed;border-radius:50%;z-index:-2;pointer-events:none}
+.orb.o1{width:46vmax;height:46vmax;left:-12vmax;top:-10vmax;background:radial-gradient(circle,rgba(0,240,255,.45),transparent 70%);animation:orb1 18s ease-in-out infinite alternate}
+.orb.o2{width:40vmax;height:40vmax;right:-10vmax;bottom:-12vmax;background:radial-gradient(circle,rgba(255,0,229,.4),transparent 70%);animation:orb2 22s ease-in-out infinite alternate}
+.orb.o3{width:30vmax;height:30vmax;left:28%;top:38%;background:radial-gradient(circle,rgba(57,255,20,.16),transparent 70%);animation:orb3 26s ease-in-out infinite alternate}
+@keyframes orb1{to{transform:translate3d(8vmax,6vmax,0) scale(1.15)}}
+@keyframes orb2{to{transform:translate3d(-7vmax,-8vmax,0) scale(1.1)}}
+@keyframes orb3{to{transform:translate3d(-6vmax,10vmax,0)}}
+/* 暗角 */
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.6) 100%)}
+/* CRT扫描线（极淡） */
+.bg-scan{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.045;
+ background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.6) 2px 3px);
+ animation:scanFlick 8s steps(1) infinite}
+@keyframes scanFlick{0%,91%{opacity:.045}93%{opacity:.08}94%{opacity:.02}96%{opacity:.06}100%{opacity:.045}}
+/* 顶栏 */
+header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:5px;padding:8px 10px;background:rgba(6,9,26,.85);border-bottom:1px solid var(--line);flex-wrap:wrap}
+header::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:linear-gradient(90deg,transparent,var(--c),var(--p),var(--g),transparent);background-size:200% 100%;animation:lineFlow 5s linear infinite}
+@keyframes lineFlow{to{background-position:200% 0}}
+header h1{font-size:16px;white-space:nowrap;margin-right:auto;font-weight:800;
+ background:linear-gradient(90deg,var(--c),var(--p),var(--c));background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;
+ filter:drop-shadow(0 0 8px rgba(0,240,255,.7));animation:gradSlide 6s linear infinite}
+@keyframes gradSlide{to{background-position:200% 0}}
 header select,header button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:12px}
 header button:active{transform:scale(.94)}
+.tog{position:relative}
 .tog.on{box-shadow:var(--gc);border-color:var(--c);color:var(--c)}
+.tog.on::after{content:'';position:absolute;left:8px;right:8px;bottom:2px;height:2px;background:var(--c);box-shadow:var(--gc);border-radius:2px}
+/* 视图 */
 .view{position:fixed;top:46px;left:0;right:0;bottom:0;display:none}
 #viewWork{display:block}
 #chatBox{position:absolute;top:0;left:0;right:0;bottom:66px;overflow-y:auto;padding:12px 12px 20px;-webkit-overflow-scrolling:touch}
 .msg{margin:10px 0;padding:10px 13px;border-radius:14px;max-width:100%;word-break:break-word;animation:fadeIn .25s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-.msg.user{background:linear-gradient(135deg,rgba(0,240,255,.2),rgba(0,240,255,.06));border:1px solid rgba(0,240,255,.35);margin-left:auto;width:fit-content;max-width:88%}
-.msg.ai{background:linear-gradient(135deg,rgba(255,0,229,.1),rgba(255,0,229,.03));border:1px solid rgba(255,0,229,.28)}
-.out-item{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;content-visibility:auto;contain-intrinsic-size:auto 260px}
+.msg.user{background:linear-gradient(135deg,rgba(0,240,255,.22),rgba(0,240,255,.06));border:1px solid rgba(0,240,255,.4);margin-left:auto;width:fit-content;max-width:88%;box-shadow:0 0 14px rgba(0,240,255,.14)}
+.msg.ai{background:linear-gradient(135deg,rgba(255,0,229,.12),rgba(255,0,229,.04));border:1px solid rgba(255,0,229,.32);box-shadow:0 0 14px rgba(255,0,229,.1)}
+.typing::after{content:'▌';color:var(--g);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.out-item{position:relative;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;content-visibility:auto;contain-intrinsic-size:auto 260px}
+.out-item::before{content:'';position:absolute;top:-1px;left:-1px;width:18px;height:18px;border-top:2px solid var(--c);border-left:2px solid var(--c);border-radius:12px 0 0 0}
+.out-item::after{content:'';position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;border-bottom:2px solid var(--p);border-right:2px solid var(--p);border-radius:0 0 12px 0}
 .out-item img{max-width:100%;border-radius:8px}
-pre.code{font-family:Consolas,monospace;font-size:12px;color:var(--g);background:rgba(0,0,0,.5);border:1px solid rgba(57,255,20,.3);border-radius:8px;padding:8px;overflow-x:auto;white-space:pre-wrap}
+pre.code{font-family:Consolas,monospace;font-size:12px;color:var(--g);background:rgba(0,0,0,.5);border:1px solid rgba(57,255,20,.3);border-radius:8px;padding:8px;overflow-x:auto;white-space:pre-wrap;text-shadow:0 0 6px rgba(57,255,20,.4)}
 table.tbl{border-collapse:collapse;width:100%;font-size:12px;background:#0a0e23}
 table.tbl th,table.tbl td{border:1px solid rgba(0,240,255,.25);padding:5px 8px}
 table.tbl th{background:rgba(0,240,255,.15)}
-button{background:linear-gradient(135deg,rgba(0,240,255,.16),rgba(255,0,229,.16));color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13px;transition:transform .12s}
+button{position:relative;background:linear-gradient(135deg,rgba(0,240,255,.18),rgba(255,0,229,.18));color:var(--txt);border:1px solid rgba(0,240,255,.35);border-radius:9px;padding:7px 11px;font-size:13px;transition:transform .12s,box-shadow .2s}
 button:active{transform:scale(.95)}
-button.pri{background:linear-gradient(135deg,var(--c),var(--p));color:#000;font-weight:700;border:none;box-shadow:0 0 12px rgba(0,240,255,.35)}
-.inputbar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:flex-end;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line)}
+button:hover{box-shadow:var(--gc)}
+button.pri{overflow:hidden;background:linear-gradient(135deg,var(--c),var(--p));color:#000;font-weight:700;border:none;box-shadow:0 0 14px rgba(0,240,255,.4)}
+button.pri::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:sheen 3.2s ease-in-out infinite}
+@keyframes sheen{0%{left:-60%}60%,100%{left:140%}}
+.inputbar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:flex-end;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:rgba(6,9,26,.85);border-top:1px solid var(--line)}
 .inputbar textarea{flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:15px;resize:none;height:42px;max-height:110px;outline:none}
+.inputbar textarea:focus{border-color:var(--c);box-shadow:var(--gc)}
 #viewFoot{overflow-y:auto;padding:12px 12px 30px;-webkit-overflow-scrolling:touch}
 #tplFab{position:fixed;bottom:74px;right:12px;z-index:60}
-#tplFab button{border-radius:22px;padding:10px 14px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--c),var(--p));color:#000;border:none;box-shadow:var(--gc)}
-#tplPanel{position:fixed;right:12px;bottom:118px;z-index:61;width:212px;max-height:58vh;overflow-y:auto;background:var(--panel);border:1px solid var(--c);border-radius:12px;padding:8px;box-shadow:var(--gp);display:none}
+#tplFab button{border-radius:22px;padding:10px 14px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--c),var(--p));color:#000;border:none;animation:fabPulse 2.6s ease-in-out infinite}
+@keyframes fabPulse{0%,100%{box-shadow:var(--gc)}50%{box-shadow:var(--gp)}}
+#tplPanel{position:fixed;right:12px;bottom:118px;z-index:61;width:212px;max-height:58vh;overflow-y:auto;background:rgba(8,12,32,.96);border:1px solid var(--c);border-radius:12px;padding:8px;box-shadow:var(--gp);display:none}
 #tplPanel button{display:block;width:100%;margin:4px 0;text-align:left;font-size:13px}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:linear-gradient(var(--c),var(--p));border-radius:3px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="bg-grid"></div>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div class="bg-scan"></div>
 <header>
 <h1>⚡ 锋刃工作台</h1>
 <button id="tabWork" class="tog on">💬工作台</button>
@@ -188,7 +228,7 @@ function handleExcalidraw(text){
  return hit?text:null;
 }
 function openDrawio(body){if(navigator.clipboard)navigator.clipboard.writeText(body);window.open('https://app.diagrams.net/?splash=0','_blank')}
-/* ========== Pyodide + 字体缓存 + 搜索 ========== */
+/* ========== Pyodide + 字体缓存 ========== */
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(k){try{const db=await idbOpen();return await new Promise((res,rej)=>{const q=db.transaction('kv','readonly').objectStore('kv').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}catch(e){return null}}
 async function idbSet(k,v){try{const db=await idbOpen();await new Promise((res,rej)=>{const q=db.transaction('kv','readwrite').objectStore('kv').put(v,k);q.onsuccess=res;q.onerror=()=>rej(q.error)})}catch(e){}}
@@ -278,8 +318,8 @@ async function tavilySearch(q){
   return items.length?('【搜索到的资料】\n'+items.join('\n\n')):'（未搜到资料）';
  }catch(e){return '（搜索失败：'+e.message+'）'}
 }
-/* ========== 锋刃v6.0引擎 ① ========== */
-const ENGINE_PY = `
+/* ========== 锋刃v6.0引擎 ①（var声明，已修复重复声明bug） ========== */
+var ENGINE_PY = `
 import math, json
 L_TABLE={'英超':0.95,'西甲':0.95,'德甲':0.95,'意甲':0.95,'法甲':0.95,'英冠':0.90,'葡超':0.85,'荷甲':0.85,'巴甲':0.85,'美职联':0.75,'日职联':0.75,'K联赛':0.75,'韩职':0.75,'挪超':0.65,'瑞典超':0.65,'丹超':0.65,'苏超':0.65,'芬超':0.60,'澳超':0.55,'土超':0.55,'俄超':0.55,'亚洲二级':0.55}
 W=[1.48,1.52,0.98,1.18,0.93,0.79]
@@ -318,8 +358,7 @@ class BladeV60:
   fh=self._g('form_home',[]) or []; fa=self._g('form_away',[]) or []
   fi=0.15*((sum(1 for x in fh if str(x).upper() in ('W','胜'))/max(len(fh),1))-(sum(1 for x in fa if str(x).upper() in ('W','胜'))/max(len(fa),1)))
   F=0.4*(h2h-0.5)*2+fi+0.10*float(self._g('motivation',0))
-  return {'A':A,'B':B,'C':C,'D':D,'E':E,'F':F,'H2H':h2h}
- def i_s/* ========== 锋刃v6.0引擎 ② ========== */
+  return {'A':A,'B':B,'C':C,'D':D,'E':E,'F':F,'H2H':h2/* ========== 锋刃v6.0引擎 ② ========== */
 const ENGINE_PY2 = `
  def s3(self,s1f,votes,ss):
   vh,vd,va=votes; mx=max(vh,vd,va)
@@ -451,9 +490,18 @@ const ENGINE_PY2 = `
   self.audit.append(log)
   return '✅ 校准完成 E='+format(E,'.3f')+' '+str(log)
 `;
-const ENGINE_PY = ENGINE_PY + ENGINE_PY2;
-function applyAiPipeline(t){t=renderTplCall(t)||t;t=convertEcharts(t)||t;t=handleExcalidraw(t)||t;t=handleMatchData(t)||t;return t}
-/* ========== 输出渲染 ========== */
+ENGINE_PY += ENGINE_PY2;   /* ← 已修复：追加拼接，不再重复声明 */
+/* ========== MATCHDATA自动接收 ========== */
+function handleMatchData(text){
+ const re=/___MATCHDATA___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
+ text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
+  $('mdInput').value=JSON.stringify(d,null,1);
+  switchTab('foot');
+  setTimeout(runFootball,400);
+  return '（⚽已接收比赛数据 → 引擎自动推演中，结果见「⚽推演」分区）'});
+ return hit?text:null;
+}
+/* =/* ========== 输出渲染 ========== */
 let CODES=[];
 function extractCodeBlocks(text){CODES=[];return text.replace(/```python\n?([\s\S]*?)```/g,(m,c)=>{CODES.push(c);return '\n[[CODE:'+(CODES.length-1)+']]\n'})}
 function splitMarkers(text){
@@ -529,6 +577,7 @@ async function send(){
  addMsg('user',q);
  HISTORY.push({role:'user',content:q});
  const box=addMsg('ai','');
+ box.firstChild.classList.add('typing');
  let full='';
  try{
   let uc=q;
@@ -578,7 +627,7 @@ const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中�
 4.数据图表 → ___ECHARTS___换行+echarts option JSON
 5.手绘风图 → ___EXCALIDRAW___换行+{"nodes":[{"id":"a","label":".."}],"edges":[{"from":"a","to":"b","label":".."}]}
 6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动渲染+一键保存
-【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡) weight_table(体重表) football_card(推演卡:hom/* ========== 模板面板 ========== */
+【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡/* ========== 模板面板 ========== */
 const PANEL_ITEMS=[
  ['🍎减肥计划图','flow_jianfei',{target:'122→118斤',p1:'启动期1-3天',p2:'加速期4-7天',p3:'冲刺期8-11天',p4:'巩固期12-14天'}],
  ['🍱一周食谱表','food_plan',{}],['📊运动打卡表','card_plan',{}],['📈体重记录表','weight_table',{}],
@@ -623,16 +672,16 @@ $('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e
 $('tplBtn').onclick=toggleTplPanel;
 buildPanel();
 fillSample();
-addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存；⚽推演=锋刃v6.0引擎（AI说"推演皇马vs曼城"会自动搜情报→填数据→跑引擎→出正式推演）。试试："给我做14天减肥计划全套"');<script>
-/* ========== 锋刃v6.0 自迭代闭环（赛果录入+校准+持久化） ========== */
+addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存；⚽推演=锋刃v6.0引擎（AI说"推演皇马vs曼城"会自动搜情报→填数据→跑引擎→出正式推演）。试试："给我做14天减肥计划全套"');
+</script>
+</body>
+</html>
+<script>
+/* ========== 锋刃v6.0 自迭代闭环 ========== */
 (function(){
  if(window.__footPatched)return; window.__footPatched=true;
-
- /* 学习状态（localStorage持久化） */
  var FOOT_STATE=(function(){try{return JSON.parse(localStorage.getItem('wt_foot_state'))||{samples:0,t_base:null,calibration:1.0,leagues:{},audit:[]}}catch(e){return{samples:0,t_base:null,calibration:1.0,leagues:{},audit:[]}}})();
  function saveFS(){localStorage.setItem('wt_foot_state',JSON.stringify(FOOT_STATE))}
-
- /* 注入赛果录入UI到⚽推演分区 */
  if(!document.getElementById('calSec')){
   var sec=document.createElement('div');sec.id='calSec';
   sec.style.cssText='margin-top:14px;border:1px dashed rgba(0,240,255,.4);border-radius:12px;padding:10px';
@@ -645,8 +694,6 @@ addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存�
    +'<div id="calOut" style="font-size:12px;margin-top:8px;color:#39ff14;white-space:pre-wrap"></div>';
   $('viewFoot').appendChild(sec);
  }
-
- /* 新版runFootball（覆盖旧版：自动注入学习参数） */
  window.runFootball=async function(){
   var txt=$('mdInput').value.trim(),data;
   try{data=JSON.parse(txt)}catch(e){$('footOut').innerHTML='<div style="color:#ff9090">❌ MATCH_DATA JSON格式错误: '+escapeHtml(e.message)+'</div>';return}
@@ -677,8 +724,6 @@ addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存�
    out.appendChild(st);
   }catch(e){out.innerHTML='<div style="color:#ff9090">❌ '+escapeHtml(e.message||String(e))+'</div>'}
  };
-
- /* 赛果录入+校准 */
  window.runCalibrate=async function(){
   var m=$('actScore').value.trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
   var out=$('calOut');
@@ -695,34 +740,27 @@ addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存�
    py.runPython('__xv=__b.signals();__x=[__xv["A"],__xv["B"],__xv["C"],__xv["D"],__xv["E"],__xv["F"]];__ds,__ss=__b.dists(__x);__s1,_,_,_=__b.s1(__x,__ss);__v=__b.direction(__x,__ss);__sc,__dr,__ex=__b.s3(__s1,__v,__ss);__imp,__raw,__fin=__b.confidence(__v,__x);__bt=__b.btts(__ss);__b.last={"dir":__dr,"s1":__s1,"btts":__bt[2],"score":__sc[0],"fin":__fin}');
    py.globals.set('__act',{dir:$('actDir').value,s1:h+a,btts:$('actBtts').value,score:[h,a]});
    py.runPython('__log=__b.calibrate(__act)');
+   py.runPython('__pd=__b.last["dir"]');
    py.runPython('__st={"T_base":T_BASE,"L":__b.L,"cal":__b.cal,"E":(__b.audit[-1]["E"] if __b.audit else 0)}');
    var log=String(py.globals.get('__log'));
    var st=py.globals.get('__st').toJs();
+   var pd=String(py.globals.get('__pd'));
    var finv=Number(py.globals.get('__fin'));
-   /* 更新持久化状态 */
    var league=md.league||'英超';
    var lg=FOOT_STATE.leagues[league]||{count:0,L:null,hits:0,confSum:0,ratio:0.9};
    lg.count+=1;FOOT_STATE.samples+=1;
    FOOT_STATE.t_base=st.T_base;
    FOOT_STATE.calibration=st.cal;
    if(st.L)lg.L=st.L;
-   if($('actDir').value===(String(log).indexOf('方向'+$('actDir').value)>-1?'':'')){}
-   /* 命中统计：用__b.last.dir与实际对比 */
-   var pd=py.globals.get('__dr'); /* 上面内联没存，改用解析last */
-   lg.hits+=0;
-   /* 简化：用E判定命中（E<0.5算基本命中） */
-   lg.confSum+=0.0001;
-   lg.ratio=Math.min(1.5,Math.max(0.5,lg.ratio));
+   if(pd===$('actDir').value)lg.hits+=1;
+   lg.confSum+=finv;
+   lg.ratio=Math.min(1.5,Math.max(0.5,lg.confSum>0.01?lg.hits/lg.confSum:0.9));
    FOOT_STATE.leagues[league]=lg;
    FOOT_STATE.audit.push({t:new Date().toLocaleString(),league:league,E:st.E});
    if(FOOT_STATE.audit.length>200)FOOT_STATE.audit=FOOT_STATE.audit.slice(-200);
    saveFS();
-   out.textContent=log+'\n\n📊 已保存: 总样本'+FOOT_STATE.samples+'场 | '+league+'已录'+lg.count+'场 | T_base='+st.T_base.toFixed(4)+' | L='+(st.L||md.L||'默认').toFixed?String(st.L):(st.L||'-')+' | E='+st.E.toFixed(3);
+   out.textContent=log+'\n📊 已保存: 总样本'+FOOT_STATE.samples+'场 | '+league+'已录'+lg.count+'场 | T_base='+st.T_base.toFixed(4)+' | L='+(st.L||'-')+' | E='+st.E.toFixed(3)+' | 校准比='+lg.ratio.toFixed(2);
   }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
  };
 })();
 </script>
-
-</script>
-</body>
-</html>
