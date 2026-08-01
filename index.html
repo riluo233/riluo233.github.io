@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><meta name="theme-color" content="#111"><title>DS+ Agent</title><script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script><style>
 *{margin:0;padding:0;box-sizing:border-box}body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:sans-serif;-webkit-tap-highlight-color:transparent}#app{height:100%;display:flex;flex-direction:column;max-width:700px;margin:0 auto}
-#hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0}.hbtn{width:34px;height:34px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;display:flex;align-items:center;justify-content:center;cursor:pointer}.hbtn.on{background:#8b5cf6;color:#fff}
+#hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0}.hbtn{width:34px;height:34px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}.hbtn.on{background:#8b5cf6;color:#fff}.hbtn.g.on{background:#22c55e;color:#fff;border-color:#22c55e}
 #chat{flex:1;overflow-y:auto;padding:10px;-webkit-overflow-scrolling:touch}.msg{display:flex;margin-bottom:12px;gap:6px}.msg.u{flex-direction:row-reverse}.av{width:28px;height:28px;border-radius:50%;background:#252525;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}.bub{max-width:85%;padding:8px 12px;border-radius:12px;font-size:.9rem;line-height:1.5;word-break:break-word}.msg.u .bub{background:#1e3a2f}.msg.a .bub{background:#1a1a1a;border:1px solid #333}
 .st{color:#8b5cf6;font-style:italic;font-size:.75rem;margin:2px 0}
 .cw{margin:6px 0;border-radius:8px;overflow:hidden;border:1px solid #333}.ch{display:flex;justify-content:space-between;padding:4px 8px;background:#252525;font-size:.65rem;color:#999}.cb{padding:2px 8px;border-radius:4px;border:none;font-size:.65rem;cursor:pointer}.cb.r{background:#4ade80;color:#000}.cb.c{background:#1a1a1a;color:#999}.cw pre{margin:0;padding:8px;background:#0d1117;overflow-x:auto}.cw pre code{font-family:monospace;font-size:.72rem;white-space:pre-wrap}
@@ -9,21 +9,46 @@
 #mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:100}#mb{background:#1a1a1a;border-radius:16px 16px 0 0;padding:14px;width:100%;max-width:480px}#mb h3{font-size:1rem;margin-bottom:8px}#mb label{font-size:.7rem;color:#999;display:block;margin:8px 0 2px}#mb input,#mb select{width:100%;padding:8px;background:#252525;border:1px solid #333;border-radius:6px;color:#eee;font-size:.8rem;outline:none}.ma{display:flex;gap:6px;margin-top:10px}.btn{flex:1;padding:10px;border-radius:6px;border:none;font-weight:600;cursor:pointer}.btn.p{background:#4ade80;color:#000}.btn.s{background:#252525;color:#eee}.btn.d{background:#252525;color:#ef4444;border:1px solid #333;margin-top:10px;display:block;width:100%;padding:10px;border-radius:6px}
 .tt{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:6px 14px;border-radius:16px;font-size:.75rem;z-index:200}
 </style></head><body><div id="app">
-<div id="hdr"><b>🤖 DS+ Agent</b><div style="display:flex;gap:6px"><button class="hbtn" id="srch">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">全自动：搜索 → 执行 → 回传 → 继续</p></div></div>
-<div id="inp"><textarea id="ui" rows="1" placeholder="输入需求，AI自动干活..."></textarea><button id="send">↑</button><button id="stop">■</button></div></div>
+<div id="hdr"><b>🤖 DS+ Agent</b><div style="display:flex;gap:6px"><button class="hbtn g" id="autox" title="自动执行">⚡</button><button class="hbtn" id="srch">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
+<div id="chat"><div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">⚡手动执行(默认) | 🔍搜索 | 小红书风格出图</p></div></div>
+<div id="inp"><textarea id="ui" rows="1" placeholder="输入需求，AI生成代码..."></textarea><button id="send">↑</button><button id="stop">■</button></div></div>
 <div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds"><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><label>Tavily Key（搜索）</label><input type="password" id="sk_cb" placeholder="tvly-..."><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空</button></div></div>
 <script>
 var akDS=localStorage.getItem('dsk')||'',buDS=localStorage.getItem('dsu')||'https://api.deepseek.com',mdl=localStorage.getItem('dsm')||'deepseek-v4-pro';
 var akCB=localStorage.getItem('cbk')||'';
-var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]'),busy=false,sf=false,srchOn=false;
+var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]'),busy=false,sf=false,srchOn=false,autoExec=false;
 var py=null,pyOk=false,pyBusy=false,agentBusy=false;
 var chat=document.getElementById('chat'),inp=document.getElementById('ui');
 var snd=document.getElementById('send'),stp=document.getElementById('stop');
 var mod=document.getElementById('mo');
 var PRELOAD=['numpy','pandas','matplotlib','scipy','scikit-learn','pillow'];
-var FONT_SETUP='import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport os\n_fp="/tmp/SimHei.ttf"\nif not os.path.exists(_fp):\n import pyodide.http\n try:\n  _r=await pyodide.http.pyfetch("https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf")\n  _d=await _r.bytes()\n  open(_fp,"wb").write(_d)\n  fm.fontManager.addfont(_fp)\n except Exception:\n  pass\nelse:\n try: fm.fontManager.addfont(_fp)\n except Exception: pass\nplt.rcParams["font.sans-serif"]=["SimHei","sans-serif"]\nplt.rcParams["axes.unicode_minus"]=False';
-var AGENT_PROMPT='你是智能Agent，可以搜索和执行代码。规则：\n1.需要实时数据时输出 [SEARCH:关键词]\n2.需要计算/画图/分析时输出 python代码块（```python ... ```），系统会自动执行\n3.代码里不要用plt.show()，画图用plt.savefig到BytesIO后print("___IMG___"+base64)\n4.表格用print("___TABLE___"+CSV)\n5.流程图用print("___MERMAID___"+mermaid语法)\n6.收到搜索结果或代码执行结果后继续分析，直到完成任务';
+var FONT_SETUP='import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport os\n_fp="/tmp/SimHei.ttf"\nif os.path.exists(_fp):\n fm.fontManager.addfont(_fp)\n plt.rcParams["font.sans-serif"]=["SimHei","sans-serif"]\n plt.rcParams["axes.unicode_minus"]=False\nelse:\n try:\n  _b=__import__("js").fontData\n  if _b:\n   open(_fp,"wb").write(_b.to_py())\n   fm.fontManager.addfont(_fp)\n   plt.rcParams["font.sans-serif"]=["SimHei","sans-serif"]\n   plt.rcParams["axes.unicode_minus"]=False\n except Exception:\n  pass';
+var fontReady=false,fontLoading=false;
+function loadFontData(cb){
+  if(fontReady){if(cb)cb();return;}
+  if(fontLoading){setTimeout(function(){loadFontData(cb);},500);return;}
+  fontLoading=true;
+  var req=indexedDB.open('DSFont',1);
+  req.onupgradeneeded=function(){req.result.createObjectStore('f');};
+  req.onsuccess=function(){
+    var db=req.result;
+    var tx=db.transaction('f','readonly').objectStore('f').get('simhei');
+    tx.onsuccess=function(){
+      if(tx.result){
+        window.fontData=tx.result;fontReady=true;if(cb)cb();
+      }else{
+        fetch('https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf').then(function(r){return r.arrayBuffer();}).then(function(buf){
+          window.fontData=new Uint8Array(buf);
+          try{db.transaction('f','readwrite').objectStore('f').put(new Uint8Array(buf),'simhei');}catch(e){}
+          fontReady=true;if(cb)cb();
+        }).catch(function(){fontReady=true;if(cb)cb();});
+      }
+    };
+    tx.onerror=function(){fontReady=true;if(cb)cb();};
+  };
+  req.onerror=function(){fontReady=true;if(cb)cb();};
+}
+var AGENT_PROMPT='你是智能Agent。规则：\n1.需要实时数据时输出 [SEARCH:关键词]\n2.需要计算/画图/分析时输出 python代码块（```python ... ```）\n3.代码里不要用plt.show()，画图用plt.savefig到BytesIO后print("___IMG___"+base64)\n4.表格用print("___TABLE___"+CSV)\n5.流程图用print("___MERMAID___"+mermaid语法)\n6.小红书风格精美图用print("___HTML___"+HTML代码)，支持渐变linear-gradient、阴影box-shadow、圆角border-radius、白底、max-width:360px\n7.收到搜索结果后继续分析，直到完成任务';
 var agentMsgs=[];
 function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
 function scb(){chat.scrollTop=chat.scrollHeight;}
@@ -75,6 +100,7 @@ function execPy(code,w,btn,cb){
   if(pyOk){go();return;}
   if(pyBusy){setTimeout(function(){execPy(code,w,btn,cb);},1000);return;}
   pyBusy=true;tst('首次加载Python (~50MB)...');
+  loadFontData(function(){});
   var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
   s.onload=function(){loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;go();}).catch(function(e){pyBusy=false;if(cb)cb('❌ 加载失败',[]);});};
   s.onerror=function(){pyBusy=false;if(cb)cb('❌ 网络错误',[]);};document.head.appendChild(s);
@@ -82,11 +108,52 @@ function execPy(code,w,btn,cb){
 function showRes(w,t,er,im){
   var d=document.createElement('div');d.className='er'+(er?' e':'');
   d.innerHTML='<div style="font-size:.7rem;color:'+(er?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(er?'❌ 出错':'✅ 成功')+'</div>';
-  if(t&&t.indexOf('___TABLE___')>-1){var tp=t.split('___TABLE___');t=tp[0].trim();var csv=tp[1].replace(/^\s+|\s+$/g,'');var rows=csv.split('\n').map(function(r){return r.split(',');});if(rows.length>0){var tb=document.createElement('table');rows.forEach(function(r,ri){var tr=document.createElement('tr');r.forEach(function(cell){var c=document.createElement(ri===0?'th':'td');c.textContent=cell.trim();tr.appendChild(c);});tb.appendChild(tr);});d.appendChild(tb);var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='data.csv';a.textContent='💾 保存CSV';a.className='svbtn';d.appendChild(a);}}
-  if(t&&t.indexOf('___MERMAID___')>-1){var mp=t.split('___MERMAID___');t=mp[0].trim();var mc=mp[1].trim();var dv=document.createElement('div');dv.className='mermaid';dv.textContent=mc;d.appendChild(dv);try{mermaid.initialize({startOnLoad:false,theme:'dark'});mermaid.run({nodes:[dv]}).catch(function(){});}catch(e){}
-    var sb=document.createElement('a');sb.href='data:text/plain;charset=utf-8,'+encodeURIComponent(mc);sb.download='flow.mmd';sb.textContent='💾 保存源码';sb.className='svbtn';d.appendChild(sb);}
+  if(t&&t.indexOf('___HTML___')>-1){
+    var hp=t.split('___HTML___');
+    t=hp[0].trim();
+    var hdiv=document.createElement('div');
+    hdiv.innerHTML=hp[1].trim();
+    hdiv.style.cssText='overflow-x:auto;background:#fff;border-radius:12px;padding:12px;margin:8px 0';
+    d.appendChild(hdiv);
+  }
+  if(t&&t.indexOf('___TABLE___')>-1){
+    var tp=t.split('___TABLE___');
+    t=tp[0].trim();
+    var csv=tp[1].replace(/^\s+|\s+$/g,'');
+    var rows=csv.split('\n').map(function(r){return r.split(',');});
+    if(rows.length>0){
+      var tb=document.createElement('table');
+      rows.forEach(function(r,ri){
+        var tr=document.createElement('tr');
+        r.forEach(function(cell){
+          var c=document.createElement(ri===0?'th':'td');
+          c.textContent=cell.trim();
+          tr.appendChild(c);
+        });
+        tb.appendChild(tr);
+      });
+      d.appendChild(tb);
+      var a=document.createElement('a');
+      a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+      a.download='data.csv';a.textContent='💾 保存CSV';a.className='svbtn';d.appendChild(a);
+    }
+  }
+  if(t&&t.indexOf('___MERMAID___')>-1){
+    var mp=t.split('___MERMAID___');
+    t=mp[0].trim();
+    var mc=mp[1].trim();
+    var dv=document.createElement('div');
+    dv.className='mermaid';dv.textContent=mc;d.appendChild(dv);
+    try{mermaid.initialize({startOnLoad:false,theme:'dark'});mermaid.run({nodes:[dv]}).catch(function(){});}catch(e){}
+    var sb=document.createElement('a');
+    sb.href='data:text/plain;charset=utf-8,'+encodeURIComponent(mc);
+    sb.download='flow.mmd';sb.textContent='💾 保存源码';sb.className='svbtn';d.appendChild(sb);
+  }
   if(t){var p=document.createElement('pre');p.textContent=t;p.style.cssText='margin:0;white-space:pre-wrap';d.appendChild(p);}
-  if(im&&im.length>0)im.forEach(function(b,idx){var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:4px;margin-top:4px;display:block';d.appendChild(i);var a=document.createElement('a');a.href='data:image/png;base64,'+b;a.download='chart_'+(idx+1)+'.png';a.textContent='💾 保存图'+(idx+1);a.className='svbtn';d.appendChild(a);});
+  if(im&&im.length>0)im.forEach(function(b,idx){
+    var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:4px;margin-top:4px;display:block';d.appendChild(i);
+    var a=document.createElement('a');a.href='data:image/png;base64,'+b;a.download='chart_'+(idx+1)+'.png';a.textContent='💾 保存图'+(idx+1);a.className='svbtn';d.appendChild(a);
+  });
   w.appendChild(d);scb();
 }
 function callAPI(ak,bu,mdl2,mArr,str,cb){
@@ -111,7 +178,6 @@ function agentStep(depth){
   if(depth>3){addStatus('⚠️ 达到最大循环次数');agentBusy=false;snd.style.display='flex';stp.style.display='none';return;}
   callAPI(akDS,buDS,mdl,agentMsgs,false,function(err,reply){
     if(err){addStatus('❌ '+err);agentBusy=false;snd.style.display='flex';stp.style.display='none';return;}
-    // 搜索
     var sm=reply.match(/\[SEARCH:\s*([^\]]+)\]/);
     if(sm){
       var sq=sm[1].trim();addStatus('🔍 搜索：'+sq);
@@ -122,9 +188,8 @@ function agentStep(depth){
       });
       return;
     }
-    // 代码块
     var cm=reply.match(/```(?:python|py)\n([\s\S]*?)```/);
-    if(cm){
+    if(cm&&autoExec){
       var code=cm[1].trim();addStatus('⚡ 自动执行代码...');
       var bub=addAI('```python\n'+code+'\n```');
       var w=bub.querySelector('.cw');
@@ -136,7 +201,9 @@ function agentStep(depth){
       });
       return;
     }
-    // 最终回复
+    if(reply.indexOf('___HTML___')>-1||reply.indexOf('___TABLE___')>-1||reply.indexOf('___MERMAID___')>-1){
+      addAI(reply);agentBusy=false;snd.style.display='flex';stp.style.display='none';return;
+    }
     addAI(reply);
     agentBusy=false;snd.style.display='flex';stp.style.display='none';
   });
@@ -145,7 +212,7 @@ function send(){
   var t=inp.value.trim();if(!t||agentBusy)return;
   if(!akDS){tst('请先设置Key ⚙️');openMod();return;}
   if(msgs.length===0)chat.innerHTML='';
-  msgs.push({role:'user',content:t});save();render();inp.value='';inp.style.height='auto';
+  msgs.push({role:'user',content:t});save();
   var row=document.createElement('div');row.className='msg u';row.innerHTML='<div class="av">👤</div><div class="bub">'+esc(t)+'</div>';chat.appendChild(row);scb();
   addStatus('🤖 思考中...');
   agentBusy=true;sf=false;snd.style.display='none';stp.style.display='flex';
@@ -153,7 +220,11 @@ function send(){
   agentStep(0);
 }
 function stopGen(){sf=true;agentBusy=false;agentMsgs=[];snd.style.display='flex';stp.style.display='none';tst('⏹ 已停止');}
-function render(){if(msgs.length===0){chat.innerHTML='<div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">全自动：搜索→执行→回传→继续<br>输入需求，AI自动干活</p></div>';return;}}
+function render(){if(msgs.length===0){chat.innerHTML='<div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+ Agent</h2><p style="font-size:.8rem">⚡手动执行(默认) | 小红书风格出图<br>输入需求，AI生成代码</p></div>';}}
+document.getElementById('autox').addEventListener('click',function(){
+  autoExec=!autoExec;var b=document.getElementById('autox');
+  if(autoExec){b.classList.add('on');tst('⚡ 自动执行 ON');}else{b.classList.remove('on');tst('⚡ 手动执行（点▶运行）');}
+});
 document.getElementById('srch').addEventListener('click',function(){
   srchOn=!srchOn;var b=document.getElementById('srch');
   if(srchOn){b.classList.add('on');tst('🔍 自动搜索 ON');}else{b.classList.remove('on');tst('💬 普通模式');}
