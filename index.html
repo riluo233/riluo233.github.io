@@ -1,68 +1,17 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#111">
-<title>DeepSeek+</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-system,BlinkMacSystemFont,sans-serif;-webkit-tap-highlight-color:transparent}
-#app{height:100%;display:flex;flex-direction:column;max-width:700px;margin:0 auto}
-#hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0}
-#hdr b{font-size:1rem}#hdr div{display:flex;gap:8px}
-.hbtn{width:36px;height:36px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.hbtn.on{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
-#chat{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
-.msg{display:flex;margin-bottom:14px;gap:6px}
-.msg.u{flex-direction:row-reverse}
-.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;background:#252525;flex-shrink:0}
-.bub{max-width:82%;padding:10px 14px;border-radius:14px;font-size:.9rem;line-height:1.5;word-break:break-word}
-.msg.u .bub{background:#1e3a2f;border-bottom-right-radius:3px}
-.msg.a .bub{background:#1a1a1a;border:1px solid #333;border-bottom-left-radius:3px}
-.cw{margin:8px 0;border-radius:10px;overflow:hidden;border:1px solid #333}
-.ch{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:#252525;font-size:.65rem;color:#999}
-.cb{padding:3px 8px;border-radius:5px;border:none;font-size:.65rem;cursor:pointer;font-weight:600}
-.cb.r{background:#4ade80;color:#000}.cb.c{background:#1a1a1a;color:#999;border:1px solid #333}
-.cw pre{margin:0;padding:10px;background:#0d1117;overflow-x:auto}
-.cw pre code{font-family:monospace;font-size:.75rem;color:#c9d1d9;white-space:pre-wrap}
-.er{margin-top:-1px;padding:8px 12px;background:#0d1117;border-top:1px solid #333;font-size:.75rem;max-height:400px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;color:#c9d1d9}
-.er.e{color:#ef4444}.er img{max-width:100%;border-radius:6px;margin-top:6px}
-.er table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.75rem}
-.er table th,.er table td{border:1px solid #333;padding:6px 8px;text-align:left}
-.er table th{background:#252525;color:#4ade80}
-.er .mermaid{background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:12px;margin:8px 0;overflow-x:auto}
-.svbtn{display:inline-block;margin:4px 8px 8px 0;padding:6px 14px;background:#252525;color:#4ade80;border:1px solid #4ade80;border-radius:8px;font-size:.75rem;text-decoration:none}
-#ps{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#252525;border:1px solid #4ade80;padding:8px 16px;border-radius:20px;font-size:.75rem;z-index:20;display:none}
-#inp{padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));background:#1a1a1a;border-top:1px solid #333;display:flex;gap:6px;align-items:flex-end;flex-shrink:0}
-#inp textarea{flex:1;background:#252525;border:1px solid #333;border-radius:12px;padding:10px 12px;color:#eee;font-size:.88rem;font-family:inherit;resize:none;max-height:110px;min-height:40px;outline:none;line-height:1.3}
-#inp textarea:focus{border-color:#4ade80}
-#send{width:40px;height:40px;border-radius:50%;background:#4ade80;color:#000;border:none;font-size:1.1rem;cursor:pointer;flex-shrink:0}
-#stop{width:40px;height:40px;border-radius:50%;background:#ef4444;color:#fff;border:none;font-size:.8rem;cursor:pointer;flex-shrink:0;display:none}
-#mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:100}
-#mb{background:#1a1a1a;border-radius:18px 18px 0 0;padding:18px 14px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px}
-#mb h3{font-size:1rem;margin-bottom:12px}#mb label{font-size:.75rem;color:#999;display:block;margin:10px 0 3px}
-#mb input,#mb select{width:100%;padding:10px;background:#252525;border:1px solid #333;border-radius:8px;color:#eee;font-size:.85rem;outline:none}
-.ma{display:flex;gap:8px;margin-top:14px}
-.btn{flex:1;padding:11px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;text-align:center}
-.btn.p{background:#4ade80;color:#000}.btn.s{background:#252525;color:#eee;border:1px solid #333}
-.btn.d{background:#252525;color:#ef4444;border:1px solid #333;margin-top:14px;display:block;width:100%}
-.wc{text-align:center;padding:40px 20px;color:#999}.wc .ic{font-size:3rem;margin-bottom:8px}
-.wc h2{color:#eee;margin-bottom:4px}.wc p{font-size:.82rem;line-height:1.5}
-.tt{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:8px 18px;border-radius:20px;font-size:.78rem;font-weight:600;z-index:200}
-</style>
-</head>
-<body>
-<div id="app">
-<div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="srch" title="搜索">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 搜索 · 图表 · 表格 · 流程图<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
-<div id="ps"><span id="pst">加载Python...</span></div>
-<div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
-</div>
-<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds" placeholder="sk-..."><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>DeepSeek 模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><label>ChatboxAI Key</label><input type="password" id="sk_cb" placeholder="1c0964a1-..."><label>ChatboxAI URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><meta name="theme-color" content="#111"><title>DS+</title><script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script><style>
+*{margin:0;padding:0;box-sizing:border-box}body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:sans-serif;-webkit-tap-highlight-color:transparent}#app{height:100%;display:flex;flex-direction:column;max-width:700px;margin:0 auto}
+#hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0}.hbtn{width:34px;height:34px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;display:flex;align-items:center;justify-content:center;cursor:pointer}.hbtn.on{background:#8b5cf6;color:#fff}
+#chat{flex:1;overflow-y:auto;padding:10px;-webkit-overflow-scrolling:touch}.msg{display:flex;margin-bottom:12px;gap:6px}.msg.u{flex-direction:row-reverse}.av{width:28px;height:28px;border-radius:50%;background:#252525;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}.bub{max-width:85%;padding:8px 12px;border-radius:12px;font-size:.9rem;line-height:1.5;word-break:break-word}.msg.u .bub{background:#1e3a2f}.msg.a .bub{background:#1a1a1a;border:1px solid #333}
+.cw{margin:6px 0;border-radius:8px;overflow:hidden;border:1px solid #333}.ch{display:flex;justify-content:space-between;padding:4px 8px;background:#252525;font-size:.65rem;color:#999}.cb{padding:2px 8px;border-radius:4px;border:none;font-size:.65rem;cursor:pointer}.cb.r{background:#4ade80;color:#000}.cb.c{background:#1a1a1a;color:#999}.cw pre{margin:0;padding:8px;background:#0d1117;overflow-x:auto}.cw pre code{font-family:monospace;font-size:.72rem;white-space:pre-wrap}
+.er{margin-top:-1px;padding:6px 10px;background:#0d1117;border-top:1px solid #333;font-size:.72rem;font-family:monospace;white-space:pre-wrap}.er.e{color:#ef4444}.er img{max-width:100%;border-radius:4px;margin-top:4px}.er table{width:100%;border-collapse:collapse;font-size:.7rem}.er td,.er th{border:1px solid #333;padding:4px 6px}.er th{background:#252525;color:#4ade80}.er .mermaid{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:10px;margin:6px 0}.svbtn{display:inline-block;margin:4px 6px 6px 0;padding:5px 10px;background:#252525;color:#4ade80;border:1px solid #4ade80;border-radius:6px;font-size:.7rem;text-decoration:none}
+#inp{display:flex;gap:6px;padding:6px;background:#1a1a1a;border-top:1px solid #333}#inp textarea{flex:1;background:#252525;border:1px solid #333;border-radius:10px;padding:8px;color:#eee;font-size:.85rem;resize:none;max-height:100px;min-height:38px;outline:none}#inp textarea:focus{border-color:#4ade80}#send{width:38px;height:38px;border-radius:50%;background:#4ade80;color:#000;border:none;font-size:1rem}#stop{width:38px;height:38px;border-radius:50%;background:#ef4444;color:#fff;border:none;display:none}
+#mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:100}#mb{background:#1a1a1a;border-radius:16px 16px 0 0;padding:14px;width:100%;max-width:480px}#mb h3{font-size:1rem;margin-bottom:8px}#mb label{font-size:.7rem;color:#999;display:block;margin:8px 0 2px}#mb input,#mb select{width:100%;padding:8px;background:#252525;border:1px solid #333;border-radius:6px;color:#eee;font-size:.8rem;outline:none}.ma{display:flex;gap:6px;margin-top:10px}.btn{flex:1;padding:10px;border-radius:6px;border:none;font-weight:600;cursor:pointer}.btn.p{background:#4ade80;color:#000}.btn.s{background:#252525;color:#eee}.btn.d{background:#252525;color:#ef4444;border:1px solid #333;margin-top:10px;display:block;width:100%;padding:10px;border-radius:6px}
+.tt{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:6px 14px;border-radius:16px;font-size:.75rem;z-index:200}
+</style></head><body><div id="app">
+<div id="hdr"><b>🧠 DS+</b><div style="display:flex;gap:6px"><button class="hbtn" id="srch">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
+<div id="chat"><div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+</h2><p style="font-size:.8rem">聊天 · Python · 搜索 · 图表 · 表格 · 流程图</p></div></div>
+<div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div></div>
+<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds"><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><label>ChatboxAI Key</label><input type="password" id="sk_cb"><label>ChatboxAI URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空</button></div></div>
 <script>
 var akDS=localStorage.getItem('dsk')||'',buDS=localStorage.getItem('dsu')||'https://api.deepseek.com',mdl=localStorage.getItem('dsm')||'deepseek-v4-pro';
 var akCB=localStorage.getItem('cbk')||'',buCB=localStorage.getItem('cbu')||'https://ai.chatboxai.app/v1';
@@ -70,7 +19,7 @@ var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]'),busy=false,sf=false,src
 var py=null,pyOk=false,pyBusy=false;
 var chat=document.getElementById('chat'),inp=document.getElementById('ui');
 var snd=document.getElementById('send'),stp=document.getElementById('stop');
-var mod=document.getElementById('mo'),ps=document.getElementById('ps'),pst=document.getElementById('pst');
+var mod=document.getElementById('mo'),pst=document.getElementById('pst');
 var PRELOAD=['numpy','pandas','matplotlib','scipy','scikit-learn','pillow'];
 var FONT_SETUP='import matplotlib\nmatplotlib.use("Agg")\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport os\n_fp="/tmp/SimHei.ttf"\nif not os.path.exists(_fp):\n import pyodide.http\n try:\n  _r=await pyodide.http.pyfetch("https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf")\n  _d=await _r.bytes()\n  open(_fp,"wb").write(_d)\n  fm.fontManager.addfont(_fp)\n except Exception:\n  pass\nelse:\n try: fm.fontManager.addfont(_fp)\n except Exception: pass\nplt.rcParams["font.sans-serif"]=["SimHei","sans-serif"]\nplt.rcParams["axes.unicode_minus"]=False';
 
@@ -85,7 +34,7 @@ function md(t){
   var p=t.split('\n\n');return p.map(function(x){if(x.indexOf('<div class="cw">')===0)return x;return '<p style="margin-bottom:5px">'+x.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 function render(){
-  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 搜索 · 图表 · 表格 · 流程图<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
+  if(msgs.length===0){chat.innerHTML='<div style="text-align:center;color:#999;padding:40px 20px"><h2 style="color:#eee">DeepSeek+</h2><p style="font-size:.8rem">聊天 · Python · 搜索 · 图表 · 表格 · 流程图</p></div>';return;}
   chat.innerHTML='';msgs.forEach(function(m){if(m.role==='system')return;var r=document.createElement('div');r.className='msg '+(m.role==='user'?'u':'a');r.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md(m.content)+'</div>';chat.appendChild(r);});scb();
 }
 function upd(m){var b=chat.querySelectorAll('.msg.a .bub'),l=b[b.length-1];if(l)l.innerHTML=md(m.content);scb();}
@@ -96,10 +45,10 @@ window.runCode=function(btn){
 };
 function runPy(code,btn,w){
   function go(){
-    var out='';btn.textContent='⏳ 准备环境...';
+    var out='';btn.textContent='⏳ 准备...';
     Promise.all(PRELOAD.map(function(p){return py.loadPackage(p).catch(function(){});})).then(function(){
       py.runPythonAsync(FONT_SETUP).then(function(){
-    btn.textContent='⚡ 执行中...';
+    btn.textContent='⚡ 执行...';
     try{
       py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
       var ic=code.includes('plt.')||code.includes('matplotlib');
@@ -125,11 +74,11 @@ function runPy(code,btn,w){
     });
   }
   if(pyOk){go();return;}
-  if(pyBusy)return;pyBusy=true;ps.style.display='block';pst.textContent='首次加载Python环境 (~50MB)...';
+  if(pyBusy)return;pyBusy=true;tst('首次加载Python (~50MB)...');
   var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
-  s.onload=function(){pst.textContent='加载核心...';
-    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;ps.style.display='none';go();}).catch(function(e){pyBusy=false;ps.style.display='none';showRes(w,'❌ 加载失败',true);btn.disabled=false;btn.textContent='▶ 运行';});
-  };s.onerror=function(){pyBusy=false;ps.style.display='none';showRes(w,'❌ 网络错误',true);btn.disabled=false;btn.textContent='▶ 运行';};document.head.appendChild(s);
+  s.onload=function(){
+    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;go();}).catch(function(e){pyBusy=false;showRes(w,'❌ 加载失败',true);btn.disabled=false;btn.textContent='▶ 运行';});
+  };s.onerror=function(){pyBusy=false;showRes(w,'❌ 网络错误',true);btn.disabled=false;btn.textContent='▶ 运行';};document.head.appendChild(s);
 }
 function showRes(w,t,er,im){
   var d=document.createElement('div');d.className='er'+(er?' e':'');
@@ -153,7 +102,30 @@ function showRes(w,t,er,im){
       d.appendChild(tb);
       var a=document.createElement('a');
       a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-      a.download='data.csv';a.te// ====== API 调用（ChatboxAI走CORS代理）======
+      a.download='data.csv';a.textContent='💾 保存CSV';a.className='svbtn';d.appendChild(a);
+    }
+  }
+  if(t&&t.indexOf('___MERMAID___')>-1){
+    var mp=t.split('___MERMAID___');
+    t=mp[0].trim();
+    var code=mp[1].trim();
+    var dv=document.createElement('div');
+    dv.className='mermaid';dv.textContent=code;d.appendChild(dv);
+    try{
+      mermaid.initialize({startOnLoad:false,theme:'dark'});
+      mermaid.run({nodes:[dv]}).catch(function(){});
+    }catch(e){}
+    var sb=document.createElement('a');
+    sb.href='data:text/plain;charset=utf-8,'+encodeURIComponent(code);
+    sb.download='flowchart.mmd';sb.textContent='💾 保存流程图源码';sb.className='svbtn';d.appendChild(sb);
+  }
+  if(t){var p=document.createElement('pre');p.textContent=t;p.style.cssText='margin:0;white-space:pre-wrap';d.appendChild(p);}
+  if(im&&im.length>0)im.forEach(function(b,idx){
+    var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:4px;margin-top:4px;display:block';d.appendChild(i);
+    var a=document.createElement('a');a.href='data:image/png;base64,'+b;a.download='chart_'+(idx+1)+'.png';a.textContent='💾 保存图'+(idx+1);a.className='svbtn';d.appendChild(a);
+  });
+  w.appendChild(d);scb();
+}
 function callAPI(ak,bu,mdl2,mArr,str,cb){
   var u=bu.replace(/\/$/,'')+'/chat/completions';
   if(bu.indexOf('chatboxai')>-1)u='https://corsproxy.io/?'+encodeURIComponent(u);
@@ -165,15 +137,11 @@ function callAPI(ak,bu,mdl2,mArr,str,cb){
     function pump(){rd.read().then(function(x){if(x.done){cb(null,full);return;}bf+=dc.decode(x.value,{stream:true});var ls=bf.split('\n');bf=ls.pop()||'';ls.forEach(function(l){if(!l.startsWith('data: '))return;var d=l.slice(6).trim();if(d==='[DONE]')return;try{var j=JSON.parse(d),dt=(j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content)||'';if(dt)full+=dt;}catch(e){}});if(sf){cb(null,full);return;}pump();}).catch(function(){cb(null,full);});}pump();
   }).catch(function(e){cb('❌ 网络:'+e.message,null);});
 }
-
-// ====== 自动搜索 ======
 var SP='你是DeepSeek。需要实时数据时输出 [SEARCH:关键词]，系统自动搜索后返回结果。收到结果后继续回答。不需要搜索就直接回答。';
-
 function doSearch(q,cb){
-  if(!akCB){cb(null,'搜索未配置，请在设置填ChatboxAI Key');return;}
+  if(!akCB){cb(null,'搜索未配置，请填ChatboxAI Key');return;}
   callAPI(akCB,buCB,'gemini-3-pro',[{role:'user',content:'搜索并返回详细信息：'+q}],false,cb);
 }
-
 function sendSrch(txt){
   msgs.push({role:'assistant',content:'🔍 分析...'});render();var ai=msgs.length-1;
   callAPI(akDS,buDS,mdl,[{role:'system',content:SP},{role:'user',content:txt}],false,function(err,re){
@@ -193,7 +161,6 @@ function sendSrch(txt){
   });
 }
 function fin(){busy=false;snd.style.display='flex';stp.style.display='none';}
-
 function send(){
   var t=inp.value.trim();if(!t||busy)return;
   if(!akDS){tst('请先设置Key ⚙️');openMod();return;}
@@ -204,14 +171,11 @@ function send(){
   msgs.push({role:'assistant',content:''});render();var ai=msgs.length-1;
   callAPI(akDS,buDS,mdl,msgs.filter(function(m){return m.role!=='system';}),true,function(e,f){if(e)msgs[ai].content=e;else msgs[ai].content=f||'(空)';render();save();fin();});
 }
-
 function stopGen(){sf=true;}
-
 document.getElementById('srch').addEventListener('click',function(){
   srchOn=!srchOn;var b=document.getElementById('srch');
   if(srchOn){b.classList.add('on');tst('🔍 自动搜索 ON');}else{b.classList.remove('on');tst('💬 普通模式');}
 });
-
 function openMod(){document.getElementById('sk_ds').value=akDS;document.getElementById('su_ds').value=buDS;document.getElementById('sk_cb').value=akCB;document.getElementById('su_cb').value=buCB;document.getElementById('sm').value=mdl;mod.style.display='flex';}
 function closeMod(){mod.style.display='none';}
 document.getElementById('ms').addEventListener('click',function(){
@@ -228,8 +192,6 @@ document.getElementById('sbtn').addEventListener('click',openMod);
 document.getElementById('nbtn').addEventListener('click',function(){if(msgs.length>0&&!confirm('新对话？'))return;msgs=[];save();render();tst('✨ 新对话');});
 snd.addEventListener('click',send);stp.addEventListener('click',stopGen);
 inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
-inp.addEventListener('input',function(){inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,110)+'px';});
+inp.addEventListener('input',function(){inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,100)+'px';});
 render();
-</script>
-</body>
-</html>
+</script></body></html>
