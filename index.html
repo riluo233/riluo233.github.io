@@ -1,33 +1,75 @@
-核心常量：
-  T_base = 0.2625（范围[0.18, 0.35]）
-  λ (EMA学习率) = 0.15
-  w维度权重 = [1.48, 1.52, 0.98, 1.18, 0.93, 0.79]
-  低归属阈值 = max(s_k) < 0.30
-  甜区区间 = [1.50, 1.72]
-  H2H反向阈值 = < 0.35
-  H2H克制阈值 = > 0.65
-  样本冻结期 = 30场
-  置信度带宽 = 样本<30场显示区间
-
-原型中心速查：
-  P1:[0.55,-0.40,0,0.65,0.50,0.25] σ=0.18
-  P2:[0.708,0.386,0,0.521,0.464,0.507] σ=0.12
-  P3:[0.15,0.50,0,-0.55,-0.30,-0.40] σ=0.20
-  P4:[0,-0.20,0,0.20,0,0] σ=0.15
-  P5:[0.55,-0.15,0,0.30,0.45,-0.25] σ=0.16
-  P6:[0.30,0,0,0,0,0] σ=0.25
-
-乘法S1基准：
-  P1=3.0 | P2=2.8 | P3=2.0 | P4=2.5 | P5=2.3 | P6=2.85
-
-L系数：
-  英超0.95 英冠0.90 巴甲0.85 美职/韩职0.75
-  挪超/瑞超0.65 芬超0.60 澳超0.55
-
-复盘修正记录：
-  甜区+低L<0.80 → P5×2.5，陷阱0-2/0-3
-  大赛属性（德比/榜首/酷暑）→ BTTS保守化-10%
-  低信息联赛夏季 → S1整体-0.3
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>⚡ AI工作台 · 锋刃v6.0</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--c:#00f0ff;--p:#ff00e5;--g:#39ff14;--y:#ffe600;--bg:#05060f;--panel:rgba(8,12,32,.93);--panel2:rgba(12,18,44,.9);--line:rgba(0,240,255,.25);--txt:#e8f6ff;--dim:#8fa3bf;--gc:0 0 8px rgba(0,240,255,.5),0 0 20px rgba(0,240,255,.18);--gp:0 0 8px rgba(255,0,229,.5),0 0 20px rgba(255,0,229,.18)}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(rgba(0,240,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.045) 1px,transparent 1px);background-size:38px 38px}
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 70% 45% at 50% -8%,rgba(255,0,229,.14),transparent 65%),radial-gradient(ellipse 55% 40% at 90% 110%,rgba(0,240,255,.12),transparent 60%)}
+header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:5px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line);box-shadow:0 0 14px rgba(0,240,255,.12);flex-wrap:wrap}
+header h1{font-size:15px;white-space:nowrap;text-shadow:0 0 12px rgba(0,240,255,.7);margin-right:auto}
+header select,header button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:12px}
+header button:active{transform:scale(.94)}
+.tog.on{box-shadow:var(--gc);border-color:var(--c);color:var(--c)}
+.view{position:fixed;top:46px;left:0;right:0;bottom:0;display:none}
+#viewWork{display:block}
+#chatBox{position:absolute;top:0;left:0;right:0;bottom:66px;overflow-y:auto;padding:12px 12px 20px;-webkit-overflow-scrolling:touch}
+.msg{margin:10px 0;padding:10px 13px;border-radius:14px;max-width:100%;word-break:break-word;animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.msg.user{background:linear-gradient(135deg,rgba(0,240,255,.2),rgba(0,240,255,.06));border:1px solid rgba(0,240,255,.35);margin-left:auto;width:fit-content;max-width:88%}
+.msg.ai{background:linear-gradient(135deg,rgba(255,0,229,.1),rgba(255,0,229,.03));border:1px solid rgba(255,0,229,.28)}
+.out-item{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;content-visibility:auto;contain-intrinsic-size:auto 260px}
+.out-item img{max-width:100%;border-radius:8px}
+pre.code{font-family:Consolas,monospace;font-size:12px;color:var(--g);background:rgba(0,0,0,.5);border:1px solid rgba(57,255,20,.3);border-radius:8px;padding:8px;overflow-x:auto;white-space:pre-wrap}
+table.tbl{border-collapse:collapse;width:100%;font-size:12px;background:#0a0e23}
+table.tbl th,table.tbl td{border:1px solid rgba(0,240,255,.25);padding:5px 8px}
+table.tbl th{background:rgba(0,240,255,.15)}
+button{background:linear-gradient(135deg,rgba(0,240,255,.16),rgba(255,0,229,.16));color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:13px;transition:transform .12s}
+button:active{transform:scale(.95)}
+button.pri{background:linear-gradient(135deg,var(--c),var(--p));color:#000;font-weight:700;border:none;box-shadow:0 0 12px rgba(0,240,255,.35)}
+.inputbar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:flex-end;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line)}
+.inputbar textarea{flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:15px;resize:none;height:42px;max-height:110px;outline:none}
+#viewFoot{overflow-y:auto;padding:12px 12px 30px;-webkit-overflow-scrolling:touch}
+#tplFab{position:fixed;bottom:74px;right:12px;z-index:60}
+#tplFab button{border-radius:22px;padding:10px 14px;font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--c),var(--p));color:#000;border:none;box-shadow:var(--gc)}
+#tplPanel{position:fixed;right:12px;bottom:118px;z-index:61;width:212px;max-height:58vh;overflow-y:auto;background:var(--panel);border:1px solid var(--c);border-radius:12px;padding:8px;box-shadow:var(--gp);display:none}
+#tplPanel button{display:block;width:100%;margin:4px 0;text-align:left;font-size:13px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:linear-gradient(var(--c),var(--p));border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+<h1>⚡ 锋刃工作台</h1>
+<button id="tabWork" class="tog on">💬工作台</button>
+<button id="tabFoot">⚽推演</button>
+<select id="modelSel"><option value="deepseek-chat">V4-Flash</option><option value="deepseek-reasoner">V4-Pro</option></select>
+<button id="execBtn">⚡手动</button><button id="profBtn">🧠</button><button id="setBtn">⚙️</button>
+</header>
+<div id="viewWork" class="view">
+<main id="chatBox"></main>
+<div class="inputbar">
+<textarea id="chatInput" placeholder="说要求，AI搜索→生成→出图，你只管保存…"></textarea>
+<button id="sendBtn" class="pri">发送</button>
+</div>
+</div>
+<div id="viewFoot" class="view">
+<div style="font-size:12px;color:var(--dim);margin-bottom:6px">MATCH_DATA（AI可说"推演XXvsXX"自动填，也可手改）</div>
+<textarea id="mdInput" style="width:100%;height:150px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px;font-size:11px;font-family:Consolas,monospace;outline:none"></textarea>
+<div style="display:flex;gap:8px;margin:8px 0">
+<button class="pri" onclick="runFootball()">▶ 运行推演</button>
+<button onclick="fillSample()">📋示例</button>
+</div>
+<div id="footOut"></div>
+</div>
+<div id="tplFab"><button id="tplBtn">📁模板</button></div>
+<div id="tplPanel"></div>
+<script>
 /* ========== 配置 ========== */
 const API_URL='https://api.deepseek.com/chat/completions';
 let API_KEY=localStorage.getItem('wt_api')||'sk-28e218d04d204cc8993c1facfaa4f73d';
