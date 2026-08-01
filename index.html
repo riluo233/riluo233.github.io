@@ -232,7 +232,7 @@ function loadECharts(){if(_echartsLoaded)return _echartsLoaded;
  return _echartsLoaded}
 function convertEcharts(text){
  const re=/___ECHARTS___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
- text=text.replace(re,(mm,js)=>{let opt=null;try{opt=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
+ text=text.replace(re,(mm,js)=>{let opt=null;try{opt=JSON.parse(js.split('```').join('').trim())}catch(e){return mm}hit=true;
   const id='ec_'+Date.now()+'_'+Math.floor(Math.random()*9999);
   opt.backgroundColor=opt.backgroundColor||'#0a0e23';if(!opt.textStyle)opt.textStyle={color:'#e8f6ff'};
   _EC_QUEUE.push({id,option:opt});
@@ -264,7 +264,7 @@ function buildExcalidrawElements(data){
 }
 function handleExcalidraw(text){
  const re=/___EXCALIDRAW___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
- text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
+ text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.split('```').join('').trim())}catch(e){return mm}hit=true;
   const file={type:'excalidraw',version:2,source:'ai-app',elements:buildExcalidrawElements(d),elementsMap:{},appState:{viewBackgroundColor:'#f8f9fa'},files:{}};
   window.open('https://excalidraw.com/#json='+btoa(unescape(encodeURIComponent(JSON.stringify(file))))+',AI1','_blank');
   return '（📎手绘图已在Excalidraw新标签页打开，可编辑导出）'});
