@@ -28,8 +28,12 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 .cb.r{background:#4ade80;color:#000}.cb.c{background:#1a1a1a;color:#999;border:1px solid #333}
 .cw pre{margin:0;padding:10px;background:#0d1117;overflow-x:auto}
 .cw pre code{font-family:monospace;font-size:.75rem;color:#c9d1d9;white-space:pre-wrap}
-.er{margin-top:-1px;padding:8px 12px;background:#0d1117;border-top:1px solid #333;font-size:.75rem;max-height:300px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;color:#c9d1d9}
+.er{margin-top:-1px;padding:8px 12px;background:#0d1117;border-top:1px solid #333;font-size:.75rem;max-height:400px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;color:#c9d1d9}
 .er.e{color:#ef4444}.er img{max-width:100%;border-radius:6px;margin-top:6px}
+.er table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.75rem}
+.er table th,.er table td{border:1px solid #333;padding:6px 8px;text-align:left}
+.er table th{background:#252525;color:#4ade80}
+.svbtn{display:inline-block;margin:4px 8px 8px 0;padding:6px 14px;background:#252525;color:#4ade80;border:1px solid #4ade80;border-radius:8px;font-size:.75rem;text-decoration:none}
 #ps{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#252525;border:1px solid #4ade80;padding:8px 16px;border-radius:20px;font-size:.75rem;z-index:20;display:none}
 #inp{padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));background:#1a1a1a;border-top:1px solid #333;display:flex;gap:6px;align-items:flex-end;flex-shrink:0}
 #inp textarea{flex:1;background:#252525;border:1px solid #333;border-radius:12px;padding:10px 12px;color:#eee;font-size:.88rem;font-family:inherit;resize:none;max-height:110px;min-height:40px;outline:none;line-height:1.3}
@@ -52,7 +56,7 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 <body>
 <div id="app">
 <div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="srch" title="搜索">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索 · 图表<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
+<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 搜索 · 图表 · 表格<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
 <div id="ps"><span id="pst">加载Python...</span></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
 </div>
@@ -78,7 +82,7 @@ function md(t){
   var p=t.split('\n\n');return p.map(function(x){if(x.indexOf('<div class="cw">')===0)return x;return '<p style="margin-bottom:5px">'+x.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 function render(){
-  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索 · 图表<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
+  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 搜索 · 图表 · 表格<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
   chat.innerHTML='';msgs.forEach(function(m){if(m.role==='system')return;var r=document.createElement('div');r.className='msg '+(m.role==='user'?'u':'a');r.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md(m.content)+'</div>';chat.appendChild(r);});scb();
 }
 function upd(m){var b=chat.querySelectorAll('.msg.a .bub'),l=b[b.length-1];if(l)l.innerHTML=md(m.content);scb();}
@@ -89,8 +93,9 @@ window.runCode=function(btn){
 };
 function runPy(code,btn,w){
   function go(){
-    var out='';btn.textContent='⚡';
+    var out='';btn.textContent='⏳ 加载包...';
     Promise.all(PRELOAD.map(function(p){return py.loadPackage(p).catch(function(){});})).then(function(){
+    btn.textContent='⚡ 执行中...';
     try{
       py.runPython('import matplotlib\nmatplotlib.use("Agg")');
       py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
@@ -100,7 +105,14 @@ function runPy(code,btn,w){
         try{out=py.runPython('_so.getvalue()');}catch(e){}
         var im=[];if(ic){try{var pi=py.runPython('_ds_imgs');if(pi&&pi.toJs)im=pi.toJs();else if(Array.isArray(pi))im=pi;}catch(e){}}
         var im2=[];
-        out=out.replace(/_{2,3}IMG_{2,3}([A-Za-z0-9+/=\s]+?)(?=\n_{2,3}IMG|$)/g,function(mt,b64){var cl=b64.replace(/\s/g,'');if(cl.length>100){im2.push(cl);return'';}return mt;});
+        if(out.indexOf('IMG_')>-1){
+          var parts=out.split(/_{2,3}IMG_{2,3}/);
+          for(var i=1;i<parts.length;i++){
+            var cl=parts[i].replace(/\s/g,'');
+            if(cl.length>100)im2.push(cl);
+          }
+          out=parts[0];
+        }
         out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();
         var allImgs=im.concat(im2);
         showRes(w,out||'(执行成功)',false,allImgs);btn.disabled=false;btn.textContent='▶ 运行';
@@ -109,16 +121,42 @@ function runPy(code,btn,w){
     });
   }
   if(pyOk){go();return;}
-  if(pyBusy)return;pyBusy=true;ps.style.display='block';pst.textContent='加载Python(~20s)...';
+  if(pyBusy)return;pyBusy=true;ps.style.display='block';pst.textContent='首次加载Python环境 (~50MB)...';
   var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
-  s.onload=function(){pst.textContent='加载核心(~50MB)...';
+  s.onload=function(){pst.textContent='加载核心...';
     loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;ps.style.display='none';go();}).catch(function(e){pyBusy=false;ps.style.display='none';showRes(w,'❌ 加载失败',true);btn.disabled=false;btn.textContent='▶ 运行';});
   };s.onerror=function(){pyBusy=false;ps.style.display='none';showRes(w,'❌ 网络错误',true);btn.disabled=false;btn.textContent='▶ 运行';};document.head.appendChild(s);
 }
 function showRes(w,t,er,im){
-  var d=document.createElement('div');d.className='er'+(er?' e':'');d.innerHTML='<div style="font-size:.7rem;color:'+(er?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(er?'❌ 出错':'✅ 成功')+'</div>';
+  var d=document.createElement('div');d.className='er'+(er?' e':'');
+  d.innerHTML='<div style="font-size:.7rem;color:'+(er?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(er?'❌ 出错':'✅ 成功')+'</div>';
+  if(t&&t.indexOf('___TABLE___')>-1){
+    var tp=t.split('___TABLE___');
+    t=tp[0].trim();
+    var csv=tp[1].replace(/^\s+|\s+$/g,'');
+    var rows=csv.split('\n').map(function(r){return r.split(',');});
+    if(rows.length>0){
+      var tb=document.createElement('table');
+      rows.forEach(function(r,ri){
+        var tr=document.createElement('tr');
+        r.forEach(function(cell){
+          var c=document.createElement(ri===0?'th':'td');
+          c.textContent=cell.trim();
+          tr.appendChild(c);
+        });
+        tb.appendChild(tr);
+      });
+      d.appendChild(tb);
+      var a=document.createElement('a');
+      a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+      a.download='data.csv';a.textContent='💾 保存CSV';a.className='svbtn';d.appendChild(a);
+    }
+  }
   if(t){var p=document.createElement('pre');p.textContent=t;p.style.cssText='margin:0;white-space:pre-wrap;font:inherit;';d.appendChild(p);}
-  if(im&&im.length>0)im.forEach(function(b){var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:6px;margin-top:6px;display:block';d.appendChild(i);});
+  if(im&&im.length>0)im.forEach(function(b,idx){
+    var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:6px;margin-top:6px;display:block';d.appendChild(i);
+    var a=document.createElement('a');a.href='data:image/png;base64,'+b;a.download='chart_'+(idx+1)+'.png';a.textContent='💾 保存图'+(idx+1);a.className='svbtn';d.appendChild(a);
+  });
   w.appendChild(d);scb();
 }
 // ====== API 调用（ChatboxAI走CORS代理）======
