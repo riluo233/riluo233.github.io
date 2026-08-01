@@ -12,9 +12,9 @@
 body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-system,BlinkMacSystemFont,sans-serif;-webkit-tap-highlight-color:transparent}
 #app{height:100%;display:flex;flex-direction:column;max-width:700px;margin:0 auto}
 #hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#1a1a1a;border-bottom:1px solid #333;flex-shrink:0}
-#hdr b{font-size:1rem}
-#hdr div{display:flex;gap:8px}
+#hdr b{font-size:1rem}#hdr div{display:flex;gap:8px}
 .hbtn{width:36px;height:36px;border-radius:50%;border:1px solid #333;background:#252525;color:#aaa;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.hbtn.on{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
 #chat{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
 .msg{display:flex;margin-bottom:14px;gap:6px}
 .msg.u{flex-direction:row-reverse}
@@ -25,12 +25,11 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 .cw{margin:8px 0;border-radius:10px;overflow:hidden;border:1px solid #333}
 .ch{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:#252525;font-size:.65rem;color:#999}
 .cb{padding:3px 8px;border-radius:5px;border:none;font-size:.65rem;cursor:pointer;font-weight:600}
-.cb.r{background:#4ade80;color:#000}
-.cb.c{background:#1a1a1a;color:#999;border:1px solid #333}
+.cb.r{background:#4ade80;color:#000}.cb.c{background:#1a1a1a;color:#999;border:1px solid #333}
 .cw pre{margin:0;padding:10px;background:#0d1117;overflow-x:auto}
 .cw pre code{font-family:monospace;font-size:.75rem;color:#c9d1d9;white-space:pre-wrap}
 .er{margin-top:-1px;padding:8px 12px;background:#0d1117;border-top:1px solid #333;font-size:.75rem;max-height:300px;overflow-y:auto;font-family:monospace;white-space:pre-wrap;color:#c9d1d9}
-.er.e{color:#ef4444}
+.er.e{color:#ef4444}.er img{max-width:100%;border-radius:6px;margin-top:6px}
 #ps{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#252525;border:1px solid #4ade80;padding:8px 16px;border-radius:20px;font-size:.75rem;z-index:20;display:none}
 #inp{padding:6px 10px calc(6px + env(safe-area-inset-bottom,0px));background:#1a1a1a;border-top:1px solid #333;display:flex;gap:6px;align-items:flex-end;flex-shrink:0}
 #inp textarea{flex:1;background:#252525;border:1px solid #333;border-radius:12px;padding:10px 12px;color:#eee;font-size:.88rem;font-family:inherit;resize:none;max-height:110px;min-height:40px;outline:none;line-height:1.3}
@@ -39,56 +38,153 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 #stop{width:40px;height:40px;border-radius:50%;background:#ef4444;color:#fff;border:none;font-size:.8rem;cursor:pointer;flex-shrink:0;display:none}
 #mo{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:100}
 #mb{background:#1a1a1a;border-radius:18px 18px 0 0;padding:18px 14px calc(18px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px}
-#mb h3{font-size:1rem;margin-bottom:12px}
-#mb label{font-size:.75rem;color:#999;display:block;margin:10px 0 3px}
+#mb h3{font-size:1rem;margin-bottom:12px}#mb label{font-size:.75rem;color:#999;display:block;margin:10px 0 3px}
 #mb input,#mb select{width:100%;padding:10px;background:#252525;border:1px solid #333;border-radius:8px;color:#eee;font-size:.85rem;outline:none}
-#mb input:focus{border-color:#4ade80}
 .ma{display:flex;gap:8px;margin-top:14px}
 .btn{flex:1;padding:11px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;text-align:center}
-.btn.p{background:#4ade80;color:#000}
-.btn.s{background:#252525;color:#eee;border:1px solid #333}
+.btn.p{background:#4ade80;color:#000}.btn.s{background:#252525;color:#eee;border:1px solid #333}
 .btn.d{background:#252525;color:#ef4444;border:1px solid #333;margin-top:14px;display:block;width:100%}
-.wc{text-align:center;padding:40px 20px;color:#999}
-.wc .ic{font-size:3rem;margin-bottom:8px}
-.wc h2{color:#eee;margin-bottom:4px}
-.wc p{font-size:.82rem;line-height:1.5}
+.wc{text-align:center;padding:40px 20px;color:#999}.wc .ic{font-size:3rem;margin-bottom:8px}
+.wc h2{color:#eee;margin-bottom:4px}.wc p{font-size:.82rem;line-height:1.5}
 .tt{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#4ade80;color:#000;padding:8px 18px;border-radius:20px;font-size:.78rem;font-weight:600;z-index:200}
 </style>
 </head>
 <body>
 <div id="app">
-<div id="hdr"><b>🧠 DeepSeek+</b><div><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek V4-Pro</h2><p>聊天 + Python 代码执行<br>点击 ⚙️ 设置 API Key 开始</p></div></div>
-<div id="ps"><span id="pst">加载 Python...</span></div>
+<div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="srch" title="搜索">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
+<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
+<div id="ps"><span id="pst">加载Python...</span></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
 </div>
-<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>API Key</label><input type="password" id="sk" placeholder="sk-xxxx..."><label>API Base URL</label><input id="su" placeholder="https://api.deepseek.com"><label>模型</label><select id="sm"><option value="deepseek-v4-pro">V4-Pro</option><option value="deepseek-v4-flash">V4-Flash</option></select><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
+<div id="mo"><div id="mb"><h3>⚙️ 设置</h3><label>DeepSeek Key</label><input type="password" id="sk_ds" placeholder="sk-..."><label>DeepSeek URL</label><input id="su_ds" placeholder="https://api.deepseek.com"><label>ChatboxAI Key</label><input type="password" id="sk_cb" placeholder="1c0964a1-..."><label>ChatboxAI URL</label><input id="su_cb" placeholder="https://ai.chatboxai.app/v1"><div class="ma"><button class="btn s" id="mc">取消</button><button class="btn p" id="ms">保存</button></div><button class="btn d" id="clr">🗑️ 清空聊天</button></div></div>
 <script>
-var apiKey=localStorage.getItem('dsk')||'';
-var baseUrl=localStorage.getItem('dsu')||'https://api.deepseek.com';
-var model=localStorage.getItem('dsm')||'deepseek-v4-pro';
-var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]');
-var busy=false,stopFlag=false;
-var pyodide=null,pyReady=false,pyLoading=false;
-var chatEl=document.getElementById('chat');
-var inpEl=document.getElementById('ui');
-var sendBtn=document.getElementById('send');
-var stopBtn=document.getElementById('stop');
-var modalEl=document.getElementById('mo');
-var psEl=document.getElementById('ps');
-var pstEl=document.getElementById('pst');
+var akDS=localStorage.getItem('dsk')||'',buDS=localStorage.getItem('dsu')||'https://api.deepseek.com';
+var akCB=localStorage.getItem('cbk')||'',buCB=localStorage.getItem('cbu')||'https://ai.chatboxai.app/v1';
+var msgs=JSON.parse(localStorage.getItem('dsmsg')||'[]'),busy=false,sf=false,srchOn=false;
+var py=null,pyOk=false,pyBusy=false;
+var chat=document.getElementById('chat'),inp=document.getElementById('ui');
+var snd=document.getElementById('send'),stp=document.getElementById('stop');
+var mod=document.getElementById('mo'),ps=document.getElementById('ps'),pst=document.getElementById('pst');
 
 function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
-function scrollBottom(){chatEl.scrollTop=chatEl.scrollHeight;}
-function toast(t){var d=document.createElement('div');d.className='tt';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove();},2200);}
-function escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function scb(){chat.scrollTop=chat.scrollHeight;}
+function tst(t){var d=document.createElement('div');d.className='tt';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove();},2200);}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function md(t){
+  t=t.replace(/```(\w*)\n([\s\S]*?)```/g,function(_,l,c){var ip=l==='python'||l==='py';return '<div class="cw"><div class="ch"><span>'+(l||'code')+'</span><div style="display:flex;gap:3px"><button class="cb c" onclick="copyCode(this)">📋</button>'+(ip?'<button class="cb r" onclick="runCode(this)">▶ 运行</button>':'')+'</div></div><pre><code>'+esc(c.trim())+'</code></pre></div>';});
+  t=t.replace(/`([^`]+)`/g,'<code style="background:#0d1117;padding:2px 5px;border-radius:4px;font-size:.8rem">$1</code>');
+  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  var p=t.split('\n\n');return p.map(function(x){if(x.indexOf('<div class="cw">')===0)return x;return '<p style="margin-bottom:5px">'+x.replace(/\n/g,'<br>')+'</p>';}).join('');
+}
+function render(){
+  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+ 搜索版</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
+  chat.innerHTML='';msgs.forEach(function(m){if(m.role==='system')return;var r=document.createElement('div');r.className='msg '+(m.role==='user'?'u':'a');r.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md(m.content)+'</div>';chat.appendChild(r);});scb();
+}
+function upd(m){var b=chat.querySelectorAll('.msg.a .bub'),l=b[b.length-1];if(l)l.innerHTML=md(m.content);scb();}
+window.copyCode=function(btn){var c=btn.closest('.cw').querySelector('code').innerText;navigator.clipboard.writeText(c).then(function(){btn.textContent='✅';setTimeout(function(){btn.textContent='📋';},1800);});};
+window.runCode=function(btn){
+  var w=btn.closest('.cw'),c=w.querySelector('code').innerText,o=w.querySelector('.er');if(o)o.remove();
+  if(pyBusy){tst('Python加载中...');return;}btn.disabled=true;btn.textContent='⏳';runPy(c,btn,w);
+};
+function runPy(code,btn,w){
+  function go(){
+    var out='';btn.textContent='⚡';
+    try{
+      py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
+      var ic=code.includes('plt.')||code.includes('matplotlib');
+      if(ic)code+='\n_ds_imgs=[]\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  _ds_imgs.append(base64.b64encode(__b.read()).decode())\nexcept: pass\n';
+      var pk=[];var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;var mp={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
+      while((m=re.exec(code))!==null){var p=mp[m[1]||m[2]];if(p&&pk.indexOf(p)===-1)pk.push(p);}
+      py.runPythonAsync(code).then(function(){
+        try{out=py.runPython('_so.getvalue()');}catch(e){}var im=[];if(ic){try{var pi=py.runPython('_ds_imgs');if(pi&&pi.toJs)im=pi.toJs();else if(Array.isArray(pi))im=pi;}catch(e){}}
+        out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();showRes(w,out||'(执行成功)',im);btn.disabled=false;btn.textContent='▶ 运行';
+      }).catch(function(e){showRes(w,out+'\n\n❌ '+e.message,[]);btn.disabled=false;btn.textContent='▶ 运行';});
+    }catch(e){showRes(w,'❌ '+e.message,[]);btn.disabled=false;btn.textContent='▶ 运行';}
+  }
+  if(pyOk){go();return;}
+  if(pyBusy)return;pyBusy=true;ps.style.display='block';pst.textContent='加载Python(~20s)...';
+  var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
+  s.onload=function(){pst.textContent='加载核心(~50MB)...';
+    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;ps.style.display='none';py.loadPackage(['numpy','matplotlib']).catch(function(){});go();}).catch(function(e){pyBusy=false;ps.style.display='none';showRes(w,'❌ 加载失败',[]);btn.disabled=false;btn.textContent='▶ 运行';});
+  };s.onerror=function(){pyBusy=false;ps.style.display='none';showRes(w,'❌ 网络错误',[]);btn.disabled=false;btn.textContent='▶ 运行';};document.head.appendChild(s);
+}
+function showRes(w,t,er,im){
+  var d=document.createElement('div');d.className='er'+(er?' e':'');d.innerHTML='<div style="font-size:.7rem;color:'+(er?'#ef4444':'#4ade80')+';margin-bottom:4px">'+(er?'❌ 出错':'✅ 成功')+'</div>';
+  if(t){var p=document.createElement('pre');p.textContent=t;p.style.cssText='margin:0;white-space:pre-wrap;font:inherit;';d.appendChild(p);}
+  if(im&&im.length>0)im.forEach(function(b){var i=document.createElement('img');i.src='data:image/png;base64,'+b;i.style.cssText='max-width:100%;border-radius:6px;margin-top:6px;display:block';d.appendChild(i);});
+  w.appendChild(d);scb();
+}
+// ====== API 调用 ======
+function callAPI(ak,bu,mdl,mArr,str,cb){
+  var u=bu.replace(/\/$/,'')+'/chat/completions';
+  if(bu.indexOf('chatboxai')>-1)u='https://corsproxy.io/?'+encodeURIComponent(u);
+  fetch(u,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ak},body:JSON.stringify({model:mdl,messages:mArr,stream:str,temperature:0.7})})
+  .then(function(r){
+    if(!r.ok)return r.text().then(function(t){cb('❌ '+r.status,null);});
+    if(!str)return r.json().then(function(j){cb(null,j.choices[0].message.content);});
+    var rd=r.body.getReader(),dc=new TextDecoder(),bf='',full='';
+    function pump(){rd.read().then(function(x){if(x.done){cb(null,full);return;}bf+=dc.decode(x.value,{stream:true});var ls=bf.split('\n');bf=ls.pop()||'';ls.forEach(function(l){if(!l.startsWith('data: '))return;var d=l.slice(6).trim();if(d==='[DONE]')return;try{var j=JSON.parse(d),dt=(j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content)||'';if(dt)full+=dt;}catch(e){}});if(sf){cb(null,full);return;}pump();}).catch(function(){cb(null,full);});}pump();
+  }).catch(function(e){cb('❌ 网络:'+e.message,null);});
+}
 
-function md2html(t){
-  t=t.replace(/```(\w*)\n([\s\S]*?)```/g,function(_,lang,code){
-    var isPy=lang==='python'||lang==='py';
-    return '<div class="cw"><div class="ch"><span>'+(lang||'code')+'</span><div style="display:flex;gap:3px"><button class="cb c" onclick="copyCode(this)">📋</button>'+(isPy?'<button class="cb r" onclick="runCode(this)">▶ 运行</button>':'')+'</div></div><pre><code>'+escHTML(code.trim())+'</code></pre></div>';
+// ====== 搜索 ======
+var SP='你是DeepSeek V4-Pro。需要实时数据时输出 [SEARCH:关键词]，系统自动搜索后返回结果。收到结果后继续回答。不需要搜索就直接回答。';
+
+function doSearch(q,cb){
+  if(!akCB){cb(null,'搜索未配置');return;}
+  callAPI(akCB,buCB,'gemini-3-pro',[{role:'user',content:'搜索并返回详细信息：'+q}],false,cb);
+}
+
+function sendSrch(txt){
+  msgs.push({role:'assistant',content:'🔍 分析...'});render();var ai=msgs.length-1;
+  callAPI(akDS,buDS,'deepseek-v4-pro',[{role:'system',content:SP},{role:'user',content:txt}],false,function(err,re){
+    if(err){msgs[ai].content=err;render();save();fin();return;}
+    var sm=re.match(/\[SEARCH:\s*([^\]]+)\]/);
+    if(sm){
+      var sq=sm[1].trim();msgs[ai].content='🔍 搜索中：'+sq;render();
+      doSearch(sq,function(se,sr){
+        if(se){msgs[ai].content=se;render();save();fin();return;}
+        msgs[ai].content='';render();
+        callAPI(akDS,buDS,'deepseek-v4-pro',[{role:'system',content:SP},{role:'user',content:txt},{role:'user',content:'搜索结果：\n'+sr+'\n请据此回答。'}],true,function(fe,fr){
+          if(fe)msgs[ai].content=fe;else msgs[ai].content=fr||'(空)';
+          render();save();fin();
+        });
+      });
+    }else{msgs[ai].content=re||'(空)';render();save();fin();}
   });
-  t=t.replace(/`([^`]+)`/g,'<code style="background:#0d1117;padding:2px 5px;border-radius:4px;font-size:.8rem">\$1</code>');
-  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>\$1</strong>');
-  var ps=t.split('\n\n');
-  return ps.map(function(p){if(p.indexOf('<div class="cw">')===0)return p;return
+}
+function fin(){busy=false;snd.style.display='flex';stp.style.display='none';}
+
+function send(){
+  var t=inp.value.trim();if(!t||busy)return;
+  if(!akDS){tst('请先设置Key ⚙️');openMod();return;}
+  if(msgs.length===0)chat.innerHTML='';
+  msgs.push({role:'user',content:t});save();render();inp.value='';inp.style.height='auto';
+  busy=true;sf=false;snd.style.display='none';stp.style.display='flex';
+  if(srchOn){sendSrch(t);return;}
+  msgs.push({role:'assistant',content:''});render();var ai=msgs.length-1;
+  callAPI(akDS,buDS,'deepseek-v4-pro',msgs.filter(function(m){return m.role!=='system';}),true,function(e,f){if(e)msgs[ai].content=e;else msgs[ai].content=f||'(空)';render();save();fin();});
+}
+
+function stopGen(){sf=true;}
+
+document.getElementById('srch').addEventListener('click',function(){
+  srchOn=!srchOn;var b=document.getElementById('srch');
+  if(srchOn){b.classList.add('on');tst('🔍 自动搜索 ON');}else{b.classList.remove('on');tst('💬 普通模式');}
+});
+
+function openMod(){document.getElementById('sk_ds').value=akDS;document.getElementById('su_ds').value=buDS;document.getElementById('sk_cb').value=akCB;document.getElementById('su_cb').value=buCB;mod.style.display='flex';}
+function closeMod(){mod.style.display='none';}
+document.getElementById('ms').addEventListener('click',function(){akDS=document.getElementById('sk_ds').value.trim();buDS=document.getElementById('su_ds').value.trim()||'https://api.deepseek.com';akCB=document.getElementById('sk_cb').value.trim();buCB=document.getElementById('su_cb').value.trim()||'https://ai.chatboxai.app/v1';localStorage.setItem('dsk',akDS);localStorage.setItem('dsu',buDS);localStorage.setItem('cbk',akCB);localStorage.setItem('cbu',buCB);closeMod();tst('✅ 已保存');});
+document.getElementById('mc').addEventListener('click',closeMod);
+mod.addEventListener('click',function(e){if(e.target===mod)closeMod();});
+document.getElementById('clr').addEventListener('click',function(){if(confirm('清空？')){msgs=[];save();render();closeMod();tst('🗑️ 已清空');}});
+document.getElementById('sbtn').addEventListener('click',openMod);
+document.getElementById('nbtn').addEventListener('click',function(){if(msgs.length>0&&!confirm('新对话？'))return;msgs=[];save();render();tst('✨ 新对话');});
+snd.addEventListener('click',send);stp.addEventListener('click',stopGen);
+inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+inp.addEventListener('input',function(){inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,110)+'px';});
+render();
+</script>
+</body>
+</html>
