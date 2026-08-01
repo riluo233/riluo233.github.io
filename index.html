@@ -89,24 +89,26 @@ window.runCode=function(btn){
 function runPy(code,btn,w){
   function go(){
     var out='';btn.textContent='⚡';
+    var pk=[];var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;var mp={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
+    while((m=re.exec(code))!==null){var p=mp[m[1]||m[2]];if(p&&pk.indexOf(p)===-1)pk.push(p);}
+    Promise.all(pk.map(function(p){return py.loadPackage(p).catch(function(){});})).then(function(){
     try{
       py.runPython('import matplotlib\nmatplotlib.use("Agg")');
       py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
       var ic=code.includes('plt.')||code.includes('matplotlib');
       if(ic)code+='\n_ds_imgs=[]\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  _ds_imgs.append(base64.b64encode(__b.read()).decode())\nexcept: pass\n';
-      var pk=[];var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;var mp={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
-      while((m=re.exec(code))!==null){var p=mp[m[1]||m[2]];if(p&&pk.indexOf(p)===-1)pk.push(p);}
       py.runPythonAsync(code).then(function(){
         try{out=py.runPython('_so.getvalue()');}catch(e){}var im=[];if(ic){try{var pi=py.runPython('_ds_imgs');if(pi&&pi.toJs)im=pi.toJs();else if(Array.isArray(pi))im=pi;}catch(e){}}
         out=out.replace(/_ds_imgs[\s\S]*$/,'').trim();showRes(w,out||'(执行成功)',false,im);btn.disabled=false;btn.textContent='▶ 运行';
       }).catch(function(e){showRes(w,out+'\n\n❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';});
     }catch(e){showRes(w,'❌ '+e.message,true);btn.disabled=false;btn.textContent='▶ 运行';}
+    });
   }
   if(pyOk){go();return;}
   if(pyBusy)return;pyBusy=true;ps.style.display='block';pst.textContent='加载Python(~20s)...';
   var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pyodide@0.25.0/pyodide.js';
   s.onload=function(){pst.textContent='加载核心(~50MB)...';
-    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;ps.style.display='none';py.loadPackage(['numpy','matplotlib']).catch(function(){});go();}).catch(function(e){pyBusy=false;ps.style.display='none';showRes(w,'❌ 加载失败',true);btn.disabled=false;btn.textContent='▶ 运行';});
+    loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'}).then(function(p){py=p;pyOk=true;pyBusy=false;ps.style.display='none';go();}).catch(function(e){pyBusy=false;ps.style.display='none';showRes(w,'❌ 加载失败',true);btn.disabled=false;btn.textContent='▶ 运行';});
   };s.onerror=function(){pyBusy=false;ps.style.display='none';showRes(w,'❌ 网络错误',true);btn.disabled=false;btn.textContent='▶ 运行';};document.head.appendChild(s);
 }
 function showRes(w,t,er,im){
