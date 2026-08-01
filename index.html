@@ -52,7 +52,7 @@ body{height:100vh;overflow:hidden;background:#111;color:#eee;font-family:-apple-
 <body>
 <div id="app">
 <div id="hdr"><b>🧠 DS+</b><div><button class="hbtn" id="srch" title="搜索">🔍</button><button class="hbtn" id="nbtn">✨</button><button class="hbtn" id="sbtn">⚙️</button></div></div>
-<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
+<div id="chat"><div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索 · 图表<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div></div>
 <div id="ps"><span id="pst">加载Python...</span></div>
 <div id="inp"><textarea id="ui" rows="1" placeholder="输入消息..."></textarea><button id="send">↑</button><button id="stop">■</button></div>
 </div>
@@ -77,7 +77,7 @@ function md(t){
   var p=t.split('\n\n');return p.map(function(x){if(x.indexOf('<div class="cw">')===0)return x;return '<p style="margin-bottom:5px">'+x.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 function render(){
-  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
+  if(msgs.length===0){chat.innerHTML='<div class="wc"><div class="ic">🧠</div><h2>DeepSeek+</h2><p>聊天 · Python · 自动搜索 · 图表<br>点 🔍 开启搜索 | 说「推演 曼联vs切尔西」</p></div>';return;}
   chat.innerHTML='';msgs.forEach(function(m){if(m.role==='system')return;var r=document.createElement('div');r.className='msg '+(m.role==='user'?'u':'a');r.innerHTML='<div class="av">'+(m.role==='user'?'👤':'🧠')+'</div><div class="bub">'+md(m.content)+'</div>';chat.appendChild(r);});scb();
 }
 function upd(m){var b=chat.querySelectorAll('.msg.a .bub'),l=b[b.length-1];if(l)l.innerHTML=md(m.content);scb();}
@@ -90,6 +90,7 @@ function runPy(code,btn,w){
   function go(){
     var out='';btn.textContent='⚡';
     try{
+      py.runPython('import matplotlib\nmatplotlib.use("Agg")');
       py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
       var ic=code.includes('plt.')||code.includes('matplotlib');
       if(ic)code+='\n_ds_imgs=[]\nimport io,base64\ntry:\n import matplotlib.pyplot as __plt\n for __fi in __plt.get_fignums():\n  __plt.figure(__fi)\n  __b=io.BytesIO()\n  __plt.savefig(__b,format="png",dpi=100,bbox_inches="tight")\n  __b.seek(0)\n  _ds_imgs.append(base64.b64encode(__b.read()).decode())\nexcept: pass\n';
