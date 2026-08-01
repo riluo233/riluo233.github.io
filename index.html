@@ -98,6 +98,9 @@ button.pri::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:
 <div id="tplFab"><button id="tplBtn">📁模板</button></div>
 <div id="tplPanel"></div>
 <script>
+window.addEventListener('error',function(e){var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;right:0;z-index:999999;background:#300;color:#ff6;font-size:12px;padding:8px;white-space:pre-wrap';d.textContent='❌ '+e.message+'（行'+e.lineno+'）';document.body.appendChild(d)});
+</script>
+<script>
 <!--SEG2-->
 const API_URL='https://api.deepseek.com/chat/completions';
 let API_KEY=localStorage.getItem('wt_api')||'sk-28e218d04d204cc8993c1facfaa4f73d';
@@ -133,17 +136,60 @@ function cardHTML(){
 }
 const TPL_FLOW={
  flow_jianfei:{mode:'html',
-  mermaid:`graph TD\n A["🎯目标：{target}"] --> B["🚀{p1}<br/>戒奶茶·晚餐7分饱"]\n B --> C["⚡{p2}<br/>加蛋白·跳绳15分钟"]\n C --> D["🔥{p3}<br/>16+8·喝水2L"]\n D --> E["🏆{p4}<br/>恢复三餐·保持运动"]\n E --> F["✅达成{target}"]`,
+  mermaid:`graph TD
+ A["🎯目标：{target}"] --> B["🚀{p1}<br/>戒奶茶·晚餐7分饱"]
+ B --> C["⚡{p2}<br/>加蛋白·跳绳15分钟"]
+ C --> D["🔥{p3}<br/>16+8·喝水2L"]
+ D --> E["🏆{p4}<br/>恢复三餐·保持运动"]
+ E --> F["✅达成{target}"]`,
   html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff5f7,#fff0f5);border-radius:24px;padding:22px;box-shadow:0 8px 30px rgba(255,105,180,.25)"><div style="text-align:center;font-size:21px;font-weight:bold;color:#ff4d94">🍎 减肥计划 · 目标{target}</div><div style="background:linear-gradient(135deg,#ff9a9e,#ff4d94);border-radius:16px;padding:13px;color:#fff;margin:10px 0">🚀 <b>{p1}</b><br><span style="font-size:13px">戒奶茶宵夜 · 晚餐7分饱</span></div><div style="background:linear-gradient(135deg,#ffb199,#ff6b6b);border-radius:16px;padding:13px;color:#fff;margin:10px 0">⚡ <b>{p2}</b><br><span style="font-size:13px">早餐加蛋白 · 跳绳15分钟</span></div><div style="background:linear-gradient(135deg,#f6d365,#fda085);border-radius:16px;padding:13px;color:#fff;margin:10px 0">🔥 <b>{p3}</b><br><span style="font-size:13px">16+8轻断食 · 喝水2L</span></div><div style="background:linear-gradient(135deg,#84fab0,#4ecdc4);border-radius:16px;padding:13px;color:#fff;margin:10px 0">🏆 <b>{p4}</b><br><span style="font-size:13px">恢复三餐 · 保持运动</span></div><div style="text-align:center;font-size:15px;font-weight:bold;color:#ff4d94;margin-top:12px">✅ 达成 {target}</div></div>`},
- flow_football:{mode:'mermaid',mermaid:`graph TD\n A["⚽ {home} vs {away}"] --> B["📡搜索情报"]\n B --> C["🧩R1-R12模块"]\n C --> D["🌌六维场景"]\n D --> E["🎲S3v3五比分"]\n E --> F["📊输出结果"]`},
- flow_decision:{mode:'mermaid',mermaid:`graph TD\n A["❓{q}"] --> B{"风险可承受？"}\n B -->|是| C["✅执行"]\n B -->|否| D["🔍替代方案"]\n D --> B\n C --> E["📈复盘"]`},
- flow_timeline:{mode:'mermaid',mermaid:`graph LR\n A["{p1}"] --> B["{p2}"]\n B --> C["{p3}"]\n C --> D["🎯{target}"]`},
- flow_compare:{mode:'mermaid',mermaid:`graph TD\n A["📌{q}"] --> B["A:{a}"]\n A --> C["B:{b}"]\n B --> D{"对比"}\n C --> D\n D --> E["✅选定"]`},
- week_plan:{mode:'mermaid',mermaid:`graph TD\n A["📅本周"] --> B["周一{d1}"]\n A --> C["周二{d2}"]\n A --> D["周三{d3}"]\n A --> E["周四{d4}"]\n A --> F["周五{d5}"]\n A --> G["周末{d6}"]`},
+ flow_football:{mode:'mermaid',mermaid:`graph TD
+ A["⚽ {home} vs {away}"] --> B["📡搜索情报"]
+ B --> C["🧩R1-R12模块"]
+ C --> D["🌌六维场景"]
+ D --> E["🎲S3v3五比分"]
+ E --> F["📊输出结果"]`},
+ flow_decision:{mode:'mermaid',mermaid:`graph TD
+ A["❓{q}"] --> B{"风险可承受？"}
+ B -->|是| C["✅执行"]
+ B -->|否| D["🔍替代方案"]
+ D --> B
+ C --> E["📈复盘"]`},
+ flow_timeline:{mode:'mermaid',mermaid:`graph LR
+ A["{p1}"] --> B["{p2}"]
+ B --> C["{p3}"]
+ C --> D["🎯{target}"]`},
+ flow_compare:{mode:'mermaid',mermaid:`graph TD
+ A["📌{q}"] --> B["A:{a}"]
+ A --> C["B:{b}"]
+ B --> D{"对比"}
+ C --> D
+ D --> E["✅选定"]`},
+ week_plan:{mode:'mermaid',mermaid:`graph TD
+ A["📅本周"] --> B["周一{d1}"]
+ A --> C["周二{d2}"]
+ A --> D["周三{d3}"]
+ A --> E["周四{d4}"]
+ A --> F["周五{d5}"]
+ A --> G["周末{d6}"]`},
  food_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff7f2,#fff0e6);border-radius:24px;padding:18px;box-shadow:0 8px 30px rgba(255,165,80,.25)"><div style="text-align:center;font-size:20px;font-weight:bold;color:#ff7a3d">🍱 一周食谱表</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px"><tr style="background:#ff7a3d;color:#fff"><th style="padding:7px">餐次</th><th>周一~三</th><th>周四~日</th></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌅早</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">鸡蛋+牛奶+全麦</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">燕麦+酸奶+水果</td></tr><tr><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc;font-weight:bold">☀️午</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">鸡胸+糙米+西兰花</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">牛肉+荞麦面+沙拉</td></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌙晚</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">虾仁+蔬菜汤7分饱</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">豆腐+菌菇+青菜</td></tr></table><div style="text-align:center;font-size:11px;color:#c98;margin-top:8px">🥗少油少盐·多喝水</div></div>`},
  card_plan:{mode:'html',html:cardHTML()},
- weight_table:{mode:'table',csv:'日期,体重(斤),较昨日,备注\n第1天,121.6,-0.4,启动期\n第2天,121.2,-0.4,晚餐7分饱\n第3天,120.8,-0.4,戒奶茶\n第4天,,,加速期\n第5天,,,\n第6天,,,\n第7天,,,\n第8天,,,冲刺期\n第9天,,,\n第10天,,,\n第11天,,,\n第12天,,,巩固期\n第13天,,,\n第14天,118.0,,🎉达成'},
- football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span<!--SEG3-->
+ weight_table:{mode:'table',csv:`日期,体重(斤),较昨日,备注
+第1天,121.6,-0.4,启动期
+第2天,121.2,-0.4,晚餐7分饱
+第3天,120.8,-0.4,戒奶茶
+第4天,,,加速期
+第5天,,,
+第6天,,,
+第7天,,,
+第8天,,,冲刺期
+第9天,,,
+第10天,,,
+第11天,,,
+第12天,,,巩固期
+第13天,,,
+第14天,118.0,,🎉达成`},
+ football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;co<!--SEG3-->
 let _TPL_QUEUE=[];
 function renderTplCall(text){
  const re=/___TPL___:([a-z0-9_]+)(?:\|([^___]*))?/g;_TPL_QUEUE=[];let hit=false;
@@ -325,7 +371,7 @@ async function tavilySearch(q){
   }catch(e){text='❌ 失败'}
   show('📡 实时搜索 ['+(i+1)+'/'+steps.length+'] '+steps[i]+' → '+text);
  }
- const res=out.length?('【实时搜索到的资料】\n'+out.join('\n\n')):'（未搜到资料）';
+ const res=out.length?('【实时搜索到的资料】'+String.fromCharCode(10)+out.join(String.fromCharCode(10)+String.fromCharCode(10))):'（未搜到资料）';
  show('📡 搜索完成，共'+out.length+'条资料 ✅');
  return res;
 }
@@ -361,9 +407,7 @@ class BladeV60:
   A=(oa-oh)/(oa+oh)
   B=float(self._g('def_home',0))-float(self._g('def_away',0))
   C=float(self._g('referee',0) or 0)
-  D=float(self._g('atk_home',0.5))-float(self._g('atk_away',0.3))
-  om=self._g('odds_move',{}) or {}
-  E=(float<!--SEG5-->
+  D=float(self._g('atk_home',0.5))-float(self._g<!--SEG5-->
 const ENGINE_PY2 = `
  def s3(self,s1f,votes,ss):
   vh,vd,va=votes; mx=max(vh,vd,va)
@@ -505,26 +549,65 @@ const ENGINE_PY2 = `
   else: log['冻结']=True
   self.state={'T_ba<!--SEG6-->
 let CODES=[];
-function extractCodeBlocks(text){CODES=[];return text.replace(/```python\n?([\s\S]*?)```/g,(m,c)=>{CODES.push(c);return '\n[[CODE:'+(CODES.length-1)+']]\n'})}
-function splitMarkers(text){
- const parts=[];let cur='';const re=/(___HTML___\n|___TABLE___\n|___MERMAID___\n|___IMG___\n)/g;
- let m,last=0;
- while((m=re.exec(text))){
-  if(m.index>last)cur+=text.slice(last,m.index);
-  if(cur.trim()){parts.push({type:'text',content:cur});cur=''}
-  const s=m.index+m[0].length;
-  const e=text.indexOf('___',s);
-  const c=(e===-1)?text.slice(s):text.slice(s,e);
-  parts.push({type:m[1].replace(/\n/,'').replace(/^___|___$/g,'').toLowerCase(),content:c});
-  if(e===-1){last=text.length;break}
-  last=e;
+function extractCodeBlocks(text){
+ CODES=[];
+ var out='',rest=text,start;
+ while((start=rest.indexOf('```python'))!==-1){
+  out+=rest.slice(0,start);
+  rest=rest.slice(start+9);
+  var end=rest.indexOf('```');
+  if(end===-1){out+=rest;rest='';break}
+  CODES.push(rest.slice(0,end));
+  out+='[[CODE:'+(CODES.length-1)+']]';
+  rest=rest.slice(end+3);
  }
- if(last<text.length){cur+=text.slice(last);if(cur.trim())parts.push({type:'text',content:cur})}
+ return out+rest;
+}
+function splitMarkers(text){
+ var parts=[],cur='',rest=text;
+ var names=['___HTML___','___TABLE___','___MERMAID___','___IMG___'];
+ while(true){
+  var pos=-1,which=-1,i;
+  for(i=0;i<names.length;i++){
+   var p=rest.indexOf(names[i]);
+   if(p!==-1&&(pos===-1||p<pos)){pos=p;which=i}
+  }
+  if(pos===-1)break;
+  cur+=rest.slice(0,pos);
+  if(cur.trim()){parts.push({type:'text',content:cur});cur=''}
+  var after=rest.slice(pos+names[which].length);
+  if(after.charCodeAt(0)===10)after=after.slice(1);
+  var end=-1,j;
+  for(j=0;j<names.length;j++){
+   var q=after.indexOf(names[j]);
+   if(q!==-1&&(end===-1||q<end))end=q;
+  }
+  var content=(end===-1)?after:after.slice(0,end);
+  parts.push({type:names[which].slice(3,-3).toLowerCase(),content:content});
+  rest=(end===-1)?'':after.slice(end);
+ }
+ if(rest.trim())parts.push({type:'text',content:rest});
  return parts;
+}
+function renderText(content){
+ var t=escapeHtml(content);
+ var out='',rest=t,start;
+ while((start=rest.indexOf('[[CODE:'))!==-1){
+  out+=rest.slice(0,start);
+  rest=rest.slice(start+7);
+  var e=rest.indexOf(']]');
+  if(e===-1){out+='[[CODE:';break}
+  var idx=+rest.slice(0,e);
+  var code=CODES[idx]||'';
+  out+='<div class="out-item"><div style="font-size:11px;color:#8fa3bf;margin-bottom:4px">🐍 Python</div><pre class="code">'+escapeHtml(code.length>400?code.slice(0,400)+'…':code)+'</pre><button data-run="'+idx+'" style="margin-top:6px">▶运行</button><span class="runStatus" style="font-size:12px;color:#8fa3bf;margin-left:8px"></span></div>';
+  rest=rest.slice(e+2);
+ }
+ out+=rest;
+ return out.split(String.fromCharCode(10)).join('<br>');
 }
 function renderTable(csv,wrap){
  const t=document.createElement('table');t.className='tbl';
- csv.trim().split('\n').forEach((r,i)=>{const tr=document.createElement('tr');r.split(',').forEach(c=>{const cell=document.createElement(i===0?'th':'td');cell.textContent=c;tr.appendChild(cell)});t.appendChild(tr)});
+ csv.trim().split(String.fromCharCode(10)).forEach((r,i)=>{const tr=document.createElement('tr');r.split(',').forEach(c=>{const cell=document.createElement(i===0?'th':'td');cell.textContent=c;tr.appendChild(cell)});t.appendChild(tr)});
  wrap.appendChild(t);
  const b=document.createElement('button');b.textContent='💾保存CSV';b.style.cssText='margin-top:6px';
  b.onclick=()=>downloadFile('表格_'+Date.now()+'.csv',csv,'text/csv;charset=utf-8');
@@ -552,8 +635,7 @@ function showRes(text,box){
  splitMarkers(text).forEach(s=>{
   if(s.type==='text'){
    const d=document.createElement('div');
-   let t=escapeHtml(s.content).replace(/\[\[CODE:(\d+)\]\]/g,(mm,i)=>{const code=CODES[+i];return '<div class="out-item"><div style="font-size:11px;color:#8fa3bf;margin-bottom:4px">🐍 Python</div><pre class="code">'+escapeHtml(code.length>400?code.slice(0,400)+'…':code)+'</pre><button data-run="'+i+'" style="margin-top:6px">▶运行</button><span class="runStatus" style="font-size:12px;color:#8fa3bf;margin-left:8px"></span></div>'});
-   d.innerHTML=t.replace(/\n/g,'<br>');
+   d.innerHTML=renderText(s.content);
    box.appendChild(d);
   }else if(s.type==='html'){const d=document.createElement('div');d.className='out-item';d.innerHTML=s.content;box.appendChild(d)}
   else if(s.type==='table'){const d=document.createElement('div');d.className='out-item';renderTable(s.content,d);box.appendChild(d)}
@@ -614,20 +696,8 @@ function finalizeReply(full,box){
  saveMemory(full);
 }
 function saveMemory(full){
- const plain=full.replace(/___\w+___/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,200);
- if(plain){SUMMARY=(SUMMARY?SUMMARY+'\n':'')+plain;if(SUMMARY.length>2000)SUMMARY=SUMMARY.slice(-2000);localStorage.setItem('wt_summary',SUMMARY)}
- HISTORY.push({role:'assistant',content:full});
- if(HISTORY.length>40)HISTORY=HISTORY.slice(-40);
-}
-const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中文回答，直接给成品，不啰嗦。
-【输出协议】
-1.小红书风HTML海报 → ___HTML___换行+HTML代码
-2.表格 → ___TABLE___换行+CSV
-3.流程图 → ___MERMAID___换行+Mermaid代码
-4.数据图表 → ___ECHARTS___换行+echarts option JSON
-5.手绘风图 → ___EXCALIDRAW___换行+{"nodes":[{"id":"a","label":".."}],"edges":[{"from":"a","to":"b","label":".."}]}
-6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动渲染+一键保存
-【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡) weight_table(体重表) football_card(推演卡:home,away,s1-s5,rec) flow_football(推演流程:home,away) week_plan(周计划:d1-d6) todo(待办) flow_decision(决策:q) flow_t<!--SEG7-->
+ const plain=full.replace(/___\w+___/g,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,200);
+ if(plain){SUMMARY=(SUMMARY?SUMMARY+'\n':'')+plain;if(SUMMARY.length>20<!--SEG7-->
 (function(){
  if(document.getElementById('calSec'))return;
  const foot=$('viewFoot');
@@ -640,19 +710,29 @@ const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中�
  sec2.innerHTML='<div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🚀 批量导入赛果（每行: 比分 方向 BTTS，如 <b>2-1 主 Yes</b>；按最近推演顺序配对）</div><textarea id="bulkIn" placeholder="2-1 主 Yes&#10;1-1 平 No" style="width:100%;height:70px;background:#0c122c;color:#e8f6ff;border:1px solid rgba(57,255,20,.3);border-radius:8px;padding:7px;font-size:12px;font-family:Consolas,monospace"></textarea><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><button class="pri" onclick="bulkCal()">🚀批量校准</button><button onclick="kmeansBtn()">🧬原型重构</button><button onclick="showJudge()">📊模型评分</button><button onclick="dailyEvolve()">🔄每日升级</button></div><div id="evolOut" style="font-size:12px;margin-top:8px;color:#39ff14;white-space:pre-wrap"></div>';
  foot.appendChild(sec2);
 })();
+function parseBulkLine(line){
+ var p=line.split(' ');
+ p=p.filter(function(x){return x.length>0});
+ if(p.length<3)return null;
+ var sc=p[0].split('-');
+ if(sc.length!==2)return null;
+ var h=+sc[0],a=+sc[1];
+ if(isNaN(h)||isNaN(a))return null;
+ return {h:h,a:a,dir:p[1],btts:p[2]};
+}
 async function bulkCal(){
- const lines=$('bulkIn').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
- const rs=window.FOOT_STATE.results;
- const out=$('evolOut');
+ var lines=$('bulkIn').value.split(String.fromCharCode(10)).map(function(s){return s.trim()}).filter(function(s){return s.length>0});
+ var rs=window.FOOT_STATE.results;
+ var out=$('evolOut');
  if(!lines.length){out.textContent='❌ 请先粘贴赛果';return}
  if(rs.length<lines.length){out.textContent='❌ 历史推演记录不足（现有'+rs.length+'条，需'+lines.length+'条）';return}
  out.textContent='⏳ 批量校准中…';
- const items=[];
- for(let i=0;i<lines.length;i++){
-  const mm=lines[i].match(/^(\d+)\s*[-:]\s*(\d+)\s+([主平客])\s+(\w+)$/);
+ var items=[];
+ for(var i=0;i<lines.length;i++){
+  var mm=parseBulkLine(lines[i]);
   if(!mm)continue;
-  const r=rs[rs.length-lines.length+i];
-  items.push({md:r.md,pred:r.pred,act:{h:+mm[1],a:+mm[2],dir:mm[3],btts:mm[4]}});
+  var r=rs[rs.length-lines.length+i];
+  items.push({md:r.md,pred:r.pred,act:{h:mm.h,a:mm.a,dir:mm.dir,btts:mm.btts}});
  }
  if(!items.length){out.textContent='❌ 行格式应为: 2-1 主 Yes';return}
  try{
@@ -680,7 +760,7 @@ __logs,__bst=__bulk_cal(__items)`);
   window.FOOT_STATE.proto=st.proto;
   window.FOOT_STATE.w=st.w;
   saveFS();
-  out.textContent=logs.join('\n')+'\n📊 批量完成: +'+items.length+'场 | 总样本'+window.FOOT_STATE.samples+' | T_base='+st.T_base.toFixed(4);
+  out.textContent=logs.join(String.fromCharCode(10))+String.fromCharCode(10)+'📊 批量完成: +'+items.length+'场 | 总样本'+window.FOOT_STATE.samples+' | T_base='+st.T_base.toFixed(4);
  }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
 }
 async function kmeansBtn(){
@@ -714,7 +794,7 @@ function showJudge(){
  lines.push(' 信息优势(方向命中): '+(j.edgeT?Math.round((j.edgeH/j.edgeT)*100):0)+'% ('+(j.edgeH||0)+'/'+(j.edgeT||0)+')');
  lines.push(' 双轨影子样本: 主轨'+window.FOOT_STATE.shadow.main.length+'场');
  lines.push(' FMEA失败指纹库: '+(window.FOOT_STATE.fmea||[]).length+'个');
- out.textContent=lines.join('\n');
+ out.textContent=lines.join(String.fromCharCode(10));
 }
 async function dailyEvolve(){
  const out=$('evolOut');
@@ -733,14 +813,7 @@ async function dailyEvolve(){
    py.globals.set('__sample_pts',vecs);
    py.runPython(KMEANS_PY);
    py.runPython('__rk=rebuild_protos()');
-   const msg=String(py.globals.get('__rk'));
-   py.runPython('__proto=dict(PROTO);__w=list(W)');
-   window.FOOT_STATE.proto=py.globals.get('__proto').toJs();
-   window.FOOT_STATE.w=py.globals.get('__w').toJs();
-   lines2.push('🧬 '+msg);
-  }catch(e){lines2.push('🧬 重构失败: '+escapeHtml(e.message||String(e)))}
- }
- window.FOOT_STATE.lastEvolve=new Date().toLocaleDateS<!--SEG8-->
+   const msg=String<!--SEG8-->
 const PANEL_ITEMS=[
  ['🍎减肥计划图','flow_jianfei',{target:'122→118斤',p1:'启动期1-3天',p2:'加速期4-7天',p3:'冲刺期8-11天',p4:'巩固期12-14天'}],
  ['🍱一周食谱表','food_plan',{}],['📊运动打卡表','card_plan',{}],['📈体重记录表','weight_table',{}],
@@ -789,34 +862,34 @@ if(window.FOOT_STATE.lastEvolve!==new Date().toLocaleDateString()){
  setTimeout(function(){try{dailyEvolve()}catch(e){}},1500);
 }
 </script>
- <script>
-/* ========== 主页生动化升级包 ========== */
+<script>
+/* ========== 主页生动化升级包（已内置） ========== */
 (function(){
  if(document.getElementById('pfx'))return;
  var style=document.createElement('style');
  style.textContent=`
- .glitch{position:relative;display:inline-block}
- .glitch::before,.glitch::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;overflow:hidden;opacity:.85}
- .glitch::before{color:#ff00e5;animation:g1 3s infinite linear alternate-reverse;clip-path:inset(0 0 60% 0)}
- .glitch::after{color:#00f0ff;animation:g2 2.7s infinite linear alternate-reverse;clip-path:inset(40% 0 0 0)}
- @keyframes g1{0%{transform:translate(-2px,-1px)}25%{transform:translate(2px,1px)}50%{transform:translate(-1px,2px)}75%{transform:translate(1px,-2px)}100%{transform:translate(-2px,1px)}}
- @keyframes g2{0%{transform:translate(2px,1px)}25%{transform:translate(-2px,-1px)}50%{transform:translate(1px,-2px)}75%{transform:translate(-1px,2px)}100%{transform:translate(2px,-1px)}}
- .neon-flicker{animation:flicker 4s linear infinite}
- @keyframes flicker{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.55}43%{opacity:1}78%{opacity:1}79%{opacity:.35}80%{opacity:1}}
- #pfx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
- .p{position:absolute;bottom:-10px;border-radius:50%;will-change:transform,opacity;animation:rise linear infinite}
- @keyframes rise{0%{transform:translateY(0);opacity:0}10%{opacity:.7}85%{opacity:.5}100%{transform:translateY(-110vh);opacity:0}}
- .hud{position:fixed;z-index:40;font-family:Consolas,monospace;font-size:10px;color:rgba(0,240,255,.55);letter-spacing:1px;pointer-events:none}
- .hud.tl{top:50px;left:10px}
- .hud.tr{top:50px;right:10px;text-align:right}
- #statusBar{position:fixed;left:0;right:0;bottom:0;z-index:55;height:20px;background:rgba(3,4,10,.92);border-top:1px solid rgba(0,240,255,.25);font-family:Consolas,monospace;font-size:10px;color:#39ff14;display:flex;align-items:center;padding:0 10px;overflow:hidden;white-space:nowrap}
- #chatBox{bottom:88px}
- .inputbar{bottom:24px}
- .out-item:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(0,240,255,.28)}
- .msg:hover{transform:translateX(2px)}
- .spark{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9999;animation:sparkAni .5s ease-out forwards}
- @keyframes sparkAni{to{transform:translateY(-30px) scale(0);opacity:0}}
- `;
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;overflow:hidden;opacity:.85}
+.glitch::before{color:#ff00e5;animation:g1 3s infinite linear alternate-reverse;clip-path:inset(0 0 60% 0)}
+.glitch::after{color:#00f0ff;animation:g2 2.7s infinite linear alternate-reverse;clip-path:inset(40% 0 0 0)}
+@keyframes g1{0%{transform:translate(-2px,-1px)}25%{transform:translate(2px,1px)}50%{transform:translate(-1px,2px)}75%{transform:translate(1px,-2px)}100%{transform:translate(-2px,1px)}}
+@keyframes g2{0%{transform:translate(2px,1px)}25%{transform:translate(-2px,-1px)}50%{transform:translate(1px,-2px)}75%{transform:translate(-1px,2px)}100%{transform:translate(2px,-1px)}}
+.neon-flicker{animation:flicker 4s linear infinite}
+@keyframes flicker{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.55}43%{opacity:1}78%{opacity:1}79%{opacity:.35}80%{opacity:1}}
+#pfx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.p{position:absolute;bottom:-10px;border-radius:50%;will-change:transform,opacity;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0);opacity:0}10%{opacity:.7}85%{opacity:.5}100%{transform:translateY(-110vh);opacity:0}}
+.hud{position:fixed;z-index:40;font-family:Consolas,monospace;font-size:10px;color:rgba(0,240,255,.55);letter-spacing:1px;pointer-events:none}
+.hud.tl{top:50px;left:10px}
+.hud.tr{top:50px;right:10px;text-align:right}
+#statusBar{position:fixed;left:0;right:0;bottom:0;z-index:55;height:20px;background:rgba(3,4,10,.92);border-top:1px solid rgba(0,240,255,.25);font-family:Consolas,monospace;font-size:10px;color:#39ff14;display:flex;align-items:center;padding:0 10px;overflow:hidden;white-space:nowrap}
+#chatBox{bottom:88px}
+.inputbar{bottom:24px}
+.out-item:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(0,240,255,.28)}
+.msg:hover{transform:translateX(2px)}
+.spark{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9999;animation:sparkAni .5s ease-out forwards}
+@keyframes sparkAni{to{transform:translateY(-30px) scale(0);opacity:0}}
+`;
  document.head.appendChild(style);
  var pfx=document.createElement('div');pfx.id='pfx';document.body.appendChild(pfx);
  for(var i=0;i<26;i++){
