@@ -3,19 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>⚡ AI工作台 · 赛博朋克PRO</title>
+<title>⚡ AI工作台 · 锋刃v6.1</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--c:#00f0ff;--p:#ff00e5;--g:#39ff14;--y:#ffe600;--bg:#03040a;--panel:rgba(8,12,32,.88);--panel2:rgba(14,20,48,.92);--line:rgba(0,240,255,.28);--txt:#e8f6ff;--dim:#8fa3bf;--gc:0 0 8px rgba(0,240,255,.55),0 0 24px rgba(0,240,255,.22);--gp:0 0 8px rgba(255,0,229,.55),0 0 24px rgba(255,0,229,.22)}
 html,body{height:100%}
 body{background:var(--bg);color:var(--txt);font-family:'PingFang SC','Microsoft YaHei',system-ui,sans-serif;font-size:15px;line-height:1.65;overflow:hidden}
-/* 霓虹网格（流动） */
-.bg-grid{position:fixed;inset:-30% -30%;z-index:-3;pointer-events:none;
- background:linear-gradient(rgba(0,240,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.07) 1px,transparent 1px),linear-gradient(rgba(255,0,229,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,229,.05) 1px,transparent 1px);
- background-size:48px 48px,48px 48px,240px 240px,240px 240px;
- animation:gridMove 26s linear infinite;opacity:.85}
+.bg-grid{position:fixed;inset:-30% -30%;z-index:-3;pointer-events:none;background:linear-gradient(rgba(0,240,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.07) 1px,transparent 1px),linear-gradient(rgba(255,0,229,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,229,.05) 1px,transparent 1px);background-size:48px 48px,48px 48px,240px 240px,240px 240px;animation:gridMove 26s linear infinite;opacity:.85}
 @keyframes gridMove{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(48px,48px,0)}}
-/* 漂浮霓虹光球（无blur，纯渐变，GPU友好） */
 .orb{position:fixed;border-radius:50%;z-index:-2;pointer-events:none}
 .orb.o1{width:46vmax;height:46vmax;left:-12vmax;top:-10vmax;background:radial-gradient(circle,rgba(0,240,255,.45),transparent 70%);animation:orb1 18s ease-in-out infinite alternate}
 .orb.o2{width:40vmax;height:40vmax;right:-10vmax;bottom:-12vmax;background:radial-gradient(circle,rgba(255,0,229,.4),transparent 70%);animation:orb2 22s ease-in-out infinite alternate}
@@ -23,27 +18,19 @@ body{background:var(--bg);color:var(--txt);font-family:'PingFang SC','Microsoft 
 @keyframes orb1{to{transform:translate3d(8vmax,6vmax,0) scale(1.15)}}
 @keyframes orb2{to{transform:translate3d(-7vmax,-8vmax,0) scale(1.1)}}
 @keyframes orb3{to{transform:translate3d(-6vmax,10vmax,0)}}
-/* 暗角 */
 body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.6) 100%)}
-/* CRT扫描线（极淡） */
-.bg-scan{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.045;
- background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.6) 2px 3px);
- animation:scanFlick 8s steps(1) infinite}
+.bg-scan{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.045;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.6) 2px 3px);animation:scanFlick 8s steps(1) infinite}
 @keyframes scanFlick{0%,91%{opacity:.045}93%{opacity:.08}94%{opacity:.02}96%{opacity:.06}100%{opacity:.045}}
-/* 顶栏 */
 header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:5px;padding:8px 10px;background:rgba(6,9,26,.85);border-bottom:1px solid var(--line);flex-wrap:wrap}
 header::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;background:linear-gradient(90deg,transparent,var(--c),var(--p),var(--g),transparent);background-size:200% 100%;animation:lineFlow 5s linear infinite}
 @keyframes lineFlow{to{background-position:200% 0}}
-header h1{font-size:16px;white-space:nowrap;margin-right:auto;font-weight:800;
- background:linear-gradient(90deg,var(--c),var(--p),var(--c));background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;
- filter:drop-shadow(0 0 8px rgba(0,240,255,.7));animation:gradSlide 6s linear infinite}
+header h1{font-size:16px;white-space:nowrap;margin-right:auto;font-weight:800;background:linear-gradient(90deg,var(--c),var(--p),var(--c));background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 8px rgba(0,240,255,.7));animation:gradSlide 6s linear infinite}
 @keyframes gradSlide{to{background-position:200% 0}}
 header select,header button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:12px}
 header button:active{transform:scale(.94)}
 .tog{position:relative}
 .tog.on{box-shadow:var(--gc);border-color:var(--c);color:var(--c)}
 .tog.on::after{content:'';position:absolute;left:8px;right:8px;bottom:2px;height:2px;background:var(--c);box-shadow:var(--gc);border-radius:2px}
-/* 视图 */
 .view{position:fixed;top:46px;left:0;right:0;bottom:0;display:none}
 #viewWork{display:block}
 #chatBox{position:absolute;top:0;left:0;right:0;bottom:66px;overflow-y:auto;padding:12px 12px 20px;-webkit-overflow-scrolling:touch}
@@ -94,12 +81,12 @@ button.pri::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:
 <div id="viewWork" class="view">
 <main id="chatBox"></main>
 <div class="inputbar">
-<textarea id="chatInput" placeholder="说要求，AI搜索→生成→出图，你只管保存…"></textarea>
+<textarea id="chatInput" placeholder="说要求，AI实时搜索→生成→出图，你只管保存…"></textarea>
 <button id="sendBtn" class="pri">发送</button>
 </div>
 </div>
 <div id="viewFoot" class="view">
-<div style="font-size:12px;color:var(--dim);margin-bottom:6px">MATCH_DATA（AI可说"推演XXvsXX"自动填，也可手改）</div>
+<div style="font-size:12px;color:var(--dim);margin-bottom:6px">MATCH_DATA（AI说"推演XXvsXX"自动填+自动搜索，也可手改）</div>
 <textarea id="mdInput" style="width:100%;height:150px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px;font-size:11px;font-family:Consolas,monospace;outline:none"></textarea>
 <div style="display:flex;gap:8px;margin:8px 0">
 <button class="pri" onclick="runFootball()">▶ 运行推演</button>
@@ -143,7 +130,7 @@ const TPL_FLOW={
  food_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff7f2,#fff0e6);border-radius:24px;padding:18px;box-shadow:0 8px 30px rgba(255,165,80,.25)"><div style="text-align:center;font-size:20px;font-weight:bold;color:#ff7a3d">🍱 一周食谱表</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px"><tr style="background:#ff7a3d;color:#fff"><th style="padding:7px">餐次</th><th>周一~三</th><th>周四~日</th></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌅早</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">鸡蛋+牛奶+全麦</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">燕麦+酸奶+水果</td></tr><tr><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc;font-weight:bold">☀️午</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">鸡胸+糙米+西兰花</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">牛肉+荞麦面+沙拉</td></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌙晚</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">虾仁+蔬菜汤7分饱</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">豆腐+菌菇+青菜</td></tr></table><div style="text-align:center;font-size:11px;color:#c98;margin-top:8px">🥗少油少盐·多喝水</div></div>`},
  card_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#f0fbff,#e8f7ff);border-radius:24px;padding:16px;box-shadow:0 8px 30px rgba(0,180,255,.25)"><div style="text-align:center;font-size:19px;font-weight:bold;color:#0090e8">📊 运动打卡（点☐打勾）</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;text-align:center"><tr style="background:#0090e8;color:#fff"><th style="padding:5px">天</th><th>快走</th><th>跳绳</th><th>拉伸</th><th>燃脂</th></tr>`+Array.from({length:14},(_,i)=>`<tr><td style="padding:4px;border:1px solid #cce9ff;background:#fff">第${i+1}天</td>`+[0,1,2,3].map(()=>`<td style="padding:4px;border:1px solid #cce9ff;background:#fff;font-size:15px;cursor:pointer" onclick="this.textContent=this.textContent==='☐'?'✅':'☐'">☐</td>`).join('')+`</tr>`).join('')+`</table></div>`},
  weight_table:{mode:'table',csv:'日期,体重(斤),较昨日,备注\n第1天,121.6,-0.4,启动期\n第2天,121.2,-0.4,晚餐7分饱\n第3天,120.8,-0.4,戒奶茶\n第4天,,,加速期\n第5天,,,\n第6天,,,\n第7天,,,\n第8天,,,冲刺期\n第9天,,,\n第10天,,,\n第11天,,,\n第12天,,,巩固期\n第13天,,,\n第14天,118.0,,🎉达成'},
- football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.0 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="backgro/* ========== AI模板调用协议 ========== */
+ football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="backgro/* ========== AI模板调用协议 ========== */
 let _TPL_QUEUE=[];
 function renderTplCall(text){
  const re=/___TPL___:([a-z0-9_]+)(?:\|([^___]*))?/g;_TPL_QUEUE=[];let hit=false;
@@ -309,16 +296,31 @@ async function runCode(code,st,btn){
  }
 }
 function shouldSearch(q){return /推演|赔率|比分|比赛|赛前|最新|新闻|搜索|情报|名单|伤停/.test(q)}
+/* ========== 📡可视化实时搜索（过程全程可见） ========== */
 async function tavilySearch(q){
- try{
-  const c=new AbortController();const t=setTimeout(()=>c.abort(),10000);
-  const r=await fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:TAVILY_KEY,query:q,max_results:5,search_depth:'basic'}),signal:c.signal});
-  clearTimeout(t);const j=await r.json();
-  const items=(j.results||[]).slice(0,5).map(x=>'【'+x.title+'】'+(x.content||'').slice(0,400));
-  return items.length?('【搜索到的资料】\n'+items.join('\n\n')):'（未搜到资料）';
- }catch(e){return '（搜索失败：'+e.message+'）'}
+ const box=document.querySelector('#chatBox .msg.ai:last-child .txt');
+ const steps=['赔率走势','近期状态','H2H交锋','伤停名单','最新情报'];
+ let out=[];
+ const show=t=>{if(box){box.textContent=t;scrollBox()}};
+ show('📡 实时搜索启动…');
+ for(let i=0;i<steps.length;i++){
+  show('📡 实时搜索 ['+(i+1)+'/'+steps.length+'] '+steps[i]+' ⏳');
+  let text='';
+  try{
+   const c=new AbortController();const t=setTimeout(()=>c.abort(),8000);
+   const r=await fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:TAVILY_KEY,query:q+' '+steps[i],max_results:3,search_depth:'basic'}),signal:c.signal});
+   clearTimeout(t);const j=await r.json();
+   const items=(j.results||[]).slice(0,3).map(x=>'◆'+steps[i]+'【'+x.title+'】'+(x.content||'').slice(0,250));
+   if(items.length){out=out.concat(items);text='✅ 找到'+items.length+'条'}
+   else text='无结果';
+  }catch(e){text='❌ 失败'}
+  show('📡 实时搜索 ['+(i+1)+'/'+steps.length+'] '+steps[i]+' → '+text);
+ }
+ const res=out.length?('【实时搜索到的资料】\n'+out.join('\n\n')):'（未搜到资料）';
+ show('📡 搜索完成，共'+out.length+'条资料 ✅');
+ return res;
 }
-/* ========== 锋刃v6.0引擎 ①（var声明，已修复重复声明bug） ========== */
+/* ========== 锋刃v6.1引擎 ① ========== */
 var ENGINE_PY = `
 import math, json
 L_TABLE={'英超':0.95,'西甲':0.95,'德甲':0.95,'意甲':0.95,'法甲':0.95,'英冠':0.90,'葡超':0.85,'荷甲':0.85,'巴甲':0.85,'美职联':0.75,'日职联':0.75,'K联赛':0.75,'韩职':0.75,'挪超':0.65,'瑞典超':0.65,'丹超':0.65,'苏超':0.65,'芬超':0.60,'澳超':0.55,'土超':0.55,'俄超':0.55,'亚洲二级':0.55}
@@ -349,16 +351,7 @@ class BladeV60:
  def signals(self):
   od=self._g('odds',{}) or {}; oh=float(od.get('home',2.0)); oa=float(od.get('away',3.5))
   A=(oa-oh)/(oa+oh)
-  B=float(self._g('def_home',0))-float(self._g('def_away',0))
-  C=float(self._g('referee',0) or 0)
-  D=float(self._g('atk_home',0.5))-float(self._g('atk_away',0.3))
-  om=self._g('odds_move',{}) or {}
-  E=(float(om.get('over',0))+float(om.get('btts',0))+float(om.get('home',0)))/3
-  h2h,_=self.h2h()
-  fh=self._g('form_home',[]) or []; fa=self._g('form_away',[]) or []
-  fi=0.15*((sum(1 for x in fh if str(x).upper() in ('W','胜'))/max(len(fh),1))-(sum(1 for x in fa if str(x).upper() in ('W','胜'))/max(len(fa),1)))
-  F=0.4*(h2h-0.5)*2+fi+0.10*float(self._g('motivation',0))
-  return {'A':A,'B':B,'C':C,'D':D,'E':E,'F':F,'H2H':h2/* ========== 锋刃v6.0引擎 ② ========== */
+  B=float(self._g('def_home',0))-float(self./* ========== 锋刃v6.1引擎 ②（含自进化calibrate） ========== */
 const ENGINE_PY2 = `
  def s3(self,s1f,votes,ss):
   vh,vd,va=votes; mx=max(vh,vd,va)
@@ -423,8 +416,9 @@ const ENGINE_PY2 = `
   implied,raw,fin=self.confidence(votes,x); yes,no,bv=self.btts(ss)
   sc,dr,ext=self.s3(s1f,votes,ss); I=self.i_score(); T=self.temp()
   maxs=max(ss.values()); atyp=' ⚠️不典型' if maxs<0.30 else ''
+  self.last={'dir':dr,'s1':s1f,'btts':bv,'score':sc[0],'fin':fin}
   L=[]
-  L.append('🔪 锋刃 v6.0 正式推演')
+  L.append('🔪 锋刃 v6.1 正式推演')
   L.append('对阵 | '+str(self._g('league',''))+'第'+str(self._g('round','?'))+'轮 | 北京时间'+str(self._g('time','?'))+' | '+str(self._g('venue','')))
   L.append('')
   L.append('📡 数据采集清单(15类+铁律#10五项): 必采8✅ 强建议4🔶 增强3➕')
@@ -480,28 +474,23 @@ const ENGINE_PY2 = `
   log={'E':round(E,3)}
   global T_BASE
   if self.samples>=30:
+   xv=self.signals(); x=[xv['A'],xv['B'],xv['C'],xv['D'],xv['E'],xv['F']]
+   ds,ss=self.dists(x); lam=0.15
+   for k in PROTO:
+    c=PROTO[k][0]
+    for i in range(6): c[i]=c[i]+lam*ss[k]*(x[i]-c[i])
+   contrib=[sum(ss[k]*W[i]*((x[i]-PROTO[k][0][i])**2)/(PROTO[k][1]**2) for k in ss) for i in range(6)]
+   imax=contrib.index(max(contrib)); imin=contrib.index(min(contrib))
+   W[imax]*=0.95; W[imin]*=1.03; tot=sum(W)
+   for i in range(6): W[i]=W[i]*7.0/tot
    if E>0.40 and self.i_score()<0.60: T_BASE=min(0.35,T_BASE*1.05)
    if E<0.15 and self.i_score()>0.75: T_BASE=max(0.18,T_BASE*0.97)
    if self.samples>=10:
     if self._g('league_ratio',0.9)<0.85: self.L=max(0.50,self.L*0.93)
     if self._g('league_ratio',0.9)>1.10: self.L=min(0.98,self.L*1.04)
    log['T_base']=round(T_BASE,4); log['L']=round(self.L,3)
-  log['冻结']=(self.samples<30)
-  self.audit.append(log)
-  return '✅ 校准完成 E='+format(E,'.3f')+' '+str(log)
-`;
-ENGINE_PY += ENGINE_PY2;   /* ← 已修复：追加拼接，不再重复声明 */
-/* ========== MATCHDATA自动接收 ========== */
-function handleMatchData(text){
- const re=/___MATCHDATA___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
- text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
-  $('mdInput').value=JSON.stringify(d,null,1);
-  switchTab('foot');
-  setTimeout(runFootball,400);
-  return '（⚽已接收比赛数据 → 引擎自动推演中，结果见「⚽推演」分区）'});
- return hit?text:null;
-}
-/* =/* ========== 输出渲染 ========== */
+   log['w']=[round(w,3) for w in W]; log['ema']='原型EMA+权重梯度已更新'
+/* ========== 输出渲染 ========== */
 let CODES=[];
 function extractCodeBlocks(text){CODES=[];return text.replace(/```python\n?([\s\S]*?)```/g,(m,c)=>{CODES.push(c);return '\n[[CODE:'+(CODES.length-1)+']]\n'})}
 function splitMarkers(text){
@@ -627,7 +616,120 @@ const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中�
 4.数据图表 → ___ECHARTS___换行+echarts option JSON
 5.手绘风图 → ___EXCALIDRAW___换行+{"nodes":[{"id":"a","label":".."}],"edges":[{"from":"a","to":"b","label":".."}]}
 6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动渲染+一键保存
-【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡/* ========== 模板面板 ========== */
+【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡/* ========== v6.1工具区UI（赛果/批量/升级/评分/重构） ========== */
+(function(){
+ if(document.getElementById('calSec'))return;
+ const foot=$('viewFoot');
+ const sec1=document.createElement('div');sec1.id='calSec';
+ sec1.style.cssText='margin-top:14px;border:1px dashed rgba(0,240,255,.4);border-radius:12px;padding:10px';
+ sec1.innerHTML='<div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">📥 录入赛果（喂给校准引擎，越用越准）</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input id="actScore" placeholder="实际比分 如2-1" style="flex:1;min-width:80px;background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px"><select id="actDir" style="background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px"><option value="主">主胜</option><option value="平">平</option><option value="客">客胜</option></select><select id="actBtts" style="background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px"><option value="Yes">Yes</option><option value="No">No</option></select><button class="pri" onclick="runCalibrate()" style="padding:7px 12px">✅录入校准</button></div><div id="calOut" style="font-size:12px;margin-top:8px;color:#39ff14;white-space:pre-wrap"></div>';
+ foot.appendChild(sec1);
+ const sec2=document.createElement('div');sec2.id='bulkSec';
+ sec2.style.cssText='margin-top:10px;border:1px dashed rgba(57,255,20,.35);border-radius:12px;padding:10px';
+ sec2.innerHTML='<div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🚀 批量导入赛果（每行: 比分 方向 BTTS，如 <b>2-1 主 Yes</b>；按最近推演顺序配对）</div><textarea id="bulkIn" placeholder="2-1 主 Yes&#10;1-1 平 No" style="width:100%;height:70px;background:#0c122c;color:#e8f6ff;border:1px solid rgba(57,255,20,.3);border-radius:8px;padding:7px;font-size:12px;font-family:Consolas,monospace"></textarea><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><button class="pri" onclick="bulkCal()">🚀批量校准</button><button onclick="kmeansBtn()">🧬原型重构</button><button onclick="showJudge()">📊模型评分</button><button onclick="dailyEvolve()">🔄每日升级</button></div><div id="evolOut" style="font-size:12px;margin-top:8px;color:#39ff14;white-space:pre-wrap"></div>';
+ foot.appendChild(sec2);
+})();
+async function bulkCal(){
+ const lines=$('bulkIn').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+ const rs=window.FOOT_STATE.results;
+ const out=$('evolOut');
+ if(!lines.length){out.textContent='❌ 请先粘贴赛果';return}
+ if(rs.length<lines.length){out.textContent='❌ 历史推演记录不足（现有'+rs.length+'条，需'+lines.length+'条）';return}
+ out.textContent='⏳ 批量校准中…';
+ const items=[];
+ for(let i=0;i<lines.length;i++){
+  const mm=lines[i].match(/^(\d+)\s*[-:]\s*(\d+)\s+([主平客])\s+(\w+)$/);
+  if(!mm)continue;
+  const r=rs[rs.length-lines.length+i];
+  items.push({md:r.md,pred:r.pred,act:{h:+mm[1],a:+mm[2],dir:mm[3],btts:mm[4]}});
+ }
+ if(!items.length){out.textContent='❌ 行格式应为: 2-1 主 Yes';return}
+ try{
+  const py=await getPyodide();
+  py.runPython(ENGINE_PY);
+  if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
+  if(window.FOOT_STATE.proto){py.globals.set('__pr',window.FOOT_STATE.proto);py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
+  if(window.FOOT_STATE.w){py.globals.set('__w',window.FOOT_STATE.w);py.runPython('W=list(__w)')}
+  py.globals.set('__items',items);
+  py.runPython(`
+def __bulk_cal(items):
+ logs=[]
+ for it in items:
+  b=BladeV60(it['md'])
+  b.last={'dir':it['pred']['dir'],'s1':float(it['pred']['s1']),'btts':it['pred']['btts'] or 'Yes（倾向）','score':list(it['pred']['score']) or [1,0],'fin':float(it['pred']['fin'])}
+  act={'dir':it['act']['dir'],'s1':it['act']['h']+it['act']['a'],'btts':it['act']['btts'],'score':[it['act']['h'],it['act']['a']]}
+  logs.append(b.calibrate(act))
+ return logs, b.state
+__logs,__bst=__bulk_cal(__items)`);
+  const logs=py.globals.get('__logs').toJs();
+  const st=py.globals.get('__bst').toJs();
+  window.FOOT_STATE.samples+=items.length;
+  window.FOOT_STATE.t_base=st.T_base;
+  window.FOOT_STATE.calibration=st.cal;
+  window.FOOT_STATE.proto=st.proto;
+  window.FOOT_STATE.w=st.w;
+  saveFS();
+  out.textContent=logs.join('\n')+'\n📊 批量完成: +'+items.length+'场 | 总样本'+window.FOOT_STATE.samples+' | T_base='+st.T_base.toFixed(4);
+ }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
+}
+async function kmeansBtn(){
+ const out=$('evolOut');
+ const vecs=(window.FOOT_STATE.results||[]).map(r=>r.vec).filter(Boolean);
+ out.textContent='🧬 原型重构: 样本'+vecs.length+'场'+(vecs.length<20?'（不足20场，暂不重构）':'…');
+ if(vecs.length<20)return;
+ try{
+  const py=await getPyodide();
+  py.runPython(ENGINE_PY);
+  if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
+  py.globals.set('__sample_pts',vecs);
+  py.runPython(KMEANS_PY);
+  py.runPython('__rk=rebuild_protos()');
+  const msg=String(py.globals.get('__rk'));
+  py.runPython('__proto=dict(PROTO);__w=list(W)');
+  window.FOOT_STATE.proto=py.globals.get('__proto').toJs();
+  window.FOOT_STATE.w=py.globals.get('__w').toJs();
+  saveFS();
+  out.textContent=msg;
+ }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
+}
+function showJudge(){
+ const j=window.FOOT_STATE.judge||{};
+ const out=$('evolOut');
+ const lines=['🛡️ 外部裁判系统:'];
+ let total=0,n=0;
+ Object.keys(j.buckets||{}).forEach(k=>{const b=j.buckets[k];const rate=b.n?b.hit/b.n:0;lines.push(' 置信度'+k+': '+b.n+'场 命中率'+Math.round(rate*100)+'%');if(b.n>=3){total+=Math.abs(rate-(parseInt(k)/100));n++}});
+ lines.push(' 校准偏差: '+(n?((total/n)*100).toFixed(1)+'%':'数据不足')+(n&&(total/n)>0.08?' ⚠️需重校准':''));
+ lines.push(' 凯利1/4累计: '+j.kelly.toFixed(3)+'单位 ('+(j.kellyT||0)+'场)');
+ lines.push(' 信息优势(方向命中): '+(j.edgeT?Math.round((j.edgeH/j.edgeT)*100):0)+'% ('+(j.edgeH||0)+'/'+(j.edgeT||0)+')');
+ lines.push(' 双轨影子样本: 主轨'+window.FOOT_STATE.shadow.main.length+'场');
+ lines.push(' FMEA失败指纹库: '+(window.FOOT_STATE.fmea||[]).length+'个');
+ out.textContent=lines.join('\n');
+}
+async function dailyEvolve(){
+ const out=$('evolOut');
+ out.textContent='🔄 每日自动升级中…';
+ showJudge();
+ const rs=window.FOOT_STATE.results||[];
+ let mh=0,lh=0,tt=0;
+ rs.forEach(r=>{if(r.actual){tt++;if(r.pred&&r.pred.dir===r.actual.dir)mh++;if(r.legacy&&r.legacy.dir===r.actual.dir)lh++}});
+ const lines2=['👻 双轨对比(已录赛果'+tt+'场): 主轨v6.1命中'+Math.round(tt?mh/tt*100:0)+'% | 影轨v4.8.1命中'+Math.round(tt?lh/tt*100:0)+'%'];
+ if(tt>=3&&lh>mh)lines2.push('⚠️ 影轨连续占优，建议回滚审查');
+ const vecs=rs.map(r=>r.vec).filter(Boolean);
+ if(vecs.length>=20){
+  try{
+   const py=await getPyodide();
+   py.runPython(ENGINE_PY);
+   py.globals.set('__sample_pts',vecs);
+   py.runPython(KMEANS_PY);
+   py.runPython('__rk=rebuild_protos()');
+   const msg=String(py.globals.get('__rk'));
+   py.runPython('__proto=dict(PROTO);__w=list(W)');
+   window.FOOT_STATE.proto=py.globals.get('__proto').toJs();
+   window.FOOT_STATE.w=py.globals.get('__w').toJs();
+   lines2.push('🧬 '+msg);
+  }catch(e){lines2.push('🧬 重构失败: '+escapeHtml(e.message||String(e)))}
+ }
+ window.FOOT/* ========== 模板面板 ========== */
 const PANEL_ITEMS=[
  ['🍎减肥计划图','flow_jianfei',{target:'122→118斤',p1:'启动期1-3天',p2:'加速期4-7天',p3:'冲刺期8-11天',p4:'巩固期12-14天'}],
  ['🍱一周食谱表','food_plan',{}],['📊运动打卡表','card_plan',{}],['📈体重记录表','weight_table',{}],
@@ -672,95 +774,11 @@ $('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e
 $('tplBtn').onclick=toggleTplPanel;
 buildPanel();
 fillSample();
-addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存；⚽推演=锋刃v6.0引擎（AI说"推演皇马vs曼城"会自动搜情报→填数据→跑引擎→出正式推演）。试试："给我做14天减肥计划全套"');
+addMsg('ai','👋 锋刃v6.1工作台：说"推演XXvsXX"→可视化实时搜索→自动跑引擎（自进化+影轨+FMEA）；赛后录赛果→每日自动升级→越用越准。试试："给我做14天减肥计划全套"');
+/* 每日自动升级（打开页面自动检测） */
+if(window.FOOT_STATE.lastEvolve!==new Date().toLocaleDateString()){
+ setTimeout(function(){try{dailyEvolve()}catch(e){}},1500);
+}
 </script>
 </body>
 </html>
-<script>
-/* ========== 锋刃v6.0 自迭代闭环 ========== */
-(function(){
- if(window.__footPatched)return; window.__footPatched=true;
- var FOOT_STATE=(function(){try{return JSON.parse(localStorage.getItem('wt_foot_state'))||{samples:0,t_base:null,calibration:1.0,leagues:{},audit:[]}}catch(e){return{samples:0,t_base:null,calibration:1.0,leagues:{},audit:[]}}})();
- function saveFS(){localStorage.setItem('wt_foot_state',JSON.stringify(FOOT_STATE))}
- if(!document.getElementById('calSec')){
-  var sec=document.createElement('div');sec.id='calSec';
-  sec.style.cssText='margin-top:14px;border:1px dashed rgba(0,240,255,.4);border-radius:12px;padding:10px';
-  sec.innerHTML='<div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">📥 录入赛果（喂给校准引擎，越用越准）</div>'
-   +'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
-   +'<input id="actScore" placeholder="实际比分 如2-1" style="flex:1;min-width:80px;background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px">'
-   +'<select id="actDir" style="background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px"><option value="主">主胜</option><option value="平">平</option><option value="客">客胜</option></select>'
-   +'<select id="actBtts" style="background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px"><option value="Yes">双方进球Yes</option><option value="No">双方进球No</option></select>'
-   +'<button class="pri" onclick="runCalibrate()" style="padding:7px 12px">✅ 录入校准</button></div>'
-   +'<div id="calOut" style="font-size:12px;margin-top:8px;color:#39ff14;white-space:pre-wrap"></div>';
-  $('viewFoot').appendChild(sec);
- }
- window.runFootball=async function(){
-  var txt=$('mdInput').value.trim(),data;
-  try{data=JSON.parse(txt)}catch(e){$('footOut').innerHTML='<div style="color:#ff9090">❌ MATCH_DATA JSON格式错误: '+escapeHtml(e.message)+'</div>';return}
-  var lg=FOOT_STATE.leagues[data.league||'英超']||{count:0,L:null,hits:0,confSum:0,ratio:0.9};
-  data.samples=FOOT_STATE.samples;
-  data.calibration=FOOT_STATE.calibration;
-  if(lg.L)data.L=lg.L;
-  data.league_ratio=lg.ratio;
-  var out=$('footOut');out.innerHTML='<div style="color:#8fa3bf">⏳ 加载引擎中(首次约50MB)…</div>';
-  try{
-   var py=await getPyodide();
-   out.innerHTML='<div style="color:#8fa3bf">⏳ 推演计算中…</div>';
-   py.globals.set('__md',data);
-   py.runPython(ENGINE_PY);
-   if(FOOT_STATE.t_base)py.runPython('T_BASE='+FOOT_STATE.t_base);
-   py.runPython('__res=BladeV60(__md).run()');
-   var res=String(py.globals.get('__res'));
-   out.innerHTML='';
-   var pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;font-size:12px;color:#39ff14;background:rgba(0,0,0,.5);border-radius:10px;padding:10px';
-   pre.textContent=res;out.appendChild(pre);
-   var bar=document.createElement('div');bar.style.cssText='display:flex;gap:6px;margin-top:8px;flex-wrap:wrap';
-   var b1=document.createElement('button');b1.textContent='💾保存.txt';b1.onclick=function(){downloadFile('推演_'+Date.now()+'.txt',res)};
-   var b2=document.createElement('button');b2.textContent='📋复制';b2.onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(res)};
-   var b3=document.createElement('button');b3.textContent='🎴生成海报';b3.onclick=function(){outputTpl('football_card',{home:data.home||'主队',away:data.away||'客队',s1:'2-1',s2:'1-1',s3:'1-0',s4:'0-1',s5:'2-2',rec:'见上方推演'})};
-   [b1,b2,b3].forEach(function(b){bar.appendChild(b)});out.appendChild(bar);
-   var st=document.createElement('div');st.style.cssText='font-size:11px;color:#8fa3bf;margin-top:6px';
-   st.textContent='📈 学习状态: 样本'+FOOT_STATE.samples+'场'+(FOOT_STATE.samples<30?'（冻结期，只积累不修改）':'（已解锁校准）')+' | T_base='+(FOOT_STATE.t_base||0.2625).toFixed(4)+' | '+data.league+'校准比='+lg.ratio.toFixed(2);
-   out.appendChild(st);
-  }catch(e){out.innerHTML='<div style="color:#ff9090">❌ '+escapeHtml(e.message||String(e))+'</div>'}
- };
- window.runCalibrate=async function(){
-  var m=$('actScore').value.trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
-  var out=$('calOut');
-  if(!m){out.textContent='❌ 比分格式应为 2-1';return}
-  var h=+m[1],a=+m[2];
-  var md;try{md=JSON.parse($('mdInput').value||'{}')}catch(e){md={}}
-  out.textContent='⏳ 校准中…';
-  try{
-   var py=await getPyodide();
-   py.globals.set('__md',md);
-   py.runPython(ENGINE_PY);
-   if(FOOT_STATE.t_base)py.runPython('T_BASE='+FOOT_STATE.t_base);
-   py.runPython('__b=BladeV60(__md)');
-   py.runPython('__xv=__b.signals();__x=[__xv["A"],__xv["B"],__xv["C"],__xv["D"],__xv["E"],__xv["F"]];__ds,__ss=__b.dists(__x);__s1,_,_,_=__b.s1(__x,__ss);__v=__b.direction(__x,__ss);__sc,__dr,__ex=__b.s3(__s1,__v,__ss);__imp,__raw,__fin=__b.confidence(__v,__x);__bt=__b.btts(__ss);__b.last={"dir":__dr,"s1":__s1,"btts":__bt[2],"score":__sc[0],"fin":__fin}');
-   py.globals.set('__act',{dir:$('actDir').value,s1:h+a,btts:$('actBtts').value,score:[h,a]});
-   py.runPython('__log=__b.calibrate(__act)');
-   py.runPython('__pd=__b.last["dir"]');
-   py.runPython('__st={"T_base":T_BASE,"L":__b.L,"cal":__b.cal,"E":(__b.audit[-1]["E"] if __b.audit else 0)}');
-   var log=String(py.globals.get('__log'));
-   var st=py.globals.get('__st').toJs();
-   var pd=String(py.globals.get('__pd'));
-   var finv=Number(py.globals.get('__fin'));
-   var league=md.league||'英超';
-   var lg=FOOT_STATE.leagues[league]||{count:0,L:null,hits:0,confSum:0,ratio:0.9};
-   lg.count+=1;FOOT_STATE.samples+=1;
-   FOOT_STATE.t_base=st.T_base;
-   FOOT_STATE.calibration=st.cal;
-   if(st.L)lg.L=st.L;
-   if(pd===$('actDir').value)lg.hits+=1;
-   lg.confSum+=finv;
-   lg.ratio=Math.min(1.5,Math.max(0.5,lg.confSum>0.01?lg.hits/lg.confSum:0.9));
-   FOOT_STATE.leagues[league]=lg;
-   FOOT_STATE.audit.push({t:new Date().toLocaleString(),league:league,E:st.E});
-   if(FOOT_STATE.audit.length>200)FOOT_STATE.audit=FOOT_STATE.audit.slice(-200);
-   saveFS();
-   out.textContent=log+'\n📊 已保存: 总样本'+FOOT_STATE.samples+'场 | '+league+'已录'+lg.count+'场 | T_base='+st.T_base.toFixed(4)+' | L='+(st.L||'-')+' | E='+st.E.toFixed(3)+' | 校准比='+lg.ratio.toFixed(2);
-  }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
- };
-})();
-</script>
