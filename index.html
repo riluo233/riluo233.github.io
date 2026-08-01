@@ -789,5 +789,58 @@ if(window.FOOT_STATE.lastEvolve!==new Date().toLocaleDateString()){
  setTimeout(function(){try{dailyEvolve()}catch(e){}},1500);
 }
 </script>
+ <script>
+/* ========== 主页生动化升级包 ========== */
+(function(){
+ if(document.getElementById('pfx'))return;
+ var style=document.createElement('style');
+ style.textContent=`
+ .glitch{position:relative;display:inline-block}
+ .glitch::before,.glitch::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;overflow:hidden;opacity:.85}
+ .glitch::before{color:#ff00e5;animation:g1 3s infinite linear alternate-reverse;clip-path:inset(0 0 60% 0)}
+ .glitch::after{color:#00f0ff;animation:g2 2.7s infinite linear alternate-reverse;clip-path:inset(40% 0 0 0)}
+ @keyframes g1{0%{transform:translate(-2px,-1px)}25%{transform:translate(2px,1px)}50%{transform:translate(-1px,2px)}75%{transform:translate(1px,-2px)}100%{transform:translate(-2px,1px)}}
+ @keyframes g2{0%{transform:translate(2px,1px)}25%{transform:translate(-2px,-1px)}50%{transform:translate(1px,-2px)}75%{transform:translate(-1px,2px)}100%{transform:translate(2px,-1px)}}
+ .neon-flicker{animation:flicker 4s linear infinite}
+ @keyframes flicker{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.55}43%{opacity:1}78%{opacity:1}79%{opacity:.35}80%{opacity:1}}
+ #pfx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+ .p{position:absolute;bottom:-10px;border-radius:50%;will-change:transform,opacity;animation:rise linear infinite}
+ @keyframes rise{0%{transform:translateY(0);opacity:0}10%{opacity:.7}85%{opacity:.5}100%{transform:translateY(-110vh);opacity:0}}
+ .hud{position:fixed;z-index:40;font-family:Consolas,monospace;font-size:10px;color:rgba(0,240,255,.55);letter-spacing:1px;pointer-events:none}
+ .hud.tl{top:50px;left:10px}
+ .hud.tr{top:50px;right:10px;text-align:right}
+ #statusBar{position:fixed;left:0;right:0;bottom:0;z-index:55;height:20px;background:rgba(3,4,10,.92);border-top:1px solid rgba(0,240,255,.25);font-family:Consolas,monospace;font-size:10px;color:#39ff14;display:flex;align-items:center;padding:0 10px;overflow:hidden;white-space:nowrap}
+ #chatBox{bottom:88px}
+ .inputbar{bottom:24px}
+ .out-item:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(0,240,255,.28)}
+ .msg:hover{transform:translateX(2px)}
+ .spark{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9999;animation:sparkAni .5s ease-out forwards}
+ @keyframes sparkAni{to{transform:translateY(-30px) scale(0);opacity:0}}
+ `;
+ document.head.appendChild(style);
+ var pfx=document.createElement('div');pfx.id='pfx';document.body.appendChild(pfx);
+ for(var i=0;i<26;i++){
+  var p=document.createElement('div');p.className='p';
+  var s=1+Math.random()*3;var dur=6+Math.random()*10;
+  p.style.cssText='left:'+(Math.random()*100)+'vw;width:'+s+'px;height:'+s+'px;background:'+(Math.random()>.5?'#00f0ff':'#ff00e5')+';box-shadow:0 0 6px '+((Math.random()>.5)?'#00f0ff':'#ff00e5')+';animation-duration:'+dur+'s;animation-delay:'+(-Math.random()*dur)+'s';
+  pfx.appendChild(p);
+ }
+ var hud1=document.createElement('div');hud1.className='hud tl';hud1.textContent='⚡ SYSTEM ONLINE · v6.1';document.body.appendChild(hud1);
+ var hud2=document.createElement('div');hud2.className='hud tr';document.body.appendChild(hud2);
+ function clock(){var d=new Date();hud2.textContent=d.toLocaleTimeString('zh-CN',{hour12:false})+' · '+d.toLocaleDateString('zh-CN')}
+ clock();setInterval(clock,1000);
+ var sb=document.createElement('div');sb.id='statusBar';sb.textContent='[OK] 引擎待命 · [OK] 搜索待命 · [OK] 记忆在线 · [OK] 模板库11个';document.body.appendChild(sb);
+ document.addEventListener('click',function(e){
+  for(var i=0;i<3;i++){
+   var s=document.createElement('div');s.className='spark';
+   s.style.cssText='left:'+(e.clientX-3+Math.random()*20-10)+'px;top:'+(e.clientY-3+Math.random()*20-10)+'px;background:'+(Math.random()>.5?'#00f0ff':'#ff00e5')+';box-shadow:0 0 8px currentColor';
+   document.body.appendChild(s);
+   (function(x){setTimeout(function(){x.remove()},500)})(s);
+  }
+ });
+ var h1=document.querySelector('header h1');
+ if(h1){h1.className='glitch neon-flicker';h1.setAttribute('data-t',h1.textContent)}
+})();
+</script>
 </body>
 </html>
