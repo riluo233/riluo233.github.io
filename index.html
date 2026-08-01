@@ -65,6 +65,7 @@ var py=null,pyOk=false,pyBusy=false;
 var chat=document.getElementById('chat'),inp=document.getElementById('ui');
 var snd=document.getElementById('send'),stp=document.getElementById('stop');
 var mod=document.getElementById('mo'),ps=document.getElementById('ps'),pst=document.getElementById('pst');
+var PRELOAD=['numpy','pandas','matplotlib','scipy','scikit-learn','pillow'];
 
 function save(){localStorage.setItem('dsmsg',JSON.stringify(msgs));}
 function scb(){chat.scrollTop=chat.scrollHeight;}
@@ -89,9 +90,7 @@ window.runCode=function(btn){
 function runPy(code,btn,w){
   function go(){
     var out='';btn.textContent='⚡';
-    var pk=[];var re=/(?:import\s+(\w+)|from\s+(\w+)\s+import)/g;var m;var mp={numpy:'numpy',pandas:'pandas',matplotlib:'matplotlib',scipy:'scipy',sklearn:'scikit-learn'};
-    while((m=re.exec(code))!==null){var p=mp[m[1]||m[2]];if(p&&pk.indexOf(p)===-1)pk.push(p);}
-    Promise.all(pk.map(function(p){return py.loadPackage(p).catch(function(){});})).then(function(){
+    Promise.all(PRELOAD.map(function(p){return py.loadPackage(p).catch(function(){});})).then(function(){
     try{
       py.runPython('import matplotlib\nmatplotlib.use("Agg")');
       py.runPython('import sys\nfrom io import StringIO\n_so=StringIO()\nsys.stdout=_so\nsys.stderr=_so');
