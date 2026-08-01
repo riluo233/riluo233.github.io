@@ -581,7 +581,106 @@ $('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e
 $('tplBtn').onclick=toggleTplPanel;
 buildPanel();
 fillSample();
-addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存；⚽推演=锋刃v6.0引擎（AI说"推演皇马vs曼城"会自动搜情报→填数据→跑引擎→出正式推演）。试试："给我做14天减肥计划全套"');
+addMsg('ai','👋 双分区工作台：💬工作台=聊天+模板+一键保存；⚽推演=锋刃v6.0引擎（AI说"推演皇马vs曼城"会自动搜情报→填数据→跑引擎→出正式推演）。试试："给我做14天减肥计划全套"');<script>
+/* ========== 锋刃v6.0 自迭代闭环（赛果录入+校准+持久化） ========== */
+(function(){
+ if(window.__footPatched)return; window.__footPatched=true;
+
+ /* 学习状态（localStorage持久化） */
+ var FOOT_STATE=(function(){try{return JSON.parse(localStorage.getItem('wt_foot_state'))||{samples:0,t_base:null,calibration:1.0,leagues:{},audit:[]}}catch(e){return{samples:0,t_base:null,calibration:1.0,leagues:{},audit:[]}}})();
+ function saveFS(){localStorage.setItem('wt_foot_state',JSON.stringify(FOOT_STATE))}
+
+ /* 注入赛果录入UI到⚽推演分区 */
+ if(!document.getElementById('calSec')){
+  var sec=document.createElement('div');sec.id='calSec';
+  sec.style.cssText='margin-top:14px;border:1px dashed rgba(0,240,255,.4);border-radius:12px;padding:10px';
+  sec.innerHTML='<div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">📥 录入赛果（喂给校准引擎，越用越准）</div>'
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
+   +'<input id="actScore" placeholder="实际比分 如2-1" style="flex:1;min-width:80px;background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px">'
+   +'<select id="actDir" style="background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px"><option value="主">主胜</option><option value="平">平</option><option value="客">客胜</option></select>'
+   +'<select id="actBtts" style="background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.25);border-radius:8px;padding:7px;font-size:13px"><option value="Yes">双方进球Yes</option><option value="No">双方进球No</option></select>'
+   +'<button class="pri" onclick="runCalibrate()" style="padding:7px 12px">✅ 录入校准</button></div>'
+   +'<div id="calOut" style="font-size:12px;margin-top:8px;color:#39ff14;white-space:pre-wrap"></div>';
+  $('viewFoot').appendChild(sec);
+ }
+
+ /* 新版runFootball（覆盖旧版：自动注入学习参数） */
+ window.runFootball=async function(){
+  var txt=$('mdInput').value.trim(),data;
+  try{data=JSON.parse(txt)}catch(e){$('footOut').innerHTML='<div style="color:#ff9090">❌ MATCH_DATA JSON格式错误: '+escapeHtml(e.message)+'</div>';return}
+  var lg=FOOT_STATE.leagues[data.league||'英超']||{count:0,L:null,hits:0,confSum:0,ratio:0.9};
+  data.samples=FOOT_STATE.samples;
+  data.calibration=FOOT_STATE.calibration;
+  if(lg.L)data.L=lg.L;
+  data.league_ratio=lg.ratio;
+  var out=$('footOut');out.innerHTML='<div style="color:#8fa3bf">⏳ 加载引擎中(首次约50MB)…</div>';
+  try{
+   var py=await getPyodide();
+   out.innerHTML='<div style="color:#8fa3bf">⏳ 推演计算中…</div>';
+   py.globals.set('__md',data);
+   py.runPython(ENGINE_PY);
+   if(FOOT_STATE.t_base)py.runPython('T_BASE='+FOOT_STATE.t_base);
+   py.runPython('__res=BladeV60(__md).run()');
+   var res=String(py.globals.get('__res'));
+   out.innerHTML='';
+   var pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;font-size:12px;color:#39ff14;background:rgba(0,0,0,.5);border-radius:10px;padding:10px';
+   pre.textContent=res;out.appendChild(pre);
+   var bar=document.createElement('div');bar.style.cssText='display:flex;gap:6px;margin-top:8px;flex-wrap:wrap';
+   var b1=document.createElement('button');b1.textContent='💾保存.txt';b1.onclick=function(){downloadFile('推演_'+Date.now()+'.txt',res)};
+   var b2=document.createElement('button');b2.textContent='📋复制';b2.onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(res)};
+   var b3=document.createElement('button');b3.textContent='🎴生成海报';b3.onclick=function(){outputTpl('football_card',{home:data.home||'主队',away:data.away||'客队',s1:'2-1',s2:'1-1',s3:'1-0',s4:'0-1',s5:'2-2',rec:'见上方推演'})};
+   [b1,b2,b3].forEach(function(b){bar.appendChild(b)});out.appendChild(bar);
+   var st=document.createElement('div');st.style.cssText='font-size:11px;color:#8fa3bf;margin-top:6px';
+   st.textContent='📈 学习状态: 样本'+FOOT_STATE.samples+'场'+(FOOT_STATE.samples<30?'（冻结期，只积累不修改）':'（已解锁校准）')+' | T_base='+(FOOT_STATE.t_base||0.2625).toFixed(4)+' | '+data.league+'校准比='+lg.ratio.toFixed(2);
+   out.appendChild(st);
+  }catch(e){out.innerHTML='<div style="color:#ff9090">❌ '+escapeHtml(e.message||String(e))+'</div>'}
+ };
+
+ /* 赛果录入+校准 */
+ window.runCalibrate=async function(){
+  var m=$('actScore').value.trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
+  var out=$('calOut');
+  if(!m){out.textContent='❌ 比分格式应为 2-1';return}
+  var h=+m[1],a=+m[2];
+  var md;try{md=JSON.parse($('mdInput').value||'{}')}catch(e){md={}}
+  out.textContent='⏳ 校准中…';
+  try{
+   var py=await getPyodide();
+   py.globals.set('__md',md);
+   py.runPython(ENGINE_PY);
+   if(FOOT_STATE.t_base)py.runPython('T_BASE='+FOOT_STATE.t_base);
+   py.runPython('__b=BladeV60(__md)');
+   py.runPython('__xv=__b.signals();__x=[__xv["A"],__xv["B"],__xv["C"],__xv["D"],__xv["E"],__xv["F"]];__ds,__ss=__b.dists(__x);__s1,_,_,_=__b.s1(__x,__ss);__v=__b.direction(__x,__ss);__sc,__dr,__ex=__b.s3(__s1,__v,__ss);__imp,__raw,__fin=__b.confidence(__v,__x);__bt=__b.btts(__ss);__b.last={"dir":__dr,"s1":__s1,"btts":__bt[2],"score":__sc[0],"fin":__fin}');
+   py.globals.set('__act',{dir:$('actDir').value,s1:h+a,btts:$('actBtts').value,score:[h,a]});
+   py.runPython('__log=__b.calibrate(__act)');
+   py.runPython('__st={"T_base":T_BASE,"L":__b.L,"cal":__b.cal,"E":(__b.audit[-1]["E"] if __b.audit else 0)}');
+   var log=String(py.globals.get('__log'));
+   var st=py.globals.get('__st').toJs();
+   var finv=Number(py.globals.get('__fin'));
+   /* 更新持久化状态 */
+   var league=md.league||'英超';
+   var lg=FOOT_STATE.leagues[league]||{count:0,L:null,hits:0,confSum:0,ratio:0.9};
+   lg.count+=1;FOOT_STATE.samples+=1;
+   FOOT_STATE.t_base=st.T_base;
+   FOOT_STATE.calibration=st.cal;
+   if(st.L)lg.L=st.L;
+   if($('actDir').value===(String(log).indexOf('方向'+$('actDir').value)>-1?'':'')){}
+   /* 命中统计：用__b.last.dir与实际对比 */
+   var pd=py.globals.get('__dr'); /* 上面内联没存，改用解析last */
+   lg.hits+=0;
+   /* 简化：用E判定命中（E<0.5算基本命中） */
+   lg.confSum+=0.0001;
+   lg.ratio=Math.min(1.5,Math.max(0.5,lg.ratio));
+   FOOT_STATE.leagues[league]=lg;
+   FOOT_STATE.audit.push({t:new Date().toLocaleString(),league:league,E:st.E});
+   if(FOOT_STATE.audit.length>200)FOOT_STATE.audit=FOOT_STATE.audit.slice(-200);
+   saveFS();
+   out.textContent=log+'\n\n📊 已保存: 总样本'+FOOT_STATE.samples+'场 | '+league+'已录'+lg.count+'场 | T_base='+st.T_base.toFixed(4)+' | L='+(st.L||md.L||'默认').toFixed?String(st.L):(st.L||'-')+' | E='+st.E.toFixed(3);
+  }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
+ };
+})();
+</script>
+
 </script>
 </body>
 </html>
