@@ -97,7 +97,6 @@ button.pri::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:
 </div>
 <div id="tplFab"><button id="tplBtn">📁模板</button></div>
 <div id="tplPanel"></div>
- <script>window.onerror=function(a,b,c){document.title='ERR行'+c+':'+a;alert('行'+c+':'+a)};</script>
 <script>
 <!--SEG2-->
 const API_URL='https://api.deepseek.com/chat/completions';
@@ -118,6 +117,17 @@ function switchTab(name){
  $('tabWork').classList.toggle('on',name==='work');
  $('tabFoot').classList.toggle('on',name==='foot');
 }
+function cardHTML(){
+ let h='<div style="max-width:420px;margin:0 auto;font-family:\'PingFang SC\',sans-serif;background:linear-gradient(160deg,#f0fbff,#e8f7ff);border-radius:24px;padding:16px;box-shadow:0 8px 30px rgba(0,180,255,.25)"><div style="text-align:center;font-size:19px;font-weight:bold;color:#0090e8">📊 运动打卡（点☐打勾）</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;text-align:center"><tr style="background:#0090e8;color:#fff"><th style="padding:5px">天</th><th>快走</th><th>跳绳</th><th>拉伸</th><th>燃脂</th></tr>';
+ for(let i=1;i<=14;i++){
+  h+='<tr><td style="padding:4px;border:1px solid #cce9ff;background:#fff">第'+i+'天</td>';
+  for(let j=0;j<4;j++){
+   h+='<td style="padding:4px;border:1px solid #cce9ff;background:#fff;font-size:15px;cursor:pointer" onclick="this.textContent=this.textContent===\'☐\'?\'✅\':\'☐\'">☐</td>';
+  }
+  h+='</tr>';
+ }
+ return h+'</table></div>';
+}
 const TPL_FLOW={
  flow_jianfei:{mode:'html',
   mermaid:`graph TD\n A["🎯目标：{target}"] --> B["🚀{p1}<br/>戒奶茶·晚餐7分饱"]\n B --> C["⚡{p2}<br/>加蛋白·跳绳15分钟"]\n C --> D["🔥{p3}<br/>16+8·喝水2L"]\n D --> E["🏆{p4}<br/>恢复三餐·保持运动"]\n E --> F["✅达成{target}"]`,
@@ -128,9 +138,9 @@ const TPL_FLOW={
  flow_compare:{mode:'mermaid',mermaid:`graph TD\n A["📌{q}"] --> B["A:{a}"]\n A --> C["B:{b}"]\n B --> D{"对比"}\n C --> D\n D --> E["✅选定"]`},
  week_plan:{mode:'mermaid',mermaid:`graph TD\n A["📅本周"] --> B["周一{d1}"]\n A --> C["周二{d2}"]\n A --> D["周三{d3}"]\n A --> E["周四{d4}"]\n A --> F["周五{d5}"]\n A --> G["周末{d6}"]`},
  food_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#fff7f2,#fff0e6);border-radius:24px;padding:18px;box-shadow:0 8px 30px rgba(255,165,80,.25)"><div style="text-align:center;font-size:20px;font-weight:bold;color:#ff7a3d">🍱 一周食谱表</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px"><tr style="background:#ff7a3d;color:#fff"><th style="padding:7px">餐次</th><th>周一~三</th><th>周四~日</th></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌅早</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">鸡蛋+牛奶+全麦</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">燕麦+酸奶+水果</td></tr><tr><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc;font-weight:bold">☀️午</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">鸡胸+糙米+西兰花</td><td style="padding:7px;background:#fffaf5;border:1px solid #ffe0cc">牛肉+荞麦面+沙拉</td></tr><tr><td style="padding:7px;background:#fff;border:1px solid #ffe0cc;font-weight:bold">🌙晚</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">虾仁+蔬菜汤7分饱</td><td style="padding:7px;background:#fff;border:1px solid #ffe0cc">豆腐+菌菇+青菜</td></tr></table><div style="text-align:center;font-size:11px;color:#c98;margin-top:8px">🥗少油少盐·多喝水</div></div>`},
- card_plan:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#f0fbff,#e8f7ff);border-radius:24px;padding:16px;box-shadow:0 8px 30px rgba(0,180,255,.25)"><div style="text-align:center;font-size:19px;font-weight:bold;color:#0090e8">📊 运动打卡（点☐打勾）</div><table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;text-align:center"><tr style="background:#0090e8;color:#fff"><th style="padding:5px">天</th><th>快走</th><th>跳绳</th><th>拉伸</th><th>燃脂</th></tr>`+Array.from({length:14},(_,i)=>`<tr><td style="padding:4px;border:1px solid #cce9ff;background:#fff">第${i+1}天</td>`+[0,1,2,3].map(()=>`<td style="padding:4px;border:1px solid #cce9ff;background:#fff;font-size:15px;cursor:pointer" onclick="this.textContent=this.textContent==='☐'?'✅':'☐'">☐</td>`).join('')+`</tr>`).join('')+`</table></div>`},
+ card_plan:{mode:'html',html:cardHTML()},
  weight_table:{mode:'table',csv:'日期,体重(斤),较昨日,备注\n第1天,121.6,-0.4,启动期\n第2天,121.2,-0.4,晚餐7分饱\n第3天,120.8,-0.4,戒奶茶\n第4天,,,加速期\n第5天,,,\n第6天,,,\n第7天,,,\n第8天,,,冲刺期\n第9天,,,\n第10天,,,\n第11天,,,\n第12天,,,巩固期\n第13天,,,\n第14天,118.0,,🎉达成'},
- football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">`+['s1','s2','s3','s4','s5'].map(k=>`<span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;fo<!--SEG3-->
+ football_card:{mode:'html',html:'<div style="max-width:420px;margin:0 auto;font-family:\'PingFang SC\',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border<!--SEG3-->
 let _TPL_QUEUE=[];
 function renderTplCall(text){
  const re=/___TPL___:([a-z0-9_]+)(?:\|([^___]*))?/g;_TPL_QUEUE=[];let hit=false;
