@@ -379,11 +379,18 @@ async function tavilySearch(q){
   try{
    const c=new AbortController();const t=setTimeout(()=>c.abort(),8000);
    const r=await fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:TAVILY_KEY,query:q+' '+steps[i],max_results:3,search_depth:'basic'}),signal:c.signal});
-   clearTimeout(t);const j=await r.json();
-   const items=(j.results||[]).slice(0,3).map(x=>'◆'+steps[i]+'【'+x.title+'】'+(x.content||'').slice(0,250));
-   if(items.length){out=out.concat(items);text='✅ 找到'+items.length+'条'}
-   else text='无结果';
-  }catch(e){text='❌ 失败'}
+   clearTimeout(t);
+   if(!r.ok){
+    let em='HTTP '+r.status;
+    try{const ej=await r.json();em=(ej&&(ej.detail||ej.error||ej.message))||em}catch(e2){}
+    text='❌ '+em;
+   }else{
+    const j=await r.json();
+    const items=((j&&j.results)||[]).slice(0,3).map(x=>'◆'+steps[i]+'【'+(x.title||'')+'】'+((x.content||'').slice(0,250)));
+    if(items.length){out=out.concat(items);text='✅ 找到'+items.length+'条'}
+    else text='无结果';
+   }
+  }catch(e){text='❌ 失败('+e.message+')'}
   show('📡 实时搜索 ['+(i+1)+'/'+steps.length+'] '+steps[i]+' → '+text);
  }
  const res=out.length?('【实时搜索到的资料】'+String.fromCharCode(10)+out.join(String.fromCharCode(10)+String.fromCharCode(10))):'（未搜到资料）';
@@ -403,7 +410,7 @@ def pois(l,k):
  return math.exp(-l)*l**k/math.factorial(k)
 class BladeV60:
  def __init__(self,D):
-  self.D=D or {}
+  self.D=(D.to_py() if hasattr(D,'to_py') else D) or {}
   self.league=str(self.D.get('league','英超'))
   self.L=float(self.D.get('L') or L_TABLE.get(self.league,0.85))
   self.cal=float(self.D.get('calibration',1.0))
@@ -739,14 +746,14 @@ async function runFootball(){
  try{
   const py=await getPyodide();
   out.innerHTML='<div style="color:#8fa3bf">⏳ 推演计算中…</div>';
-  py.globals.set('__md',data);
+  py.globals.set('__md',py.toPy(data));
   py.runPython(ENGINE_PY);
   if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
-  if(window.FOOT_STATE.proto){py.globals.set('__pr',window.FOOT_STATE.proto);py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
-  if(window.FOOT_STATE.w){py.globals.set('__w',window.FOOT_STATE.w);py.runPython('W=list(__w)')}
+  if(window.FOOT_STATE.proto){py.globals.set('__pr',py.toPy(window.FOOT_STATE.proto));py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
+  if(window.FOOT_STATE.w){py.globals.set('__w',py.toPy(window.FOOT_STATE.w));py.runPython('W=list(__w)')}
   py.runPython(KMEANS_PY);
   py.runPython(SHADOW_PY);
-  py.globals.set('__md2',data);
+  py.globals.set('__md2',py.toPy(data));
   py.runPython('__lg=legacy_predict(__md2)');
   py.runPython('__b=BladeV60(__md); __res=__b.run()');
   const res0=String(py.globals.get('__res'));
@@ -996,14 +1003,14 @@ async function runCalibrate(){
  out.textContent='⏳ 校准中…';
  try{
   const py=await getPyodide();
-  py.globals.set('__md',md);
+  py.globals.set('__md',py.toPy(md));
   py.runPython(ENGINE_PY);
   if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
-  if(window.FOOT_STATE.proto){py.globals.set('__pr',window.FOOT_STATE.proto);py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
-  if(window.FOOT_STATE.w){py.globals.set('__w',window.FOOT_STATE.w);py.runPython('W=list(__w)')}
+  if(window.FOOT_STATE.proto){py.globals.set('__pr',py.toPy(window.FOOT_STATE.proto));py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
+  if(window.FOOT_STATE.w){py.globals.set('__w',py.toPy(window.FOOT_STATE.w));py.runPython('W=list(__w)')}
   py.runPython('__b=BladeV60(__md)');
   py.runPython('__xv=__b.signals();__x=[__xv["A"],__xv["B"],__xv["C"],__xv["D"],__xv["E"],__xv["F"]];__ds,__ss=__b.dists(__x);__s1,_,_,_=__b.s1(__x,__ss);__v=__b.direction(__x,__ss);__sc,__dr,__ex=__b.s3(__s1,__v,__ss);__imp,__raw,__fin=__b.confidence(__v,__x);__bt=__b.btts(__ss);__b.last={"dir":__dr,"s1":__s1,"btts":__bt[2],"score":__sc[0],"fin":__fin,"scores":__sc}');
-  py.globals.set('__act',{dir:actDir,s1:h+a,btts:actBtts,score:[h,a]});
+  py.globals.set('__act',py.toPy({dir:actDir,s1:h+a,btts:actBtts,score:[h,a]}));
   py.runPython('__log=__b.calibrate(__act)');
   py.runPython('__pd=__b.last["dir"]');
   py.runPython('__st=__b.state');
@@ -1091,9 +1098,9 @@ async function bulkCal(){
   const py=await getPyodide();
   py.runPython(ENGINE_PY);
   if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
-  if(window.FOOT_STATE.proto){py.globals.set('__pr',window.FOOT_STATE.proto);py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
-  if(window.FOOT_STATE.w){py.globals.set('__w',window.FOOT_STATE.w);py.runPython('W=list(__w)')}
-  py.globals.set('__items',items);
+  if(window.FOOT_STATE.proto){py.globals.set('__pr',py.toPy(window.FOOT_STATE.proto));py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
+  if(window.FOOT_STATE.w){py.globals.set('__w',py.toPy(window.FOOT_STATE.w));py.runPython('W=list(__w)')}
+  py.globals.set('__items',py.toPy(items));
   py.runPython(`
 def __bulk_cal(items):
  logs=[]
@@ -1125,7 +1132,7 @@ async function kmeansBtn(){
   const py=await getPyodide();
   py.runPython(ENGINE_PY);
   if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
-  py.globals.set('__sample_pts',vecs);
+  py.globals.set('__sample_pts',py.toPy(vecs));
   py.runPython(KMEANS_PY);
   py.runPython('__rk=rebuild_protos()');
   const msg=String(py.globals.get('__rk'));
@@ -1165,7 +1172,7 @@ async function dailyEvolve(){
   try{
    const py=await getPyodide();
    py.runPython(ENGINE_PY);
-   py.globals.set('__sample_pts',vecs);
+   py.globals.set('__sample_pts',py.toPy(vecs));
    py.runPython(KMEANS_PY);
    py.runPython('__rk=rebuild_protos()');
    const msg=String(py.globals.get('__rk'));
@@ -1336,6 +1343,35 @@ if(window.FOOT_STATE.lastEvolve!==new Date().toLocaleDateString()){
  var h1=document.querySelector('header h1');
  if(h1){h1.className='glitch neon-flicker';h1.setAttribute('data-t',h1.textContent)}
 })();
+ <script>
+/* 🔍 联网一键自检（手机版调试用，可随时删除） */
+(function(){
+ if(document.getElementById('stBtn'))return;
+ var b=document.createElement('button');b.id='stBtn';b.textContent='🔍自检';b.style.cssText='position:fixed;left:10px;bottom:56px;z-index:99;font-size:11px;padding:5px 9px;background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;color:#e8f6ff';
+ var out=document.createElement('div');out.id='stOut';out.style.cssText='position:fixed;left:10px;right:10px;bottom:98px;z-index:99;background:rgba(3,4,10,.96);border:1px solid #00f0ff;border-radius:10px;padding:8px;font-size:11px;color:#39ff14;white-space:pre-wrap;display:none;max-height:42vh;overflow-y:auto';
+ document.body.appendChild(b);document.body.appendChild(out);
+ b.onclick=async function(){
+  out.style.display='block';
+  var lines=['🔍 联网自检 · 版本v6.1-fix2','———————————'];
+  lines.push('Tavily Key: '+(TAVILY_KEY?TAVILY_KEY.slice(0,6)+'…'+TAVILY_KEY.slice(-4):'❌ 未设置'));
+  lines.push('DeepSeek Key: '+(API_KEY?API_KEY.slice(0,6)+'…':'❌ 未设置'));
+  lines.push('———————————');
+  try{
+   var r=await fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:TAVILY_KEY||'x',query:'阿森纳 最新新闻',max_results:1,search_depth:'basic'})});
+   var txt=await r.text();
+   lines.push(r.ok?'✅ Tavily 连通，Key有效':'❌ Tavily HTTP '+r.status+'：'+txt.slice(0,150));
+  }catch(e){lines.push('❌ Tavily 网络错误：'+e.message)}
+  lines.push('———————————');
+  try{
+   var r2=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(API_KEY||'x')},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:'hi'}],max_tokens:1})});
+   if(r2.ok)lines.push('✅ DeepSeek 连通，Key有效');
+   else{var t2=await r2.text();lines.push('❌ DeepSeek HTTP '+r2.status+'：'+t2.slice(0,150))}
+  }catch(e){lines.push('❌ DeepSeek 网络错误：'+e.message)}
+  out.textContent=lines.join('\n');
+ };
+})();
+</script>
+
 </script>
 </body>
 </html>
