@@ -189,7 +189,11 @@ const TPL_FLOW={
 第12天,,,巩固期
 第13天,,,
 第14天,118.0,,🎉达成`},
- football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;co<!--SEG3-->
+ football_card:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#0d0f2a,#1a1a4a);border-radius:24px;padding:20px;box-shadow:0 8px 30px rgba(0,240,255,.3);color:#fff"><div style="text-align:center;font-size:20px;font-weight:bold;color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.6)">⚽ 锋刃v6.1 推演结果</div><div style="text-align:center;font-size:15px;margin:8px 0 12px">{home} <span style="color:#ff00e5">VS</span> {away}</div><div style="font-size:12px;color:#8fa3bf;margin-bottom:6px">🎲 S3v3 五比分</div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;font-size:14px">{s1}</span><span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;font-size:14px">{s2}</span><span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;font-size:14px">{s3}</span><span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;font-size:14px">{s4}</span><span style="background:rgba(0,240,255,.15);border:1px solid #00f0ff;border-radius:10px;padding:6px 10px;font-size:14px">{s5}</span></div><div style="margin-top:12px;background:linear-gradient(135deg,#00f0ff,#ff00e5);border-radius:12px;padding:10px;text-align:center;font-weight:bold;color:#000">🎯 方向：{rec}</div><div style="font-size:11px;color:#8fa3bf;text-align:center;margin-top:10px">R1-R12 · 六维场景 · 仅供参考</div></div>`},
+ todo:{mode:'html',html:`<div style="max-width:420px;margin:0 auto;font-family:'PingFang SC',sans-serif;background:linear-gradient(160deg,#f4fff0,#e8ffe0);border-radius:24px;padding:18px;box-shadow:0 8px 30px rgba(80,200,60,.25)"><div style="text-align:center;font-size:19px;font-weight:bold;color:#2ea51e">✅ 待办清单（点☐打勾）</div><div style="font-size:14px;padding:8px 0;border-bottom:1px dashed #b8e0a8;cursor:pointer" onclick="tk(this)">☐ 第一项任务</div><div style="font-size:14px;padding:8px 0;border-bottom:1px dashed #b8e0a8;cursor:pointer" onclick="tk(this)">☐ 第二项任务</div><div style="font-size:14px;padding:8px 0;border-bottom:1px dashed #b8e0a8;cursor:pointer" onclick="tk(this)">☐ 第三项任务</div></div>`}
+};
+function fillTpl(t,p){var out=t;for(var k in p){out=out.split('{'+k+'}').join(p[k])}return out}
+<!--SEG3-->
 let _TPL_QUEUE=[];
 function renderTplCall(text){
  const re=/___TPL___:([a-z0-9_]+)(?:\|([^___]*))?/g;_TPL_QUEUE=[];let hit=false;
@@ -232,7 +236,7 @@ function loadECharts(){if(_echartsLoaded)return _echartsLoaded;
  return _echartsLoaded}
 function convertEcharts(text){
  const re=/___ECHARTS___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
- text=text.replace(re,(mm,js)=>{let opt=null;try{opt=JSON.parse(js.split('```').join('').trim())}catch(e){return mm}hit=true;
+ text=text.replace(re,(mm,js)=>{let opt=null;try{opt=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
   const id='ec_'+Date.now()+'_'+Math.floor(Math.random()*9999);
   opt.backgroundColor=opt.backgroundColor||'#0a0e23';if(!opt.textStyle)opt.textStyle={color:'#e8f6ff'};
   _EC_QUEUE.push({id,option:opt});
@@ -264,7 +268,7 @@ function buildExcalidrawElements(data){
 }
 function handleExcalidraw(text){
  const re=/___EXCALIDRAW___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
- text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.split('```').join('').trim())}catch(e){return mm}hit=true;
+ text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
   const file={type:'excalidraw',version:2,source:'ai-app',elements:buildExcalidrawElements(d),elementsMap:{},appState:{viewBackgroundColor:'#f8f9fa'},files:{}};
   window.open('https://excalidraw.com/#json='+btoa(unescape(encodeURIComponent(JSON.stringify(file))))+',AI1','_blank');
   return '（📎手绘图已在Excalidraw新标签页打开，可编辑导出）'});
@@ -407,7 +411,88 @@ class BladeV60:
   A=(oa-oh)/(oa+oh)
   B=float(self._g('def_home',0))-float(self._g('def_away',0))
   C=float(self._g('referee',0) or 0)
-  D=float(self._g('atk_home',0.5))-float(self._g<!--SEG5-->
+  D=float(self._g('atk_home',0.5))-float(self._g('atk_away',0.3))
+  om=self._g('odds_move',{}) or {}
+  E=(float(om.get('over',0))+float(om.get('btts',0))+float(om.get('home',0)))/3
+  h2h,_=self.h2h()
+  fh=self._g('form_home',[]) or []; fa=self._g('form_away',[]) or []
+  fi=0.15*((sum(1 for x in fh if str(x).upper() in ('W','胜'))/max(len(fh),1))-(sum(1 for x in fa if str(x).upper() in ('W','胜'))/max(len(fa),1)))
+  F=0.4*(h2h-0.5)*2+fi+0.10*float(self._g('motivation',0))
+  return {'A':A,'B':B,'C':C,'D':D,'E':E,'F':F,'H2H':h2h}
+ def i_score(self):
+  s=float(self._g('xG_avail',0.5))*0.30+float(self._g('injury_conf',0.7))*0.20+self.L*0.20+float(self._g('odds_depth',0.7))*0.15+float(self._g('media_cov',0.5))*0.15
+  s-=int(self._g('missing_must',0))*0.05+int(self._g('missing_adv',0))*0.02
+  return max(0.30,s)
+ def temp(self):
+  return min(0.70,max(0.20,T_BASE/self.i_score()))
+ def sweet(self):
+  oh=float((self._g('odds',{}) or {}).get('home',2.0))
+  return 1.50<=oh<=1.72
+ def sweet_level(self):
+  if not self.sweet(): return 0.0
+  return -0.08 if self.L<0.75 else -0.03
+ def dists(self,x):
+  T=self.temp(); ds={}; ss={}
+  for k,(c,sig) in PROTO.items():
+   d=sum(W[i]*((x[i]-c[i])**2)/(sig*sig) for i in range(6)); ds[k]=math.sqrt(d)
+  exps={k:math.exp(-ds[k]/T) for k in ds}; tot=sum(exps.values())
+  ss={k:exps[k]/tot for k in exps}
+  return ds,ss
+ def s1(self,x,ss):
+  A,B,C,D,E,F=x
+  sw=1.08 if self.sweet() else 1.0
+  vals={'P1':3.0*(1+0.85*A)*(1+1.10*D)*(1+0.55*F),'P2':2.8*(1+0.65*A)*(1+0.85*B)*(1+0.70*D)*(1+0.50*F),'P3':2.0*(1-0.50*abs(B))*(1-0.70*abs(D)),'P4':2.5*(1+0.80*D)*(1+0.55*E),'P5':2.3*(1-0.60*A)*(1+0.95*E)*sw,'P6':2.85}
+  if self.L<0.75 and self._g('season','')=='summer':
+   for k in vals: vals[k]-=0.3
+  s1f=sum(ss[k]*vals[k] for k in vals)
+  lo=sum(ss[k]*vals[k]*S1CFG[k][0] for k in vals); hi=sum(ss[k]*vals[k]*S1CFG[k][1] for k in vals)
+  return s1f,lo,hi,vals
+ def injury_net(self):
+  inj=self._g('injuries',[]) or []; posc={'att':1.0,'mid':0.7,'def':0.9,'gk':1.1}
+  tot=0
+  for it in inj:
+   stars=float(it.get('stars',3)); pos=posc.get(str(it.get('pos','mid')),0.7); reason=float(it.get('reason',0.7))
+   tot+=stars*pos*reason
+  return min(0.08,tot/10*0.05)
+ def direction(self,x,ss):
+  A,B,C,D,E,F=x
+  adj_s=0.10*A+0.08*D+0.06*F+0.05*(self.signals()['H2H']-0.5)*2
+  votes=[0,0,0]
+  for k,base in PB.items():
+   a=[base[0]+adj_s,base[1],base[2]-adj_s]
+   mn=min(a)
+   if mn<0:
+    a=[v-mn for v in a]; t=sum(a); a=[v/t for v in a]
+   for i in range(3): votes[i]+=ss[k]*a[i]
+  return votes
+ def confidence(self,votes,x):
+  od=self._g('odds',{}) or {}; oh=float(od.get('home',2.0)); dr=float(od.get('draw',3.4)); oa=float(od.get('away',3.5))
+  inv=1/oh+1/dr+1/oa; implied=(1/oh)/inv
+  n=int(self._g('cascade',0)); casc=[0,0,0,0,0.05,0.08,0.10][min(n,6)]
+  h2h=self.signals()['H2H']
+  hb=0.05 if h2h>0.65 else (-0.05 if h2h<0.35 else 0.0)
+  if h2h<0.35 and self._g('h2h_loss',0)>=0.5: hb-=0.05; casc-=0.05
+  split=float(self._g('home_away_split',0))
+  inj=self.injury_net()
+  bt=float(self._g('btts_extra',0))
+  sw=self.sweet_level()
+  raw=min(0.85,max(0.45,implied+casc+hb+split+bt-sw-inj))
+  pen=float(self._g('conf_penalty',1.0))
+  fin=min(0.82,max(0.40,raw*self.L*self.cal*pen))
+  return implied,raw,fin
+ def btts(self,ss):
+  yes=sum(ss[k]*BTTS_BASE[k] for k in ss); no=1-yes
+  if ss.get('P5',0)>0.15 and self.sweet(): yes*=0.85; no=1-yes
+  ctx=str(self._g('context',''))
+  if any(w in ctx for w in ('德比','榜首','杯赛','酷暑')): yes=max(0.0,yes-0.10); no=1-yes
+  if yes>0.60: v='Yes（确定）'
+  elif no>0.60: v='No（确定）'
+  elif yes>0.65: v='Yes（倾向）'
+  elif no>0.65: v='No（倾向）'
+  else: v='不确定'
+  return yes,no,v
+`;
+<!--SEG5-->
 const ENGINE_PY2 = `
  def s3(self,s1f,votes,ss):
   vh,vd,va=votes; mx=max(vh,vd,va)
@@ -547,7 +632,132 @@ const ENGINE_PY2 = `
    log['T_base']=round(T_BASE,4); log['L']=round(self.L,3)
    log['w']=[round(w,3) for w in W]; log['ema']='原型EMA+权重梯度已更新'
   else: log['冻结']=True
-  self.state={'T_ba<!--SEG6-->
+  self.state={'T_base':T_BASE,'L':self.L,'cal':self.cal,'E':E,'proto':dict(PROTO),'w':list(W),'samples':self.samples}
+  self.audit.append(log)
+  return '✅校准完成 E='+format(E,'.3f')+' '+str(log)
+`;
+ENGINE_PY += ENGINE_PY2;
+const KMEANS_PY=`
+def kmeans_rebuild(points,k=6,iters=60):
+ pts=[list(p) for p in (points or [])]
+ if len(pts)<k: return None
+ centers=[list(PROTO['P%d'%(i+1)][0]) for i in range(k)]
+ for _ in range(iters):
+  cl=[[] for _ in range(k)]
+  for p in pts:
+   d=[sum((p[i]-c[i])**2 for i in range(6)) for c in centers]
+   cl[d.index(min(d))].append(p)
+  for i in range(k):
+   if cl[i]:
+    centers[i]=[sum(p[j] for p in cl[i])/len(cl[i]) for j in range(6)]
+ return centers
+def rebuild_protos():
+ pts=__sample_pts or []
+ if len(pts)<20: return '样本不足(需≥20场历史数据)，暂不重构'
+ c=kmeans_rebuild(pts)
+ if c is None: return 'K-means失败'
+ for i in range(6): PROTO['P%d'%(i+1)]=(c[i],PROTO['P%d'%(i+1)][1])
+ __proto=dict(PROTO); __w=list(W)
+ return '✅原型已用K-means数据重构（样本'+str(len(pts))+'场）'
+`;
+const SHADOW_PY=`
+def legacy_predict(md):
+ od=md.get('odds',{}) or {}
+ oh=float(od.get('home',2.0)); dr=float(od.get('draw',3.4)); oa=float(od.get('away',3.5))
+ inv=1/oh+1/dr+1/oa
+ vh=(1/oh)/inv; vd=(1/dr)/inv; va=(1/oa)/inv
+ s1=vh*2.6+vd*2.2+va*2.8
+ d='主' if (vh>=vd and vh>=va) else ('平' if vd>=va else '客')
+ return {'dir':d,'s1':s1,'conf':max(vh,vd,va)}
+`;
+window.FOOT_STATE=(function(){try{return JSON.parse(localStorage.getItem('wt_foot_state'))||{}}catch(e){return{}}})();
+window.FOOT_STATE.samples=window.FOOT_STATE.samples||0;
+window.FOOT_STATE.t_base=window.FOOT_STATE.t_base||null;
+window.FOOT_STATE.calibration=window.FOOT_STATE.calibration||1.0;
+window.FOOT_STATE.leagues=window.FOOT_STATE.leagues||{};
+window.FOOT_STATE.proto=window.FOOT_STATE.proto||null;
+window.FOOT_STATE.w=window.FOOT_STATE.w||null;
+window.FOOT_STATE.results=window.FOOT_STATE.results||[];
+window.FOOT_STATE.shadow=window.FOOT_STATE.shadow||{main:[],legacy:[]};
+window.FOOT_STATE.judge=window.FOOT_STATE.judge||{buckets:{},kelly:0,kellyT:0,edgeH:0,edgeT:0};
+window.FOOT_STATE.fmea=window.FOOT_STATE.fmea||[];
+window.FOOT_STATE.lastEvolve=window.FOOT_STATE.lastEvolve||'';
+function saveFS(){localStorage.setItem('wt_foot_state',JSON.stringify(window.FOOT_STATE))}
+function scanFMEA(md){
+ var od=md.odds||{}; var oh=parseFloat(od.home)||2.0;
+ var h2h=md.h2h||[]; var h2hV=h2h.length?h2h.reduce(function(a,b){return a+b},0)/h2h.length:0.5;
+ var L=md.L||({'英超':0.95,'西甲':0.95,'德甲':0.95,'意甲':0.95,'法甲':0.95,'英冠':0.90,'葡超':0.85,'荷甲':0.85,'巴甲':0.85,'美职联':0.75,'日职联':0.75,'K联赛':0.75,'挪超':0.65,'瑞典超':0.65,'芬超':0.60,'澳超':0.55}[md.league]||0.85);
+ var cond={sweet:oh>=1.50&&oh<=1.72,h2hLow:h2hV<0.35,lowL:L<0.75,dataMiss:(md.missing_must||0)>=3};
+ var hit=[];
+ (window.FOOT_STATE.fmea||[]).forEach(function(f){
+  var ok=true;
+  Object.keys(f.cond).forEach(function(k){if(f.cond[k]!==cond[k])ok=false});
+  if(ok)hit.push(f);
+ });
+ return {cond:cond,hit:hit,penalty:hit.length>=2};
+}
+function handleMatchData(text){
+ const re=/___MATCHDATA___\n?([\s\S]*?)(?=___\w+___|$)/g;let hit=false;
+ text=text.replace(re,(mm,js)=>{let d;try{d=JSON.parse(js.replace(/```json|```/g,'').trim())}catch(e){return mm}hit=true;
+  $('mdInput').value=JSON.stringify(d,null,1);
+  switchTab('foot');
+  setTimeout(runFootball,400);
+  return '（⚽已接收比赛数据 → 引擎自动推演中，结果见「⚽推演」分区）'});
+ return hit?text:null;
+}
+async function runFootball(){
+ const txt=$('mdInput').value.trim();let data;
+ try{data=JSON.parse(txt)}catch(e){$('footOut').innerHTML='<div style="color:#ff9090">❌ MATCH_DATA JSON格式错误: '+escapeHtml(e.message)+'</div>';return}
+ const lg=window.FOOT_STATE.leagues[data.league||'英超']||{count:0,L:null,hits:0,confSum:0,ratio:0.9};
+ data.samples=window.FOOT_STATE.samples;
+ data.calibration=window.FOOT_STATE.calibration;
+ if(lg.L)data.L=lg.L;
+ data.league_ratio=lg.ratio;
+ const fmea=scanFMEA(data);
+ if(fmea.penalty)data.conf_penalty=0.7;
+ const out=$('footOut');out.innerHTML='<div style="color:#8fa3bf">⏳ 加载引擎中(首次约50MB)…</div>';
+ try{
+  const py=await getPyodide();
+  out.innerHTML='<div style="color:#8fa3bf">⏳ 推演计算中…</div>';
+  py.globals.set('__md',data);
+  py.runPython(ENGINE_PY);
+  if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
+  if(window.FOOT_STATE.proto){py.globals.set('__pr',window.FOOT_STATE.proto);py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
+  if(window.FOOT_STATE.w){py.globals.set('__w',window.FOOT_STATE.w);py.runPython('W=list(__w)')}
+  py.runPython(KMEANS_PY);
+  py.runPython(SHADOW_PY);
+  py.globals.set('__md2',data);
+  py.runPython('__lg=legacy_predict(__md2)');
+  py.runPython('__b=BladeV60(__md); __res=__b.run()');
+  const res0=String(py.globals.get('__res'));
+  const lg2=py.globals.get('__lg').toJs();
+  let res=res0;
+  if(fmea.penalty)res='⚠️【FMEA高危】命中'+fmea.hit.length+'个失败指纹，方向置信度已×0.7\n\n'+res;
+  res+='\n\n👻 影轨v4.8.1: 方向'+lg2.dir+' | S1='+lg2.s1.toFixed(2)+' | 置信度'+(lg2.conf*100).toFixed(0)+'%';
+  py.runPython('__pv={k:__b.last[k] for k in __b.last}');
+  const pv=py.globals.get('__pv').toJs();
+  window.FOOT_STATE.shadow.main.push({league:data.league,dir:pv.dir,s1:pv.s1,fin:pv.fin});
+  window.FOOT_STATE.shadow.legacy.push({league:data.league,dir:lg2.dir,s1:lg2.s1,conf:lg2.conf});
+  window.FOOT_STATE.shadow.main=window.FOOT_STATE.shadow.main.slice(-20);
+  window.FOOT_STATE.shadow.legacy=window.FOOT_STATE.shadow.legacy.slice(-20);
+  window.FOOT_STATE.results.push({md:data,pred:{dir:pv.dir,s1:pv.s1,btts:pv.btts,score:pv.score,fin:pv.fin}});
+  if(window.FOOT_STATE.results.length>100)window.FOOT_STATE.results=window.FOOT_STATE.results.slice(-100);
+  saveFS();
+  out.innerHTML='';
+  const pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;font-size:12px;color:#39ff14;background:rgba(0,0,0,.5);border-radius:10px;padding:10px';
+  pre.textContent=res;out.appendChild(pre);
+  const bar=document.createElement('div');bar.style.cssText='display:flex;gap:6px;margin-top:8px;flex-wrap:wrap';
+  const b1=document.createElement('button');b1.textContent='💾保存.txt';b1.onclick=()=>downloadFile('推演_'+Date.now()+'.txt',res);
+  const b2=document.createElement('button');b2.textContent='📋复制';b2.onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(res);
+  const b3=document.createElement('button');b3.textContent='🎴生成海报';b3.onclick=()=>{outputTpl('football_card',{home:data.home||'主队',away:data.away||'客队',s1:'2-1',s2:'1-1',s3:'1-0',s4:'0-1',s5:'2-2',rec:'见上方推演'})};
+  [b1,b2,b3].forEach(b=>bar.appendChild(b));out.appendChild(bar);
+  const st=document.createElement('div');st.style.cssText='font-size:11px;color:#8fa3bf;margin-top:6px';
+  st.textContent='📈 学习状态: 样本'+window.FOOT_STATE.samples+'场 | T_base='+(window.FOOT_STATE.t_base||0.2625).toFixed(4)+' | 校准比='+lg.ratio.toFixed(2)+(fmea.penalty?' | ⚠️FMEA高危':'')+' | 影轨已对比';
+  out.appendChild(st);
+ }catch(e){out.innerHTML='<div style="color:#ff9090">❌ '+escapeHtml(e.message||String(e))+'</div>'}
+}
+function applyAiPipeline(t){t=renderTplCall(t)||t;t=convertEcharts(t)||t;t=handleExcalidraw(t)||t;t=handleMatchData(t)||t;return t}
+<!--SEG6-->
 let CODES=[];
 function extractCodeBlocks(text){
  CODES=[];
@@ -697,7 +907,93 @@ function finalizeReply(full,box){
 }
 function saveMemory(full){
  const plain=full.replace(/___\w+___/g,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,200);
- if(plain){SUMMARY=(SUMMARY?SUMMARY+'\n':'')+plain;if(SUMMARY.length>20<!--SEG7-->
+ if(plain){SUMMARY=(SUMMARY?SUMMARY+'\n':'')+plain;if(SUMMARY.length>2000)SUMMARY=SUMMARY.slice(-2000);localStorage.setItem('wt_summary',SUMMARY)}
+ HISTORY.push({role:'assistant',content:full});
+ if(HISTORY.length>40)HISTORY=HISTORY.slice(-40);
+}
+const SYSTEM_PROMPT=`你是"锋刃AI工作台"助手，单页App内运行。中文回答，直接给成品，不啰嗦。
+【输出协议】
+1.小红书风HTML海报 → ___HTML___换行+HTML代码
+2.表格 → ___TABLE___换行+CSV
+3.流程图 → ___MERMAID___换行+Mermaid代码
+4.数据图表 → ___ECHARTS___换行+echarts option JSON
+5.手绘风图 → ___EXCALIDRAW___换行+{"nodes":[{"id":"a","label":".."}],"edges":[{"from":"a","to":"b","label":".."}]}
+6.模板调用 → ___TPL___:模板ID|参数=值&参数=值，多个连续输出，App自动渲染+一键保存
+【模板ID】flow_jianfei(减肥图:target,p1-p4) food_plan(食谱) card_plan(打卡) weight_table(体重表) football_card(推演卡:home,away,s1-s5,rec) flow_football(推演流程:home,away) week_plan(周计划:d1-d6) todo(待办) flow_decision(决策:q) flow_timeline(阶段:p1-p3,target) flow_compare(对比:q,a,b)
+组合：减肥全套→flow_jianfei+food_plan+card_plan+weight_table；要"小红书/海报"加mode=html
+【Python】要计算/画matplotlib图时输出python代码块；matplotlib已设Agg，画完调用_ds_save(plt.gcf())，禁止plt.show()；中文乱码改用英文标签。App自动运行。
+【搜索】用户提推演/赔率/比赛/比分/最新/新闻/情报时，App会自动实时搜索（过程可见），你基于资料回答。
+【减肥铁律】减肥图必须：渐变卡片+圆角+阴影+emoji+四阶段(启动/加速/冲刺/巩固)+目标122→118斤14天；优先___TPL___:flow_jianfei
+【足球推演】用户要求推演XX vs XX时：先实时搜索情报，然后输出 ___MATCHDATA___ +完整JSON（App自动跑锋刃v6.1引擎，含自进化/影轨/FMEA/可视化），之后可再输出football_card海报。
+MATCH_DATA字段：league,round,time,venue,home,away,odds{home,draw,away},odds_move{home,asian,heat,over,btts},abnormal,bookmaker,xg,form_home,form_away,atk_home,atk_away,def_home,def_away,referee,h2h(近6场主视角胜1平0.5负0),h2h_goals,injuries[{stars,pos,reason}],injury_conf,media_cov,odds_depth,xG_avail,cascade,home_away_split,btts_extra,missing_must,missing_adv,context,samples,calibration`;
+function addFMEA(cond){
+ const fs=window.FOOT_STATE.fmea;
+ const found=fs.find(f=>JSON.stringify(f.cond)===JSON.stringify(cond));
+ if(found){found.hits++;found.last=new Date().toLocaleDateString()}
+ else fs.push({id:'FM'+(fs.length+1),cond:cond,pattern:'dir',hits:1,created:new Date().toLocaleDateString()});
+ if(fs.length>50)fs.shift();
+}
+async function runCalibrate(){
+ const m=$('actScore').value.trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
+ const out=$('calOut');
+ if(!m){out.textContent='❌ 比分格式应为 2-1';return}
+ const h=+m[1],a=+m[2],actDir=$('actDir').value,actBtts=$('actBtts').value;
+ const md=JSON.parse($('mdInput').value||'{}');
+ out.textContent='⏳ 校准中…';
+ try{
+  const py=await getPyodide();
+  py.globals.set('__md',md);
+  py.runPython(ENGINE_PY);
+  if(window.FOOT_STATE.t_base)py.runPython('T_BASE='+window.FOOT_STATE.t_base);
+  if(window.FOOT_STATE.proto){py.globals.set('__pr',window.FOOT_STATE.proto);py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
+  if(window.FOOT_STATE.w){py.globals.set('__w',window.FOOT_STATE.w);py.runPython('W=list(__w)')}
+  py.runPython('__b=BladeV60(__md)');
+  py.runPython('__xv=__b.signals();__x=[__xv["A"],__xv["B"],__xv["C"],__xv["D"],__xv["E"],__xv["F"]];__ds,__ss=__b.dists(__x);__s1,_,_,_=__b.s1(__x,__ss);__v=__b.direction(__x,__ss);__sc,__dr,__ex=__b.s3(__s1,__v,__ss);__imp,__raw,__fin=__b.confidence(__v,__x);__bt=__b.btts(__ss);__b.last={"dir":__dr,"s1":__s1,"btts":__bt[2],"score":__sc[0],"fin":__fin}');
+  py.globals.set('__act',{dir:actDir,s1:h+a,btts:actBtts,score:[h,a]});
+  py.runPython('__log=__b.calibrate(__act)');
+  py.runPython('__pd=__b.last["dir"]');
+  py.runPython('__st=__b.state');
+  py.runPython('__rv=__b.signals();__vec=[__rv["A"],__rv["B"],__rv["C"],__rv["D"],__rv["E"],__rv["F"]]');
+  const log=String(py.globals.get('__log'));
+  const st=py.globals.get('__st').toJs();
+  const pd=String(py.globals.get('__pd'));
+  const vec=py.globals.get('__vec').toJs();
+  const finv=Number(py.globals.get('__fin'));
+  const lg=window.FOOT_STATE.leagues[md.league||'英超']||{count:0,L:null,hits:0,confSum:0,ratio:0.9};
+  lg.count+=1;window.FOOT_STATE.samples+=1;
+  window.FOOT_STATE.t_base=st.T_base;
+  window.FOOT_STATE.calibration=st.cal;
+  if(st.L)lg.L=st.L;
+  if(pd===actDir)lg.hits+=1;
+  lg.confSum+=finv;
+  lg.ratio=Math.min(1.5,Math.max(0.5,lg.confSum>0.01?lg.hits/lg.confSum:0.9));
+  window.FOOT_STATE.leagues[md.league||'英超']=lg;
+  window.FOOT_STATE.proto=st.proto;
+  window.FOOT_STATE.w=st.w;
+  const jg=window.FOOT_STATE.judge;
+  const key=Math.round(finv*100/10)*10+'%';
+  jg.buckets[key]=jg.buckets[key]||{n:0,hit:0};
+  jg.buckets[key].n++;
+  if(pd===actDir)jg.buckets[key].hit++;
+  const odds=md.odds||{};
+  const price=actDir==='主'?parseFloat(odds.home)||2:actDir==='客'?parseFloat(odds.away)||3.5:parseFloat(odds.draw)||3.4;
+  const b0=price-1,p0=finv,kf=Math.max(0,(p0*b0-(1-p0))/b0),stake=kf*0.25;
+  jg.kelly+=(pd===actDir)?stake*b0:-stake;jg.kellyT++;
+  jg.edgeT++;if(pd===actDir)jg.edgeH++;
+  const r=scanFMEA(md);
+  if(pd!==actDir)addFMEA(r.cond);
+  const lastR=window.FOOT_STATE.results[window.FOOT_STATE.results.length-1];
+  if(lastR&&!lastR.actual){
+   lastR.actual={dir:actDir,h:h,a:a,btts:actBtts};
+   lastR.vec=vec;
+   const lgl=window.FOOT_STATE.shadow.legacy[window.FOOT_STATE.shadow.legacy.length-1];
+   if(lgl)lastR.legacy=lgl;
+  }
+  saveFS();
+  out.textContent=log+'\n📊 已保存: 总样本'+window.FOOT_STATE.samples+'场 | '+md.league+'已录'+lg.count+'场 | T_base='+st.T_base.toFixed(4)+' | L='+(st.L||'-')+' | E='+st.E.toFixed(3)+' | 校准比='+lg.ratio.toFixed(2)+' | 凯利累计='+jg.kelly.toFixed(3);
+ }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
+}
+<!--SEG7-->
 (function(){
  if(document.getElementById('calSec'))return;
  const foot=$('viewFoot');
@@ -813,7 +1109,18 @@ async function dailyEvolve(){
    py.globals.set('__sample_pts',vecs);
    py.runPython(KMEANS_PY);
    py.runPython('__rk=rebuild_protos()');
-   const msg=String<!--SEG8-->
+   const msg=String(py.globals.get('__rk'));
+   py.runPython('__proto=dict(PROTO);__w=list(W)');
+   window.FOOT_STATE.proto=py.globals.get('__proto').toJs();
+   window.FOOT_STATE.w=py.globals.get('__w').toJs();
+   lines2.push('🧬 '+msg);
+  }catch(e){lines2.push('🧬 重构失败: '+escapeHtml(e.message||String(e)))}
+ }
+ window.FOOT_STATE.lastEvolve=new Date().toLocaleDateString();
+ saveFS();
+ out.textContent=out.textContent+String.fromCharCode(10)+lines2.join(String.fromCharCode(10))+String.fromCharCode(10)+'✅ 今日自动升级完成 ('+window.FOOT_STATE.lastEvolve+')';
+}
+<!--SEG8-->
 const PANEL_ITEMS=[
  ['🍎减肥计划图','flow_jianfei',{target:'122→118斤',p1:'启动期1-3天',p2:'加速期4-7天',p3:'冲刺期8-11天',p4:'巩固期12-14天'}],
  ['🍱一周食谱表','food_plan',{}],['📊运动打卡表','card_plan',{}],['📈体重记录表','weight_table',{}],
