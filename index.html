@@ -103,7 +103,7 @@ window.addEventListener('error',function(e){var d=document.createElement('div');
 <script>
 <!--SEG2-->
 const API_URL='https://api.deepseek.com/chat/completions';
-let API_KEY=localStorage.getItem('wt_api')||'sk-28e218d04d204cc8993c1facfaa4f73d';
+let API_KEY=localStorage.getItem('wt_api')||'';
 let TAVILY_KEY=localStorage.getItem('wt_tavily')||'';
 let MODEL=localStorage.getItem('wt_model')||'deepseek-chat';
 let AUTO_EXEC=false;
@@ -279,7 +279,7 @@ function openDrawio(body){if(navigator.clipboard)navigator.clipboard.writeText(b
 function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open('wt_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function idbGet(k){try{const db=await idbOpen();return await new Promise((res,rej)=>{const q=db.transaction('kv','readonly').objectStore('kv').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}catch(e){return null}}
 async function idbSet(k,v){try{const db=await idbOpen();await new Promise((res,rej)=>{const q=db.transaction('kv','readwrite').objectStore('kv').put(v,k);q.onsuccess=res;q.onerror=()=>rej(q.error)})}catch(e){}}
-const FONT_URLS=['https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf'];
+const FONT_URLS=['https://cdn.jsdelivr.net/gh/StellarCN/scp_zh@master/fonts/SimHei.ttf','https://raw.githubusercontent.com/StellarCN/scp_zh/master/fonts/SimHei.ttf'];
 async function ensureCJKFont(py){
  try{
   let buf=await idbGet('simhei_v1');
@@ -315,10 +315,25 @@ def _ds_save(fig=None):
 function getPyodide(){
  if(_pyP)return _pyP;
  _pyP=(async()=>{
-  if(!window.loadPyodide)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';s.onload=res;s.onerror=()=>rej(new Error('Pyodide加载失败'));document.head.appendChild(s)});
-  const py=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/'});
-  await py.loadPackages(['numpy','pandas','matplotlib','scipy']);
-  await ensureCJKFont(py);
+  const bases=[
+   'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/',
+   'https://unpkg.com/pyodide@0.25.0/full/'
+  ];
+  let py=null,lastErr=null;
+  for(const base of bases){
+   try{
+    if(!window.loadPyodide){
+     await new Promise((res,rej)=>{const s=document.createElement('script');s.src=base+'pyodide.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+    }
+    py=await loadPyodide({indexURL:base});
+    await py.loadPackage(['numpy','pandas','matplotlib','scipy']);
+    await ensureCJKFont(py);
+    break;
+   }catch(e){lastErr=e;window.loadPyodide=null}
+  }
+  if(!py)throw new Error('Pyodide加载失败('+(lastErr&&lastErr.message)+')，请检查网络');
+  const sb=document.getElementById('statusBar');
+  if(sb)sb.textContent='[OK] 引擎就绪 · [OK] 搜索待命 · [OK] 记忆在线 · [OK] 模板库11个';
   return py;
  })();
  return _pyP;
@@ -357,7 +372,7 @@ async function runCode(code,st,btn){
 }
 function shouldSearch(q){return /推演|赔率|比分|比赛|赛前|最新|新闻|搜索|情报|名单|伤停/.test(q)}
 async function tavilySearch(q){
- const box=document.querySelector('#chatBox .msg.ai:last-child .txt');
+ const box=document.querySelector('#chatBox .msg.ai:last-child > div');
  const steps=['赔率走势','近期状态','H2H交锋','伤停名单','最新情报'];
  let out=[];
  const show=t=>{if(box){box.textContent=t;scrollBox()}};
@@ -437,6 +452,9 @@ class BladeV60:
    d=sum(W[i]*((x[i]-c[i])**2)/(sig*sig) for i in range(6)); ds[k]=math.sqrt(d)
   exps={k:math.exp(-ds[k]/T) for k in ds}; tot=sum(exps.values())
   ss={k:exps[k]/tot for k in exps}
+  if self.sweet() and self.L<0.80:
+   ss['P5']=ss.get('P5',0)*2.5
+   _t=sum(ss.values()); ss={k:v/_t for k,v in ss.items()}
   return ds,ss
  def s1(self,x,ss):
   A,B,C,D,E,F=x
@@ -444,7 +462,9 @@ class BladeV60:
   vals={'P1':3.0*(1+0.85*A)*(1+1.10*D)*(1+0.55*F),'P2':2.8*(1+0.65*A)*(1+0.85*B)*(1+0.70*D)*(1+0.50*F),'P3':2.0*(1-0.50*abs(B))*(1-0.70*abs(D)),'P4':2.5*(1+0.80*D)*(1+0.55*E),'P5':2.3*(1-0.60*A)*(1+0.95*E)*sw,'P6':2.85}
   if self.L<0.75 and self._g('season','')=='summer':
    for k in vals: vals[k]-=0.3
+  for k in vals: vals[k]=max(1.0,min(4.5,vals[k]))
   s1f=sum(ss[k]*vals[k] for k in vals)
+  s1f=max(1.0,min(4.5,s1f))
   lo=sum(ss[k]*vals[k]*S1CFG[k][0] for k in vals); hi=sum(ss[k]*vals[k]*S1CFG[k][1] for k in vals)
   return s1f,lo,hi,vals
  def injury_net(self):
@@ -468,7 +488,7 @@ class BladeV60:
  def confidence(self,votes,x):
   od=self._g('odds',{}) or {}; oh=float(od.get('home',2.0)); dr=float(od.get('draw',3.4)); oa=float(od.get('away',3.5))
   inv=1/oh+1/dr+1/oa; implied=(1/oh)/inv
-  n=int(self._g('cascade',0)); casc=[0,0,0,0,0.05,0.08,0.10][min(n,6)]
+  n=int(self._g('cascade',0)); casc=[0,0,0,0,0,0.05,0.08,0.10][min(n,7)]
   h2h=self.signals()['H2H']
   hb=0.05 if h2h>0.65 else (-0.05 if h2h<0.35 else 0.0)
   if h2h<0.35 and self._g('h2h_loss',0)>=0.5: hb-=0.05; casc-=0.05
@@ -530,7 +550,7 @@ const ENGINE_PY2 = `
   rest=[r for r in grid if r!=p1]
   p2=rest[0] if rest else grid[0]
   p3s=next((r for r in grid if r[0]==r[1]),[1,1,0.1])
-  trap=[0,1,0.15] if self.sweet() else next((r for r in grid if r[0]<r[1]),[0,1,0.1])
+  trap=[0,2,0.15] if (self.sweet() and self.L<0.80) else ([0,1,0.15] if self.sweet() else next((r for r in grid if r[0]<r[1]),[0,1,0.1]))
   scores=[p1[0:2],p2[0:2],p3s[0:2],trap[0:2],extreme[0:2]]
   return scores,drift,extreme
  def counter(self,x,ss):
@@ -557,7 +577,7 @@ const ENGINE_PY2 = `
   implied,raw,fin=self.confidence(votes,x); yes,no,bv=self.btts(ss)
   sc,dr,ext=self.s3(s1f,votes,ss); I=self.i_score(); T=self.temp()
   maxs=max(ss.values()); atyp=' ⚠️不典型' if maxs<0.30 else ''
-  self.last={'dir':dr,'s1':s1f,'btts':bv,'score':sc[0],'fin':fin}
+  self.last={'dir':dr,'s1':s1f,'btts':bv,'score':sc[0],'fin':fin,'scores':sc}
   L=[]
   L.append('🔪 锋刃 v6.1 正式推演')
   L.append('对阵 | '+str(self._g('league',''))+'第'+str(self._g('round','?'))+'轮 | 北京时间'+str(self._g('time','?'))+' | '+str(self._g('venue','')))
@@ -607,10 +627,11 @@ const ENGINE_PY2 = `
   ed=1 if last['dir']==actual['dir'] else 0
   es=abs(last['s1']-float(actual['s1']))/max(float(actual['s1']),0.1)
   eb=1 if last['btts'].split(' ')[0]==actual['btts'] else 0
-  sc=last['score']; asc=actual['score']
-  if sc[0]==asc[0] and sc[1]==asc[1]: esco=1
-  elif abs(sc[0]-asc[0])<=1 and abs(sc[1]-asc[1])<=1: esco=0.5
-  else: esco=0
+  asc=actual['score']
+  scs=last.get('scores') or [last['score']]
+  esco=0.0
+  for _i,_s in enumerate(scs):
+   if list(_s)==list(asc): esco=[1.0,0.5,0.33][_i] if _i<3 else 0.0; break
   E=0.35*ed+0.30*es+0.20*eb+0.15*esco
   log={'E':round(E,3)}
   global T_BASE
@@ -626,7 +647,7 @@ const ENGINE_PY2 = `
    for i in range(6): W[i]=W[i]*7.0/tot
    if E>0.40 and self.i_score()<0.60: T_BASE=min(0.35,T_BASE*1.05)
    if E<0.15 and self.i_score()>0.75: T_BASE=max(0.18,T_BASE*0.97)
-   if self.samples>=10:
+   if int(self._g('league_count',0))>=10:
     if self._g('league_ratio',0.9)<0.85: self.L=max(0.50,self.L*0.93)
     if self._g('league_ratio',0.9)>1.10: self.L=min(0.98,self.L*1.04)
    log['T_base']=round(T_BASE,4); log['L']=round(self.L,3)
@@ -713,6 +734,7 @@ async function runFootball(){
  data.calibration=window.FOOT_STATE.calibration;
  if(lg.L)data.L=lg.L;
  data.league_ratio=lg.ratio;
+ data.league_count=(lg.count||0);
  const fmea=scanFMEA(data);
  if(fmea.penalty)data.conf_penalty=0.7;
  const out=$('footOut');out.innerHTML='<div style="color:#8fa3bf">⏳ 加载引擎中(首次约50MB)…</div>';
@@ -731,6 +753,8 @@ async function runFootball(){
   py.runPython('__b=BladeV60(__md); __res=__b.run()');
   const res0=String(py.globals.get('__res'));
   const lg2=py.globals.get('__lg').toJs();
+  py.runPython('__rv=__b.signals();__vec=[__rv["A"],__rv["B"],__rv["C"],__rv["D"],__rv["E"],__rv["F"]]');
+  const vec=py.globals.get('__vec').toJs();
   let res=res0;
   if(fmea.penalty)res='⚠️【FMEA高危】命中'+fmea.hit.length+'个失败指纹，方向置信度已×0.7\n\n'+res;
   res+='\n\n👻 影轨v4.8.1: 方向'+lg2.dir+' | S1='+lg2.s1.toFixed(2)+' | 置信度'+(lg2.conf*100).toFixed(0)+'%';
@@ -740,7 +764,7 @@ async function runFootball(){
   window.FOOT_STATE.shadow.legacy.push({league:data.league,dir:lg2.dir,s1:lg2.s1,conf:lg2.conf});
   window.FOOT_STATE.shadow.main=window.FOOT_STATE.shadow.main.slice(-20);
   window.FOOT_STATE.shadow.legacy=window.FOOT_STATE.shadow.legacy.slice(-20);
-  window.FOOT_STATE.results.push({md:data,pred:{dir:pv.dir,s1:pv.s1,btts:pv.btts,score:pv.score,fin:pv.fin}});
+  window.FOOT_STATE.results.push({md:data,pred:{dir:pv.dir,s1:pv.s1,btts:pv.btts,score:pv.score,fin:pv.fin},vec:vec,legacy:{dir:lg2.dir,s1:lg2.s1,conf:lg2.conf}});
   if(window.FOOT_STATE.results.length>100)window.FOOT_STATE.results=window.FOOT_STATE.results.slice(-100);
   saveFS();
   out.innerHTML='';
@@ -823,17 +847,49 @@ function renderTable(csv,wrap){
  b.onclick=()=>downloadFile('表格_'+Date.now()+'.csv',csv,'text/csv;charset=utf-8');
  wrap.appendChild(b);
 }
-function renderMermaid(code,wrap){
+let _mermaidP=null;
+function loadMermaid(){
+ if(_mermaidP)return _mermaidP;
+ _mermaidP=new Promise((res,rej)=>{
+  if(window.mermaid){res();return}
+  const urls=[
+   'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js',
+   'https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js',
+   'https://cdn.bootcdn.net/ajax/libs/mermaid/10.9.1/mermaid.min.js',
+   'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js'
+  ];
+  let i=0;
+  (function next(){
+   if(i>=urls.length){rej(new Error('Mermaid库加载失败'));return}
+   const s=document.createElement('script');
+   s.src=urls[i++];
+   s.onload=()=>window.mermaid?res():next();
+   s.onerror=next;
+   document.head.appendChild(s);
+  })();
+ });
+ return _mermaidP;
+}
+async function renderMermaid(code,wrap){
  const body=code.trim();
- const b64=btoa(unescape(encodeURIComponent(body)));
- const img=document.createElement('img');
- img.src='https://mermaid.ink/img/base64:'+b64;
- img.style.cssText='max-width:100%;background:#fff;border-radius:8px';
- img.onerror=()=>{img.outerHTML='<div style="color:#ff9090;font-size:13px">流程图渲染失败，可保存.mmd后用mermaid.live查看</div>'};
- wrap.appendChild(img);
+ if(!body){wrap.innerHTML='<div style="color:#8fa3bf;font-size:12px">（空流程图）</div>';return}
+ wrap.innerHTML='<div style="color:#8fa3bf;font-size:12px">⏳ 渲染中…</div>';
+ try{
+  await loadMermaid();
+  mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'loose',fontFamily:'inherit'});
+  const uid='mmd_'+Date.now()+'_'+Math.floor(Math.random()*99999);
+  const {svg}=await mermaid.render(uid,body);
+  wrap.innerHTML='';
+  const box=document.createElement('div');
+  box.style.cssText='background:#fff;border-radius:10px;padding:8px;overflow-x:auto;text-align:center';
+  box.innerHTML=svg;
+  wrap.appendChild(box);
+ }catch(e){
+  wrap.innerHTML='<div style="color:#ff9090;font-size:13px">流程图渲染失败：'+escapeHtml(e.message||String(e))+'<br><span style="color:#8fa3bf">已保留.mmd导出，可到 mermaid.live 打开查看</span></div>';
+ }
  const bar=document.createElement('div');bar.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:6px';
  const b1=document.createElement('button');b1.textContent='💾.mmd';b1.onclick=()=>downloadFile('流程图_'+Date.now()+'.mmd',body);
- const b2=document.createElement('button');b2.textContent='🖼️PNG';b2.onclick=()=>window.open('https://mermaid.ink/img/base64:'+b64,'_blank');
+ const b2=document.createElement('button');b2.textContent='🖼️PNG';b2.onclick=()=>{const svg=wrap.querySelector('svg');if(!svg){alert('请先成功渲染再导出PNG');return}const xml=new XMLSerializer().serializeToString(svg);const blob=new Blob([xml],{type:'image/svg+xml;charset=utf-8'});const img=new Image();img.onload=()=>{const c=document.createElement('canvas');const r=2;c.width=img.width*r;c.height=img.height*r;const cx=c.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height);cx.drawImage(img,0,0,c.width,c.height);saveDataUrl('流程图_'+Date.now()+'.png',c.toDataURL('image/png'))};img.src=URL.createObjectURL(blob)};
  const b3=document.createElement('button');b3.textContent='📐draw.io';b3.onclick=()=>openDrawio(body);
  const b4=document.createElement('button');b4.textContent='✏️编辑';b4.onclick=()=>window.open('https://mermaid.live/edit?raw='+encodeURIComponent(body),'_blank');
  [b1,b2,b3,b4].forEach(b=>bar.appendChild(b));
@@ -939,6 +995,7 @@ async function runCalibrate(){
  if(!m){out.textContent='❌ 比分格式应为 2-1';return}
  const h=+m[1],a=+m[2],actDir=$('actDir').value,actBtts=$('actBtts').value;
  const md=JSON.parse($('mdInput').value||'{}');
+ md.league_count=(window.FOOT_STATE.leagues[md.league||'英超']||{count:0}).count;
  out.textContent='⏳ 校准中…';
  try{
   const py=await getPyodide();
@@ -948,7 +1005,7 @@ async function runCalibrate(){
   if(window.FOOT_STATE.proto){py.globals.set('__pr',window.FOOT_STATE.proto);py.runPython('PROTO={k:(__pr[k][0],__pr[k][1]) for k in __pr}')}
   if(window.FOOT_STATE.w){py.globals.set('__w',window.FOOT_STATE.w);py.runPython('W=list(__w)')}
   py.runPython('__b=BladeV60(__md)');
-  py.runPython('__xv=__b.signals();__x=[__xv["A"],__xv["B"],__xv["C"],__xv["D"],__xv["E"],__xv["F"]];__ds,__ss=__b.dists(__x);__s1,_,_,_=__b.s1(__x,__ss);__v=__b.direction(__x,__ss);__sc,__dr,__ex=__b.s3(__s1,__v,__ss);__imp,__raw,__fin=__b.confidence(__v,__x);__bt=__b.btts(__ss);__b.last={"dir":__dr,"s1":__s1,"btts":__bt[2],"score":__sc[0],"fin":__fin}');
+  py.runPython('__xv=__b.signals();__x=[__xv["A"],__xv["B"],__xv["C"],__xv["D"],__xv["E"],__xv["F"]];__ds,__ss=__b.dists(__x);__s1,_,_,_=__b.s1(__x,__ss);__v=__b.direction(__x,__ss);__sc,__dr,__ex=__b.s3(__s1,__v,__ss);__imp,__raw,__fin=__b.confidence(__v,__x);__bt=__b.btts(__ss);__b.last={"dir":__dr,"s1":__s1,"btts":__bt[2],"score":__sc[0],"fin":__fin,"scores":__sc}');
   py.globals.set('__act',{dir:actDir,s1:h+a,btts:actBtts,score:[h,a]});
   py.runPython('__log=__b.calibrate(__act)');
   py.runPython('__pd=__b.last["dir"]');
@@ -1028,7 +1085,10 @@ async function bulkCal(){
   var mm=parseBulkLine(lines[i]);
   if(!mm)continue;
   var r=rs[rs.length-lines.length+i];
-  items.push({md:r.md,pred:r.pred,act:{h:mm.h,a:mm.a,dir:mm.dir,btts:mm.btts}});
+  r.actual={dir:mm.dir,h:mm.h,a:mm.a,btts:mm.btts};
+  var it={md:r.md,pred:r.pred,act:{h:mm.h,a:mm.a,dir:mm.dir,btts:mm.btts}};
+  it.md.league_count=(window.FOOT_STATE.leagues[r.md.league||'英超']||{count:0}).count+1;
+  items.push(it);
  }
  if(!items.length){out.textContent='❌ 行格式应为: 2-1 主 Yes';return}
  try{
@@ -1055,6 +1115,7 @@ __logs,__bst=__bulk_cal(__items)`);
   window.FOOT_STATE.calibration=st.cal;
   window.FOOT_STATE.proto=st.proto;
   window.FOOT_STATE.w=st.w;
+  items.forEach(function(it){const Lx=window.FOOT_STATE.leagues[it.md.league||'英超']||{count:0,L:null,hits:0,confSum:0,ratio:0.9};Lx.count++;window.FOOT_STATE.leagues[it.md.league||'英超']=Lx});
   saveFS();
   out.textContent=logs.join(String.fromCharCode(10))+String.fromCharCode(10)+'📊 批量完成: +'+items.length+'场 | 总样本'+window.FOOT_STATE.samples+' | T_base='+st.T_base.toFixed(4);
  }catch(e){out.textContent='❌ '+escapeHtml(e.message||String(e))}
@@ -1094,6 +1155,8 @@ function showJudge(){
 }
 async function dailyEvolve(){
  const out=$('evolOut');
+ const today=new Date().toLocaleDateString();
+ if(window.FOOT_STATE.lastEvolve===today){out.textContent='📅 今日已升级，无需重复操作';return}
  out.textContent='🔄 每日自动升级中…';
  showJudge();
  const rs=window.FOOT_STATE.results||[];
@@ -1155,10 +1218,7 @@ $('modelSel').value=MODEL;
 $('modelSel').onchange=e=>{MODEL=e.target.value;localStorage.setItem('wt_model',MODEL)};
 $('execBtn').onclick=()=>{AUTO_EXEC=!AUTO_EXEC;$('execBtn').textContent=AUTO_EXEC?'⚡自动':'⚡手动';$('execBtn').classList.toggle('on',AUTO_EXEC)};
 $('profBtn').onclick=()=>{const v=prompt('编辑用户档案(记忆偏好):',PROFILE);if(v!==null){PROFILE=v;localStorage.setItem('wt_profile',PROFILE)}};
-$('setBtn').onclick=()=>{
- const k=prompt('DeepSeek API Key:',API_KEY);if(k!==null&&k.trim()){API_KEY=k.trim();localStorage.setItem('wt_api',API_KEY)}
- const tk=prompt('Tavily Key(留空则搜索不可用):',TAVILY_KEY);if(tk!==null){TAVILY_KEY=tk.trim();localStorage.setItem('wt_tavily',TAVILY_KEY)}
-};
+$('setBtn').onclick=function(){if(window.openSettings)window.openSettings();else alert('设置模块未加载(请检查SEG9)')};
 $('sendBtn').onclick=send;
 $('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
 $('tplBtn').onclick=toggleTplPanel;
@@ -1168,6 +1228,67 @@ addMsg('ai','👋 锋刃v6.1工作台：说"推演XXvsXX"→可视化实时搜�
 if(window.FOOT_STATE.lastEvolve!==new Date().toLocaleDateString()){
  setTimeout(function(){try{dailyEvolve()}catch(e){}},1500);
 }
+<!--SEG9  API接入设置弹窗(新增)-->
+(function(){
+ if(document.getElementById('setModal'))return;
+ var st=document.createElement('style');
+ st.textContent='#setModal{position:fixed;inset:0;z-index:99998;background:rgba(2,3,10,.72);display:none;align-items:center;justify-content:center}#setModal.on{display:flex}#setCard{width:min(440px,92vw);background:rgba(10,15,38,.97);border:1px solid #00f0ff;border-radius:16px;padding:18px;box-shadow:0 0 30px rgba(0,240,255,.35);color:#e8f6ff;max-height:88vh;overflow-y:auto}#setCard h2{margin:0 0 12px;font-size:17px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,.5)}#setCard .row{margin:10px 0}#setCard label{display:block;font-size:12px;color:#8fa3bf;margin-bottom:4px}#setCard input,#setCard select{width:100%;background:#0c122c;color:#e8f6ff;border:1px solid rgba(0,240,255,.3);border-radius:9px;padding:8px;font-size:13px;box-sizing:border-box;outline:none}#setCard input:focus{border-color:#00f0ff;box-shadow:0 0 8px rgba(0,240,255,.3)}#setCard .btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}#setCard .tip{font-size:11px;color:#6f83a5;margin-top:10px;line-height:1.6}#setCard .st{font-size:12px;margin-top:10px;white-space:pre-wrap;min-height:16px;color:#39ff14}#setCard a{color:#00f0ff;text-decoration:none}';
+ document.head.appendChild(st);
+ var m=document.createElement('div');m.id='setModal';
+ m.innerHTML='<div id="setCard"><h2>⚙️ API 接入设置</h2>'+
+ '<div class="row"><label>🔑 DeepSeek API Key <a href="https://platform.deepseek.com/api_keys" target="_blank">（去获取）</a></label><input id="setApi" type="password" placeholder="sk-…" autocomplete="off"></div>'+
+ '<div class="row"><label>🔍 Tavily 搜索 Key（不填则实时搜索不可用）<a href="https://app.tavily.com" target="_blank">（去获取）</a></label><input id="setTavily" type="password" placeholder="tvly-…" autocomplete="off"></div>'+
+ '<div class="row"><label>🤖 默认模型</label><select id="setModel"><option value="deepseek-chat">V4-Flash（快）</option><option value="deepseek-reasoner">V4-Pro（深）</option></select></div>'+
+ '<div class="st" id="setStatus"></div>'+
+ '<div class="btns"><button class="pri" id="setSave">💾 保存</button><button id="setTest">🔌 测试连接</button><button id="setShow">👁 显示Key</button><button id="setClose">✖ 关闭</button></div>'+
+ '<div class="tip">Key 只保存在本机 localStorage，不上传任何服务器。点击「测试连接」会发一条最小请求验证 Key 是否有效。保存后建议刷新页面生效。</div></div>';
+ document.body.appendChild(m);
+ var mk=function(id){return document.getElementById(id)};
+ function openSettings(){
+  mk('setApi').value=API_KEY||'';
+  mk('setTavily').value=TAVILY_KEY||'';
+  mk('setModel').value=MODEL;
+  mk('setStatus').textContent='';
+  m.classList.add('on');
+ }
+ function closeSettings(){m.classList.remove('on')}
+ mk('setClose').onclick=closeSettings;
+ m.onclick=function(e){if(e.target===m)closeSettings()};
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&m.classList.contains('on'))closeSettings()});
+ mk('setSave').onclick=function(){
+  var k=mk('setApi').value.trim(),t=mk('setTavily').value.trim();
+  API_KEY=k;TAVILY_KEY=t;MODEL=mk('setModel').value;
+  localStorage.setItem('wt_api',API_KEY);
+  localStorage.setItem('wt_tavily',TAVILY_KEY);
+  localStorage.setItem('wt_model',MODEL);
+  $('modelSel').value=MODEL;
+  mk('setStatus').textContent='✅ 已保存到本地（localStorage）';
+  var sb=document.getElementById('statusBar');
+  if(sb)sb.textContent='[OK] 引擎'+(window.__py?'就绪':'待命')+' · '+(TAVILY_KEY?'[OK] 搜索在线':'[!] 搜索未配置Key')+' · [OK] 记忆在线 · [OK] 模板库11个';
+ };
+ mk('setTest').onclick=async function(){
+  var k=mk('setApi').value.trim();
+  var stEl=mk('setStatus');
+  if(!k){stEl.textContent='❌ 请先填写 DeepSeek Key';return}
+  stEl.textContent='⏳ 测试中…';
+  try{
+   var r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:'ping'}],max_tokens:1})});
+   var j=null;try{j=await r.json()}catch(e){}
+   if(r.ok)stEl.textContent='✅ 连接成功，Key 有效';
+   else stEl.textContent='❌ HTTP '+r.status+'：'+((j&&j.error&&j.error.message)||'Key无效或额度不足');
+  }catch(e){stEl.textContent='❌ 网络错误：'+escapeHtml(e.message||String(e))}
+ };
+ mk('setShow').onclick=function(){
+  var a=mk('setApi'),t=mk('setTavily');
+  a.type=a.type==='password'?'text':'password';
+  t.type=t.type==='password'?'text':'password';
+  this.textContent=a.type==='password'?'👁 显示Key':'🙈 隐藏Key';
+ };
+ window.openSettings=openSettings;
+ window.closeSettings=closeSettings;
+ var sbBtn=document.getElementById('setBtn');
+ if(sbBtn)sbBtn.onclick=openSettings;
+})();
 </script>
 <script>
 /* ========== 主页生动化升级包（已内置） ========== */
